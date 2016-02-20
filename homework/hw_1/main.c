@@ -29,11 +29,12 @@ int main(int argc, char** argv) {
     }
 
     int x1, y1, x2, y2;
-    while(scanf("%d %d %d %d", &x1, &y1, &x2, &y2)) {
+    while(scanf("%d", &x1)) {
         if (x1 == 0) {
             break;
         }
 
+        scanf("%d %d %d", &y1, &x2, &y2);
         x1--, y1--, x2--, y2--;
 
         for (i = x1; i <= x2; i++) {
