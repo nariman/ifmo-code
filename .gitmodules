@@ -1,3 +1,9 @@
 [submodule "intro/paradigms-2016"]
 	path = intro/paradigms-2016
 	url = https://github.com/kgeorgiy/paradigms-2016
+[submodule "paradigms-2016"]
+	path = paradigms-2016
+	url = https://github.com/kgeorgiy/paradigms-2016
+[submodule "intro/java-intro-2015"]
+	path = intro/java-intro-2015
+	url = https://github.com/kgeorgiy/java-intro-2015
