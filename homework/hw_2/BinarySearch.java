@@ -20,7 +20,7 @@ public class BinarySearch {
      *                              or `l`, if element not found
      */
     private static int iterative(long[] list, long pivot, int fromIndex, int toIndex) {
-        int m = 0;
+        int m;
 
         while (toIndex - fromIndex > 1) {
             m = fromIndex + (toIndex - fromIndex) / 2;
@@ -39,6 +39,7 @@ public class BinarySearch {
             return fromIndex;
         }
     }
+
     /**
      * Finds the minimum index `i` of element, that list[i] <= `x` in `list`, sorted in ascending
      * Search area must contains at least one element
