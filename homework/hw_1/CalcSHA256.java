@@ -1,10 +1,13 @@
+/**
+ * Nariman Safiulin (woofilee)
+ * File: CalcSHA256.java
+ * Created on: Feb 12, 2016
+ */
+
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.security.MessageDigest;
 
-/**
- * Created by woofi on 12.02.2016.
- */
 public class CalcSHA256 {
     public static void main(String[] args) throws Exception {
         for (String testFile : Files.readAllLines(Paths.get(args[0]))) {
