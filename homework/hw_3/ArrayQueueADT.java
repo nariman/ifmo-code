@@ -20,6 +20,15 @@ public class ArrayQueueADT {
         this.elements = new Object[START_CAPACITY];
     }
 
+    /**
+     * Checks, that current capacity of array is enough to append a new element.
+     * Otherwise, doubles a capacity of array, and copies existing data in order from zero-cell of array.
+     *
+     * Pre: newCapacity > 0
+     * Post: Doubles a capacity, if required capacity greater than current capacity, otherwise, returns
+     *
+     * @param   newCapacity     int     Required size of array
+     */
     private static void ensureCapacity(ArrayQueueADT queue, int newCapacity) {
         if (newCapacity < queue.capacity) {
             return;
@@ -29,14 +38,9 @@ public class ArrayQueueADT {
         queue.capacity <<= 1;
         Object[] grow = new Object[queue.capacity];
 
-        for (int i = queue.head, j = 0; i < to; i++, j++) {
-            grow[j] = queue.elements[i];
-        }
-
+        System.arraycopy(queue.elements, queue.head, grow, 0, to - queue.head);
         if (queue.tail < queue.head) {
-            for (int i = 0, j = to - queue.head; i < queue.tail; i++, j++) {
-                grow[j] = queue.elements[i];
-            }
+            System.arraycopy(queue.elements, 0, grow, to - queue.head, queue.tail);
         }
 
         queue.elements = grow;
@@ -45,10 +49,16 @@ public class ArrayQueueADT {
     }
 
     /**
-     * Adds element to the ArrayQueue
+     * Adds element to the queue
+     *
+     * Inv: tail == head, if queue is empty
+     * Inv: tail > head, if size < (capacity - head)
+     * Inv: tail < head, if size >= (capacity - head)
+     *
+     * Pre: el != null
+     * Post: Adds element to the tail of queue (size -> size + 1), elements[tail] != null
      */
     public static void enqueue(ArrayQueueADT queue, Object el) {
-        assert el != null;
         ensureCapacity(queue, queue.size + 1);
         queue.elements[queue.tail] = el;
         queue.tail = (queue.tail + 1) % queue.capacity;
@@ -56,7 +66,11 @@ public class ArrayQueueADT {
     }
 
     /**
-     * Returns the first element in the ArrayQueue
+     * Returns first element at the queue
+     *
+     * Pre: Queue must contains at least one object (size > 0)
+     * Post: Returns first element at the queue
+     * Post: elements[head] != null
      */
     public static Object element(ArrayQueueADT queue) {
         assert queue.size > 0;
@@ -64,7 +78,15 @@ public class ArrayQueueADT {
     }
 
     /**
-     * Remove and returns first element in the ArrayQueue
+     * Remove and returns first element in the queue
+     *
+     * Inv: tail == head, if queue is empty
+     * Inv: tail > head, if size < (capacity - head)
+     * Inv: tail < head, if size >= (capacity - head)
+     *
+     * Pre: Queue must contains at least one object (size > 1)
+     * Post: Returns object on the head of queue and removes it from the queue (size -> size - 1)
+     * Post: elements[head] != null
      */
     public static Object dequeue(ArrayQueueADT queue) {
         assert queue.size > 0;
@@ -75,21 +97,30 @@ public class ArrayQueueADT {
     }
 
     /**
-     * Returns current size of ArrayQueue
+     * Returns current size of the queue
+     *
+     * Pre: -
+     * Post: Returns current size of the queue
      */
     public static int size(ArrayQueueADT queue) {
         return queue.size;
     }
 
     /**
-     * Checks if the ArrayQueue is empty
+     * Checks if the queue is empty
+     *
+     * Pre: -
+     * Post: Returns a boolean, which indicated, that queue is empty, or not
      */
     public static boolean isEmpty(ArrayQueueADT queue) {
         return queue.size == 0;
     }
 
     /**
-     * Removes all elements from the ArrayQueue
+     * Removes all elements from the queue
+     *
+     * Pre: -
+     * Post: Resets the queue to the initial state
      */
     public static void clear(ArrayQueueADT queue) {
         queue.capacity = START_CAPACITY;
@@ -97,5 +128,21 @@ public class ArrayQueueADT {
         queue.head = 0;
         queue.tail = 0;
         queue.elements = new Object[START_CAPACITY];
+    }
+
+    /**
+     * Pre: -
+     * Post: Returns a array with elements of queue, from first element to last
+     */
+    public static Object[] toArray(ArrayQueueADT queue) {
+        int to = (queue.tail < queue.head) ? queue.capacity : queue.tail;
+        Object[] arr = new Object[queue.size];
+
+        System.arraycopy(queue.elements, queue.head, arr, 0, to - queue.head);
+        if (queue.tail < queue.head) {
+            System.arraycopy(queue.elements, 0, arr, to - queue.head, queue.tail);
+        }
+
+        return arr;
     }
 }
