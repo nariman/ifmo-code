@@ -1,10 +1,12 @@
+/**
+* Nariman Safiulin (woofilee)
+* File: BinarySearchMissing.java
+* Created on: Feb 21, 2016
+*/
+
 import java.util.Random;
 
-/**
- * Created by woofi on 21.02.2016.
- */
 public class BinarySearchMissing {
-
     /**
      * Finds the minimum index `i` of element, that list[i] == `x` in `list`, in `list`, sorted in ascending,
      * or, returns the index ( -`i` - 1 ), where element can be inserted, if element not found

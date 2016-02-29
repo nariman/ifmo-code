@@ -1,10 +1,12 @@
+/**
+* Nariman Safiulin (woofilee)
+* File: BinarySearch.java
+* Created on: Feb 21, 2016
+*/
+
 import java.util.Random;
 
-/**
- * Created by woofi on 21.02.2016.
- */
 public class BinarySearch {
-
     /**
      * Finds the minimum index `i` of element, that list[i] <= `x` in `list`, sorted in ascending
      * Search area must contains at least one element
