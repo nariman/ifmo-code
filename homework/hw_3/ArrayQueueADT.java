@@ -84,7 +84,7 @@ public class ArrayQueueADT {
      * Inv: tail > head, if size < (capacity - head)
      * Inv: tail < head, if size >= (capacity - head)
      *
-     * Pre: Queue must contains at least one object (size > 1)
+     * Pre: Queue must contains at least one object (size > 0)
      * Post: Returns object on the head of queue and removes it from the queue (size -> size - 1)
      * Post: elements[head] != null
      */

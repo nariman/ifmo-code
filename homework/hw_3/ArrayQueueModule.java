@@ -54,7 +54,7 @@ public class ArrayQueueModule {
      */
     public static void enqueue(Object el) {
         ensureCapacity(size + 1);
-        elements[tail] = null;
+        elements[tail] = el;
         tail = (tail + 1) % capacity;
         size++;
     }
