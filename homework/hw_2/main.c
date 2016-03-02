@@ -14,19 +14,18 @@ FILE *io;
 
 // HELPERS
 
-#define max(a, b) (a > b) ? a : b;
-#define file_open_for_rewrite() fflush(io); fclose(io); fopen(filename, "w");
-#define file_open_for_append() fflush(io); fclose(io); fopen(filename, "a");
-#define valid_symbol(c) (!isspace(c) && c != EOF)
+int max(int a, int b) {
+    return (a > b) ? a : b;
+}
 
 char *read(FILE *stream) {
     int curr_size = 0, max_size = 0;
     char *token = malloc(0), c = (char) fgetc(stream);
-    while (!valid_symbol(c)) {
+    while (isspace(c) || c == EOF) {
         c = (char) fgetc(stream);
     }
 
-    while (valid_symbol(c)) {
+    while (!isspace(c) && c != EOF) {
         if (curr_size > max_size - 2) {
             max_size = curr_size + (1 << 8);
             token = realloc(token, max_size * sizeof(char));
@@ -37,6 +36,18 @@ char *read(FILE *stream) {
 
     token[curr_size] = '\0';
     return token;
+}
+
+void file_open_for_rewrite() {
+    fflush(io);
+    fclose(io);
+    fopen(filename, "w");
+}
+
+void file_open_for_append() {
+    fflush(io);
+    fclose(io);
+    fopen(filename, "a");
 }
 
 // CONTACT LIST AND METHODS FOR WORKING WITH LIST
@@ -275,7 +286,7 @@ void init() {
     list.cumulative = 1;
     list.size = 0;
     list.contacts = malloc(0);
-    int id, max = 1;
+    int id, m = 0;
 
     io = fopen(filename, "a+");
     rewind(io);
@@ -285,11 +296,11 @@ void init() {
         char *number = read(io);
         if (cl_add(name, number, 0)) {
             list.contacts[list.size - 1].id = id;
-            max = max(max, id);
+            m = max(m, id);
         }
     }
 
-    list.cumulative = ++max;
+    list.cumulative = ++m;
     rewrite_list();
     fprintf(io, "\n");
 }
