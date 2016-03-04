@@ -24,8 +24,12 @@ public class ArrayQueue {
      * Checks, that current capacity of array is enough to append a new element.
      * Otherwise, doubles a capacity of array, and copies existing data in order from zero-cell of array.
      *
+     * Inv: If doubles, head < tail
+     *
      * Pre: newCapacity > 0
      * Post: Doubles a capacity, if required capacity greater than current capacity, otherwise, returns
+     *
+     * @param   newCapacity     int     Required size of array
      */
     private void ensureCapacity(int newCapacity) {
         if (newCapacity < this.capacity) {
@@ -47,28 +51,29 @@ public class ArrayQueue {
     }
 
     /**
-     * Adds element to the queue
+     * Adds element to the end of the queue
      *
      * Inv: tail == head, if queue is empty
      * Inv: tail > head, if size < (capacity - head)
      * Inv: tail < head, if size >= (capacity - head)
      *
-     * Pre: el != null
-     * Post: Adds element to the tail of queue (size -> size + 1), elements[tail] != null
+     * Pre: el != null, el is immutable
+     * Post: Adds element to the end of the queue (size' = size + 1)
      */
     public void enqueue(Object el) {
+        assert el != null;
         ensureCapacity(this.size + 1);
+        this.size++;
+
         this.elements[this.tail] = el;
         this.tail = (this.tail + 1) % this.capacity;
-        this.size++;
     }
 
     /**
-     * Returns first element at the queue
+     * Returns the first element in the queue
      *
-     * Pre: Queue must contains at least one object (size > 0)
-     * Post: Returns first element at the queue
-     * Post: elements[head] != null
+     * Pre: Queue must contains at least one element (size > 0)
+     * Post: Returns the first element in the queue
      */
     public Object element() {
         assert this.size > 0;
@@ -76,19 +81,19 @@ public class ArrayQueue {
     }
 
     /**
-     * Remove and returns first element in the queue
+     * Remove and returns the first element in the queue
      *
      * Inv: tail == head, if queue is empty
      * Inv: tail > head, if size < (capacity - head)
      * Inv: tail < head, if size >= (capacity - head)
      *
-     * Pre: Queue must contains at least one object (size > 0)
-     * Post: Returns object on the head of queue and removes it from the queue (size -> size - 1)
-     * Post: elements[head] != null
+     * Pre: Queue must contains at least one element (size > 0)
+     * Post: Returns the first element at the queue and removes it from the queue (size' = size - 1)
      */
     public Object dequeue() {
         assert this.size > 0;
         this.size--;
+
         int from = this.head;
         this.head = (this.head + 1) % this.capacity;
         return this.elements[from];
@@ -108,7 +113,7 @@ public class ArrayQueue {
      * Checks if the queue is empty
      *
      * Pre: -
-     * Post: Returns a value, which indicated, that queue is empty, or not
+     * Post: Returns a boolean, which indicated, that queue is empty, or not
      */
     public boolean isEmpty() {
         return this.size == 0;
@@ -126,6 +131,58 @@ public class ArrayQueue {
         this.head = 0;
         this.tail = 0;
         this.elements = new Object[START_CAPACITY];
+    }
+
+    /**
+     * Adds element to the start of the queue
+     *
+     * Inv: tail == head, if queue is empty
+     * Inv: tail > head, if size < (capacity - head)
+     * Inv: tail < head, if size >= (capacity - head)
+     *
+     * Pre: el != null, el is immutable
+     * Post: Adds element to the start of the queue (size' = size + 1)
+     */
+    public void push(Object el) {
+        assert el != null;
+        ensureCapacity(this.size +  1);
+        this.size++;
+
+        if (this.head - 1 >= 0) {
+            this.elements[--this.head] = el;
+        } else {
+            this.elements[this.capacity - 1] = el;
+            this.head = this.capacity - 1;
+        }
+    }
+
+    /**
+     * Returns the last element in the queue
+     *
+     * Pre: Queue must contains at least one element (size > 0)
+     * Post: Returns the last element in the queue
+     */
+    public Object peek() {
+        assert this.size > 0;
+        return this.elements[(this.tail - 1 >= 0) ? this.tail - 1 : this.capacity - 1];
+    }
+
+    /**
+     * Removes the last element in the queue
+     *
+     * Inv: tail == head, if queue is empty
+     * Inv: tail > head, if size < (capacity - head)
+     * Inv: tail < head, if size >= (capacity - head)
+     *
+     * Pre: Queue must contains at least one element (size > 0)
+     * Post: Returns the last element at the queue and removes it from the queue (size' = size - 1)
+     */
+    public Object remove() {
+        assert this.size > 0;
+        this.size--;
+
+        this.tail = (this.tail - 1 >= 0) ? this.tail - 1 : this.capacity - 1;
+        return this.elements[this.tail];
     }
 
     /**

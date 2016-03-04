@@ -43,48 +43,49 @@ public class ArrayQueueModule {
     }
 
     /**
-     * Adds element to the queue
+     * Adds element to the end of the queue
      *
      * Inv: tail == head, if queue is empty
      * Inv: tail > head, if size < (capacity - head)
      * Inv: tail < head, if size >= (capacity - head)
      *
-     * Pre: el != null
-     * Post: Adds element to the tail of queue (size' = size + 1), elements[tail] != null
+     * Pre: el != null, el is immutable
+     * Post: Adds element to the end of the queue (size' = size + 1)
      */
     public static void enqueue(Object el) {
+        assert el != null;
         ensureCapacity(size + 1);
+        size++;
+
         elements[tail] = el;
         tail = (tail + 1) % capacity;
-        size++;
     }
 
     /**
-     * Returns first element at the queue
+     * Returns the first element in the queue
      *
-     * Pre: Queue must contains at least one object (size > 0)
-     * Post: Returns first element at the queue
-     * Post: elements[head] != null
+     * Pre: Queue must contains at least one element (size > 0)
+     * Post: Returns the first element in the queue
      */
     public static Object element() {
-        assert size > 0;
+//        assert size > 0;
         return elements[head];
     }
 
     /**
-     * Remove and returns first element in the queue
+     * Remove and returns the first element in the queue
      *
      * Inv: tail == head, if queue is empty
      * Inv: tail > head, if size < (capacity - head)
      * Inv: tail < head, if size >= (capacity - head)
      *
-     * Pre: Queue must contains at least one object (size > 0)
-     * Post: Returns object on the head of queue and removes it from the queue (size -> size - 1)
-     * Post: elements[head] != null
+     * Pre: Queue must contains at least one element (size > 0)
+     * Post: Returns the first element at the queue and removes it from the queue (size' = size - 1)
      */
     public static Object dequeue() {
         assert size > 0;
         size--;
+
         int from = head;
         head = (head + 1) % capacity;
         return elements[from];
@@ -122,6 +123,58 @@ public class ArrayQueueModule {
         head = 0;
         tail = 0;
         elements = new Object[START_CAPACITY];
+    }
+
+    /**
+     * Adds element to the start of the queue
+     *
+     * Inv: tail == head, if queue is empty
+     * Inv: tail > head, if size < (capacity - head)
+     * Inv: tail < head, if size >= (capacity - head)
+     *
+     * Pre: el != null, el is immutable
+     * Post: Adds element to the start of the queue (size' = size + 1)
+     */
+    public static void push(Object el) {
+        assert el != null;
+        ensureCapacity(size +  1);
+        size++;
+
+        if (head - 1 >= 0) {
+            elements[--head] = el;
+        } else {
+            elements[capacity - 1] = el;
+            head = capacity - 1;
+        }
+    }
+
+    /**
+     * Returns the last element in the queue
+     *
+     * Pre: Queue must contains at least one element (size > 0)
+     * Post: Returns the last element in the queue
+     */
+    public static Object peek() {
+        assert size > 0;
+        return elements[(tail - 1 >= 0) ? tail - 1 : capacity - 1];
+    }
+
+    /**
+     * Removes the last element in the queue
+     *
+     * Inv: tail == head, if queue is empty
+     * Inv: tail > head, if size < (capacity - head)
+     * Inv: tail < head, if size >= (capacity - head)
+     *
+     * Pre: Queue must contains at least one element (size > 0)
+     * Post: Returns the last element at the queue and removes it from the queue (size' = size - 1)
+     */
+    public static Object remove() {
+        assert size > 0;
+        size--;
+
+        tail = (tail - 1 >= 0) ? tail - 1 : capacity - 1;
+        return elements[tail];
     }
 
     /**
