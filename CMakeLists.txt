@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.3)
 project(ifmo_cpp)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c99")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
 
 set(HOMEWORK_DIR homework)
 
