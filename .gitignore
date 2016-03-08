@@ -11,8 +11,30 @@
 ## JetBrains
 #################
 
-.idea
-*.iml
+# Covers JetBrains IDEs: IntelliJ, RubyMine, PhpStorm, AppCode, PyCharm, CLion, Android Studio and Webstorm
+# Reference: https://intellij-support.jetbrains.com/hc/en-us/articles/206544839
+
+# User-specific stuff:
+.idea/workspace.xml
+.idea/tasks.xml
+.idea/dictionaries
+.idea/vcs.xml
+.idea/jsLibraryMappings.xml
+
+# Sensitive or high-churn files:
+.idea/dataSources.ids
+.idea/dataSources.xml
+.idea/dataSources.local.xml
+.idea/sqlDataSources.xml
+.idea/dynamic.xml
+.idea/uiDesigner.xml
+
+# Gradle:
+.idea/gradle.xml
+.idea/libraries
+
+# Mongo Explorer plugin:
+.idea/mongoSettings.xml
 
 ## File-based project format:
 *.iws
@@ -66,7 +88,23 @@ sftp-config.json
 Session.vim
 # temporary
 .netrwhist
+#*~
+
+
+#################
+## Linux
+#################
+
 *~
+
+# temporary files which can be created if a process still has a handle open of a deleted file
+.fuse_hidden*
+
+# KDE directory preferences
+.directory
+
+# Linux trash folder which might appear on any partition or disk
+.Trash-*
 
 
 #################
@@ -94,10 +132,18 @@ $RECYCLE.BIN/
 
 
 #################
-## Java
+## Kotlin
 #################
 
 *.class
+META-INF
+
+
+#################
+## Java
+#################
+
+#*.class
 
 # Mobile Tools for Java (J2ME)
 .mtj.tmp/
@@ -132,8 +178,8 @@ dist/
 downloads/
 eggs/
 .eggs/
-lib/
-lib64/
+#lib/
+#lib64/
 parts/
 sdist/
 var/
@@ -187,72 +233,7 @@ target/
 
 
 #################
-## C++
+## Exceptions
 #################
 
-# Compiled Object files
-*.slo
-*.lo
-*.o
-*.obj
-
-# Precompiled Headers
-*.gch
-*.pch
-
-# Compiled Dynamic libraries
-#*.so
-*.dylib
-*.dll
-
-# Fortran module files
-*.mod
-
-# Compiled Static libraries
-*.lai
-*.la
-*.a
-*.lib
-
-# Executables
-*.exe
-#*.out
-*.app
-
-
-#################
-## C
-#################
-
-# Object files
-#*.o
-*.ko
-#*.obj
-*.elf
-
-# Precompiled Headers
-#*.gch
-#*.pch
-
-# Libraries
-#*.lib
-#*.a
-#*.la
-#*.lo
-
-# Shared objects (inc. Windows DLLs)
-#*.dll
-#*.so
-*.so.*
-#*.dylib
-
-# Executables
-#*.exe
-#*.out
-#*.app
-*.i*86
-*.x86_64
-*.hex
-
-# Debug files
-*.dSYM/
+!lib/*.jar
