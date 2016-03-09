@@ -41,7 +41,7 @@ private fun solve(`in`: Scanner, out: PrintWriter) {
 
     (1..n).forEach { i -> ma[i] = `in`.nextInt() }
     (1..n).forEach { i -> c[i] = `in`.nextInt() }
-    (1..n).forEach { k -> (1..m).map { s ->
+    (1..n).forEach { k -> (1..m).forEach { s ->
         dp[k][s] = if (s < ma[k]) dp[k - 1][s] else Math.max(dp[k - 1][s], dp[k - 1][s - ma[k]] + c[k])
     } }
 
