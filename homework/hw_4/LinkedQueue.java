@@ -42,39 +42,40 @@ public class LinkedQueue extends AbstractQueue {
         }
     }
 
+    public Object element() {
+        return this.head.value;
+    }
+
+    public Object peek() {
+        return this.head.value;
+    }
+
     @Override
-    protected Object dequeueRealization() {
-        Object needle = this.head.value;
+    protected void dequeueRealization() {
         if (this.head.prev != null) {
             this.head.prev.next = null;
         }
-
         this.head = this.head.prev;
-        return needle;
     }
 
     @Override
-    protected Object removeRealization() {
-        Object needle = this.tail.value;
+    protected void removeRealization() {
         if (this.tail.next != null) {
             this.tail.next.prev = null;
         }
-
         this.tail = this.tail.next;
-        return needle;
     }
 
-    @Override
-    public Object[] toArray() {
-        Object[] elements = new Object[this.size()];
-        Node next = this.head;
-        int i = 0;
-
-        while (next != null) {
-            elements[i] = next.value;
-            next = next.prev;
-        }
-
-        return elements;
-    }
+//    @Override
+//    public Object[] toArray() {
+//        Node next = this.head;
+//        int i = 0;
+//
+//        while (next != null) {
+//            elements[i] = next.value;
+//            next = next.prev;
+//        }
+//
+//        return elements;
+//    }
 }

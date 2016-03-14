@@ -60,19 +60,24 @@ public class ArrayQueue extends AbstractQueue {
     }
 
     @Override
-    protected Object dequeueRealization() {
-        Object needle = this.elements[this.head];
-        this.elements[this.head] = null;
-        this.head = (this.head + 1) % this.capacity;
-        return needle;
+    public Object element() {
+        return this.elements[this.head];
     }
 
     @Override
-    protected Object removeRealization() {
-        this.tail = (this.tail - 1 >= 0) ? this.tail - 1 : this.capacity - 1;
-        Object needle = this.elements[this.tail];
-        this.elements[this.tail] = null;
-        return needle;
+    public Object peek() {
+        return this.elements[(this.tail - 1 >= 0) ? this.tail - 1 : this.capacity - 1];
+    }
+
+    @Override
+    protected void dequeueRealization() {
+        this.elements[this.head] = null;
+        this.head = (this.head + 1) % this.capacity;
+    }
+
+    @Override
+    protected void removeRealization() {
+        this.elements[(this.tail - 1 >= 0) ? this.tail - 1 : this.capacity - 1] = null;
     }
 
     @Override
@@ -82,16 +87,15 @@ public class ArrayQueue extends AbstractQueue {
         this.elements = new Object[START_CAPACITY];
     }
 
-    @Override
-    public Object[] toArray() {
-        int last = (this.tail < this.head) ? this.capacity : this.tail;
-        Object[] elements = new Object[this.size];
-
-        System.arraycopy(this.elements, this.head, elements, 0, last - this.head);
-        if (this.tail < this.head) {
-            System.arraycopy(this.elements, 0, elements, last - this.head, this.tail);
-        }
-
-        return elements;
-    }
+//    @Override
+//    public Object[] toArray() {
+//        int last = (this.tail < this.head) ? this.capacity : this.tail;
+//
+//        System.arraycopy(this.elements, this.head, elements, 0, last - this.head);
+//        if (this.tail < this.head) {
+//            System.arraycopy(this.elements, 0, elements, last - this.head, this.tail);
+//        }
+//
+//        return elements;
+//    }
 }

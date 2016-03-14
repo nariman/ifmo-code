@@ -1,10 +1,10 @@
 /**
  * Nariman Safiulin (woofilee)
- * File: ExpressionObject.java
+ * File: Expression.java
  * Created on: Mar 14, 2016
  */
 
-public interface ExpressionObject {
+public interface Expression {
 
     /**
      * Pre: -

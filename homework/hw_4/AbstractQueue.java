@@ -14,9 +14,9 @@ public abstract class AbstractQueue implements Queue {
 
     protected abstract void enqueueRealization(Object element);
 
-    protected abstract Object dequeueRealization();
+    protected abstract void dequeueRealization();
 
-    protected abstract Object removeRealization();
+    protected abstract void removeRealization();
 
     @Override
     public void push(Object element) {
@@ -33,7 +33,8 @@ public abstract class AbstractQueue implements Queue {
     @Override
     public Object dequeue() {
         assert this.size > 0;
-        Object needle = this.dequeueRealization();
+        Object needle = this.element();
+        this.dequeueRealization();
         this.size--;
         return needle;
     }
@@ -41,22 +42,9 @@ public abstract class AbstractQueue implements Queue {
     @Override
     public Object remove() {
         assert this.size > 0;
-        Object needle = this.removeRealization();
+        Object needle = this.peek();
+        this.removeRealization();
         this.size--;
-        return needle;
-    }
-
-    @Override
-    public Object element() {
-        Object needle = this.dequeue();
-        this.push(needle);
-        return needle;
-    }
-
-    @Override
-    public Object peek() {
-        Object needle = this.remove();
-        this.enqueue(needle);
         return needle;
     }
 
@@ -78,8 +66,20 @@ public abstract class AbstractQueue implements Queue {
     }
 
     @Override
+    public Object[] toArray() {
+        Object[] elements = new Object[this.size];
+
+        for (int i = 0; i < size; i++) {
+            elements[i] = dequeue();
+            enqueue(elements[i]);
+        }
+
+        return elements;
+    }
+
+    @Override
     public AbstractQueue filter(Predicate<Object> predicate) throws IllegalAccessException, InstantiationException {
-        AbstractQueue result = this.getClass().newInstance();
+        AbstractQueue elements = this.getClass().newInstance();
         int count = this.size;
 
         while (count-- > 0) {
@@ -87,24 +87,24 @@ public abstract class AbstractQueue implements Queue {
             this.enqueue(el);
 
             if (predicate.test(el)) {
-                result.enqueue(el);
+                elements.enqueue(el);
             }
         }
 
-        return result;
+        return elements;
     }
 
     @Override
     public AbstractQueue map(Function<Object, Object> function) throws IllegalAccessException, InstantiationException {
-        AbstractQueue result = this.getClass().newInstance();
+        AbstractQueue elements = this.getClass().newInstance();
         int count = this.size;
 
         while (count-- > 0) {
             Object el = this.dequeue();
             this.enqueue(el);
-            result.enqueue(function.apply(el));
+            elements.enqueue(function.apply(el));
         }
 
-        return result;
+        return elements;
     }
 }
