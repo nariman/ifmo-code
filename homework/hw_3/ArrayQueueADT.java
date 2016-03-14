@@ -23,13 +23,10 @@ public class ArrayQueueADT {
     /**
      * Checks, that current capacity of array is enough to append a new element.
      * Otherwise, doubles a capacity of array, and copies existing data in order from zero-cell of array.
-     *
-     * Inv: If doubles, head < tail
-     *
+     * <p>
      * Pre: newCapacity > 0
      * Post: Doubles a capacity, if required capacity greater than current capacity, otherwise, returns
-     *
-     * @param   newCapacity     int     Required size of array
+     * Inv: If doubles, head < tail
      */
     private static void ensureCapacity(ArrayQueueADT queue, int newCapacity) {
         if (newCapacity < queue.capacity) {
@@ -51,101 +48,13 @@ public class ArrayQueueADT {
     }
 
     /**
-     * Adds element to the end of the queue
-     *
-     * Inv: tail == head, if queue is empty
-     * Inv: tail > head, if size < (capacity - head)
-     * Inv: tail < head, if size >= (capacity - head)
-     *
-     * Pre: el != null, el is immutable
-     * Post: Adds element to the end of the queue (size' = size + 1)
-     */
-    public static void enqueue(ArrayQueueADT queue, Object el) {
-        assert el != null;
-        ensureCapacity(queue, queue.size + 1);
-        queue.size++;
-
-        queue.elements[queue.tail] = el;
-        queue.tail = (queue.tail + 1) % queue.capacity;
-    }
-
-    /**
-     * Returns the first element in the queue
-     *
-     * Pre: Queue must contains at least one element (size > 0)
-     * Post: Returns the first element in the queue
-     */
-    public static Object element(ArrayQueueADT queue) {
-        assert queue.size > 0;
-        return queue.elements[queue.head];
-    }
-
-    /**
-     * Remove and returns the first element in the queue
-     *
-     * Inv: tail == head, if queue is empty
-     * Inv: tail > head, if size < (capacity - head)
-     * Inv: tail < head, if size >= (capacity - head)
-     *
-     * Pre: Queue must contains at least one element (size > 0)
-     * Post: Returns the first element at the queue and removes it from the queue (size' = size - 1)
-     */
-    public static Object dequeue(ArrayQueueADT queue) {
-        assert queue.size > 0;
-        queue.size--;
-
-        int from = queue.head;
-        queue.head = (queue.head + 1) % queue.capacity;
-        return queue.elements[from];
-    }
-
-    /**
-     * Returns current size of the queue
-     *
      * Pre: -
-     * Post: Returns current size of the queue
-     */
-    public static int size(ArrayQueueADT queue) {
-        return queue.size;
-    }
-
-    /**
-     * Checks if the queue is empty
-     *
-     * Pre: -
-     * Post: Returns a boolean, which indicated, that queue is empty, or not
-     */
-    public static boolean isEmpty(ArrayQueueADT queue) {
-        return queue.size == 0;
-    }
-
-    /**
-     * Removes all elements from the queue
-     *
-     * Pre: -
-     * Post: Resets the queue to the initial state
-     */
-    public static void clear(ArrayQueueADT queue) {
-        queue.capacity = START_CAPACITY;
-        queue.size = 0;
-        queue.head = 0;
-        queue.tail = 0;
-        queue.elements = new Object[START_CAPACITY];
-    }
-
-    /**
-     * Adds element to the start of the queue
-     *
-     * Inv: tail == head, if queue is empty
-     * Inv: tail > head, if size < (capacity - head)
-     * Inv: tail < head, if size >= (capacity - head)
-     *
-     * Pre: el != null, el is immutable
-     * Post: Adds element to the start of the queue (size' = size + 1)
+     * Post: Adds element to the head of the queue
+     * Inv: size' = size + 1
      */
     public static void push(ArrayQueueADT queue, Object el) {
         assert el != null;
-        ensureCapacity(queue, queue.size +  1);
+        ensureCapacity(queue, queue.size + 1);
         queue.size++;
 
         if (queue.head - 1 >= 0) {
@@ -157,25 +66,36 @@ public class ArrayQueueADT {
     }
 
     /**
-     * Returns the last element in the queue
-     *
-     * Pre: Queue must contains at least one element (size > 0)
-     * Post: Returns the last element in the queue
+     * Pre: -
+     * Post: Adds element to the tail of the queue
+     * Inv: size' = size + 1
      */
-    public static Object peek(ArrayQueueADT queue) {
-        assert queue.size > 0;
-        return queue.elements[(queue.tail - 1 >= 0) ? queue.tail - 1 : queue.capacity - 1];
+    public static void enqueue(ArrayQueueADT queue, Object el) {
+        ensureCapacity(queue, queue.size + 1);
+        queue.size++;
+
+        queue.elements[queue.tail] = el;
+        queue.tail = (queue.tail + 1) % queue.capacity;
     }
 
     /**
-     * Removes the last element in the queue
-     *
-     * Inv: tail == head, if queue is empty
-     * Inv: tail > head, if size < (capacity - head)
-     * Inv: tail < head, if size >= (capacity - head)
-     *
      * Pre: Queue must contains at least one element (size > 0)
-     * Post: Returns the last element at the queue and removes it from the queue (size' = size - 1)
+     * Post: Returns the head element at the queue and removes it from the queue
+     * Inv: size' = size - 1
+     */
+    public static Object dequeue(ArrayQueueADT queue) {
+        assert queue.size > 0;
+        queue.size--;
+
+        int from = queue.head;
+        queue.head = (queue.head + 1) % queue.capacity;
+        return queue.elements[from];
+    }
+
+    /**
+     * Pre: Queue must contains at least one element (size > 0)
+     * Post: Returns the tail element at the queue and removes it from the queue
+     * Inv: size' = size - 1
      */
     public static Object remove(ArrayQueueADT queue) {
         assert queue.size > 0;
@@ -186,8 +106,55 @@ public class ArrayQueueADT {
     }
 
     /**
+     * Pre: Queue must contains at least one element (size > 0)
+     * Post: Returns the head element in the queue, without changes in queue
+     */
+    public static Object element(ArrayQueueADT queue) {
+        assert queue.size > 0;
+        return queue.elements[queue.head];
+    }
+
+    /**
+     * Pre: Queue must contains at least one element (size > 0)
+     * Post: Returns the tail element in the queue, without changes in queue
+     */
+    public static Object peek(ArrayQueueADT queue) {
+        assert queue.size > 0;
+        return queue.elements[(queue.tail - 1 >= 0) ? queue.tail - 1 : queue.capacity - 1];
+    }
+
+    /**
      * Pre: -
-     * Post: Returns a array with elements of queue, from first element to last
+     * Post: Returns current size of the queue, without changes in queue
+     */
+    public static int size(ArrayQueueADT queue) {
+        return queue.size;
+    }
+
+    /**
+     * Pre: -
+     * Post: Returns True, if queue is empty, otherwise False, without changes in queue
+     */
+    public static boolean isEmpty(ArrayQueueADT queue) {
+        return queue.size == 0;
+    }
+
+    /**
+     * Pre: -
+     * Post: Removes all elements from the queue
+     * Inv: size' = 0
+     */
+    public static void clear(ArrayQueueADT queue) {
+        queue.capacity = START_CAPACITY;
+        queue.size = 0;
+        queue.head = 0;
+        queue.tail = 0;
+        queue.elements = new Object[START_CAPACITY];
+    }
+
+    /**
+     * Pre: -
+     * Post: Returns a array with elements of the queue, from the first element to the last, without changes in queue
      */
     public static Object[] toArray(ArrayQueueADT queue) {
         int to = (queue.tail < queue.head) ? queue.capacity : queue.tail;
