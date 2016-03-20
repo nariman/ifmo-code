@@ -1,6 +1,6 @@
 /**
  * Nariman Safiulin (woofilee)
- * File: K.kt
+ * File: L.kt
  * Created on: Mar 20, 2016
  */
 
@@ -10,7 +10,7 @@ import java.io.FileReader
 import java.io.PrintWriter
 import java.util.StringTokenizer
 
-private val PROBLEM_NAME = "boolean"
+private val PROBLEM_NAME = "salesman"
 
 private class Scanner(file: File) {
     val br = BufferedReader(FileReader(file))
@@ -33,34 +33,34 @@ private class Scanner(file: File) {
 
 private fun solve(`in`: Scanner, out: PrintWriter) {
     val n = `in`.nextInt()
-    val v = `in`.nextInt()
-    val d = Array(n + 1) { IntArray(2) }
-    val t = Array(n + 1) { Array(2) { 0 } }
+    val m = `in`.nextInt()
+    val w = Array(n) { Array(n) { Int.MAX_VALUE } }
+    val d = Array(1 shl n) { Array(n) { Int.MAX_VALUE } }
 
-    for (i in 1..((n - 1) / 2)) {
-        t[i][0] = `in`.nextInt()
-        t[i][1] = `in`.nextInt()
+    for (i in 0..m - 1) {
+        var a = `in`.nextInt() - 1
+        var b = `in`.nextInt() - 1
+        w[a][b] = `in`.nextInt()
+        w[b][a] = w[a][b]
     }
+    (0..n - 1).forEach { i -> d[1 shl i][i] = 0 }
 
-    for (i in ((n + 1) / 2)..n) {
-        t[i][0] = `in`.nextInt()
-        d[i][t[i][0]] = 0
-        d[i][t[i][0] xor 1] = 1 shl 16
-    }
-
-    for (i in n downTo 1 step 2) {
-        val c = t[i / 2][0]
-
-        if (t[i / 2][1] == 1 && d[i][c] + d[i - 1][c] > Math.min(d[i][c], d[i - 1][c]) + 1) {
-            d[i / 2][c] = Math.min(d[i][c], d[i - 1][c]) + 1
-        } else {
-            d[i / 2][c] = d[i][c] + d[i - 1][c]
+    for (i in 0..(1 shl n) - 1) {
+        for (j in 0..n - 1) {
+            if (d[i][j] == Int.MAX_VALUE) continue
+            for (k in 0..n - 1) {
+                val off = 1 shl k
+                if (i and off == 0 && w[j][k] != Int.MAX_VALUE) {
+                    d[i or off][k] = Math.min(d[i or off][k], d[i][j] + w[j][k])
+                }
+            }
         }
-
-        d[i / 2][(c + 1) % 2] = Math.min(d[i][(c + 1) % 2], d[i - 1][(c + 1) % 2])
     }
 
-    out.println(if (d[1][v] >= 1 shl 16) "IMPOSSIBLE" else d[1][v])
+    var min = Int.MAX_VALUE
+    val off = d.size - 1
+    (0..n - 1).forEach { i -> min = Math.min(min, d[off][i]) }
+    out.println(if (min == Int.MAX_VALUE) -1 else min)
 }
 
 fun main(args: Array<String>) {
