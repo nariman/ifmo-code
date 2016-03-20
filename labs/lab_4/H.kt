@@ -1,6 +1,6 @@
 /**
  * Nariman Safiulin (woofilee)
- * File: G.kt
+ * File: H.kt
  * Created on: Mar 20, 2016
  */
 
@@ -10,7 +10,7 @@ import java.io.FileReader
 import java.io.PrintWriter
 import java.util.StringTokenizer
 
-private val PROBLEM_NAME = "concert"
+private val PROBLEM_NAME = "tapcoder"
 
 private class Scanner(file: File) {
     val br = BufferedReader(FileReader(file))
@@ -34,30 +34,40 @@ private class Scanner(file: File) {
 private fun solve(`in`: Scanner, out: PrintWriter) {
     val n = `in`.nextInt()
     val d = Array(n) { `in`.nextInt() }
-    val b = `in`.nextInt()
-    val m = `in`.nextInt()
+    val x = `in`.nextInt()
+    val brownMinBorder = 2200
     var max = -1
-    val ex = Array(n) { Array<Boolean>(m * (n + 2)) { false } }
+    val dp = Array(n + 1) { Array(2200) { -1 } }
+    dp[0][x] = 0
 
-    fun r(curr: Int, vol: Int) {
-        if (curr == n) {
-            max = Math.max(max, vol)
-            return
-        }
+    for (i in 1..n) {
+        for (j in 0..(2200 - 1)) {
+            if (dp[i - 1][j] == -1) continue
 
-        val increased = vol + d[curr]
-        val decrease = vol - d[curr]
+            var increase = j + d[i - 1]
+            val decrease = Math.max(0, j - d[i - 1])
+            dp[i][decrease] = Math.max(dp[i][decrease], dp[i - 1][j])
 
-        if (increased <= m && !ex[curr][increased]) {
-            ex[curr][increased] = true
-            r(curr + 1, vol + d[curr])
-        }
-        if (decrease >= 0 && !ex[curr][decrease]) {
-            ex[curr][decrease] = false
-            r(curr + 1, vol - d[curr])
+            if (increase >= brownMinBorder) {
+                if (i == n) continue
+                increase = Math.max(0, increase - d[i])
+                if (Math.max(0, increase) < brownMinBorder) {
+                    dp[i + 1][increase] = Math.max(dp[i + 1][increase], dp[i - 1][j] + 2)
+                }
+            } else {
+                dp[i][increase] = Math.max(dp[i][increase], dp[i - 1][j]);
+            }
         }
     }
-    r(0, b)
+
+    (0..(2200 - 1)).forEach { i -> max = Math.max(max, dp[n][i]) }
+    for (i in 0..(2200 - 1)) {
+        if(dp[n - 1][i] == -1) continue
+        val t = i + d[n - 1];
+        if(t >= 2200)
+            max = Math.max(max, dp[n - 1][i] + 1);
+    }
+
     out.println(max)
 }
 
