@@ -1,6 +1,6 @@
 /**
  * Nariman Safiulin (woofilee)
- * File: I.kt
+ * File: K.kt
  * Created on: Mar 20, 2016
  */
 
@@ -10,7 +10,7 @@ import java.io.FileReader
 import java.io.PrintWriter
 import java.util.StringTokenizer
 
-private val PROBLEM_NAME = "monsters"
+private val PROBLEM_NAME = "boolean"
 
 private class Scanner(file: File) {
     val br = BufferedReader(FileReader(file))
@@ -32,27 +32,35 @@ private class Scanner(file: File) {
 }
 
 private fun solve(`in`: Scanner, out: PrintWriter) {
-    val n: Int = `in`.nextInt()
-    val d = Array(n) { `in`.nextLong() }
-    val c = Array(n) { `in`.nextLong() }
+    val n = `in`.nextInt()
+    val v = `in`.nextInt()
+    val d = Array(n + 1) { IntArray(2) }
+    val t = Array(n + 1) { Array(2) { 0 } }
 
-    val dp = Array(n + 1) { Array(2 * n + 2) { -1L } }
-    dp[0][0] = 0L
-    for (i in 0..(n - 1)) {
-        for (j in 0..(2 * i)) {
-            if (dp[i][j] == -1L) continue
-            if (dp[i][j] >= d[i]) dp[i + 1][j] = Math.max(dp[i + 1][j], dp[i][j])
-            if (c[i] == 1L) {
-                dp[i + 1][j + 1] = Math.max(dp[i + 1][j + 1], dp[i][j] + d[i])
-            } else {
-                dp[i + 1][j + 2] = Math.max(dp[i + 1][j + 2], dp[i][j] + d[i])
-            }
-        }
+    for (i in 1..((n - 1) / 2)) {
+        t[i][0] = `in`.nextInt()
+        t[i][1] = `in`.nextInt()
     }
 
-    var i = -1
-    while (dp[n][++i] <= 0);
-    out.println(i)
+    for (i in ((n + 1) / 2)..n) {
+        t[i][0] = `in`.nextInt()
+        d[i][t[i][0]] = 0
+        d[i][t[i][0] xor 1] = 1 shl 16
+    }
+
+    for (i in n downTo 1 step 2) {
+        val c = t[i / 2][0]
+
+        if (t[i / 2][1] == 1 && d[i][c] + d[i - 1][c] > Math.min(d[i][c], d[i - 1][c]) + 1) {
+            d[i / 2][c] = Math.min(d[i][c], d[i - 1][c]) + 1
+        } else {
+            d[i / 2][c] = d[i][c] + d[i - 1][c]
+        }
+
+        d[i / 2][(c + 1) % 2] = Math.min(d[i][(c + 1) % 2], d[i - 1][(c + 1) % 2])
+    }
+
+    out.println(if (d[1][v] >= 20000) "IMPOSSIBLE" else d[1][v])
 }
 
 fun main(args: Array<String>) {
