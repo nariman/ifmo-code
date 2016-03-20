@@ -47,7 +47,7 @@ public class LinkedQueue extends AbstractQueue {
     }
 
     public Object peek() {
-        return this.head.value;
+        return this.tail.value;
     }
 
     @Override

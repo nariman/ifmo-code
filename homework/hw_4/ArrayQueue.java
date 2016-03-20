@@ -77,7 +77,8 @@ public class ArrayQueue extends AbstractQueue {
 
     @Override
     protected void removeRealization() {
-        this.elements[(this.tail - 1 >= 0) ? this.tail - 1 : this.capacity - 1] = null;
+        this.tail = (this.tail - 1 >= 0) ? this.tail - 1 : this.capacity - 1;
+        this.elements[this.tail] = null;
     }
 
     @Override
