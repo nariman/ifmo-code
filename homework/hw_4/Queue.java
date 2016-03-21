@@ -87,6 +87,7 @@ public interface Queue {
      * Pre:  -
      * Post: Returns a new queue with elements of the current queue, that satisfying the predicate, without changes in
      *       current queue
+     *       R: queue'[], where for each el in queue'[]: predicate(array) returns true
      */
     AbstractQueue filter(Predicate<Object> predicate) throws IllegalAccessException, InstantiationException;
 
@@ -94,6 +95,7 @@ public interface Queue {
      * Pre:  -
      * Post: Returns a new queue with results of the function on the elements of the current queue, without changes in
      *       current queue
+     *       R: queue'[], that for i = 1..size: queue'[i] = function(queue[i])
      */
     AbstractQueue map(Function<Object, Object> function) throws IllegalAccessException, InstantiationException;
 }

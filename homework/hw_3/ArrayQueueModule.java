@@ -40,9 +40,11 @@ public class ArrayQueueModule {
     }
 
     /**
-     * Pre: -
+     * Pre:  -
      * Post: Adds element to the head of the queue
-     * Inv: size' = size + 1
+     *       size' = size + 1 (Inv)
+     *       queue'[2..size'] = queue[1..size]
+     *       queue'[1] = element
      */
     public static void push(Object el) {
         ensureCapacity(size + 1);
@@ -57,12 +59,13 @@ public class ArrayQueueModule {
     }
 
     /**
-     * Pre: -
+     * Pre:  -
      * Post: Adds element to the tail of the queue
-     * Inv: size' = size + 1
+     *       size' = size + 1 (Inv)
+     *       queue'[1..size] = queue[1..size]
+     *       queue'[size'] = element
      */
     public static void enqueue(Object el) {
-        assert el != null;
         ensureCapacity(size + 1);
         size++;
 
@@ -71,9 +74,31 @@ public class ArrayQueueModule {
     }
 
     /**
-     * Pre: Queue must contains at least one element (size > 0)
+     * Pre:  Queue must contains at least one element (size > 0)
+     * Post: Returns the head element in the queue, without changes in queue
+     *       R = queue[1]
+     */
+    public static Object element() {
+        assert size > 0;
+        return elements[head];
+    }
+
+    /**
+     * Pre:  Queue must contains at least one element (size > 0)
+     * Post: Returns the tail element in the queue, without changes in queue
+     *       R = queue[size]
+     */
+    public static Object peek() {
+        assert size > 0;
+        return elements[(tail - 1 >= 0) ? tail - 1 : capacity - 1];
+    }
+
+    /**
+     * Pre:  Queue must contains at least one element (size > 0)
      * Post: Returns the head element at the queue and removes it from the queue
-     * Inv: size' = size - 1
+     *       size' = size - 1 (Inv)
+     *       queue' = queue[2..size]
+     *       R = queue[1]
      */
     public static Object dequeue() {
         assert size > 0;
@@ -85,9 +110,11 @@ public class ArrayQueueModule {
     }
 
     /**
-     * Pre: Queue must contains at least one element (size > 0)
+     * Pre:  Queue must contains at least one element (size > 0)
      * Post: Returns the tail element at the queue and removes it from the queue
-     * Inv: size' = size - 1
+     *       size' = size - 1 (Inv)
+     *       queue' = queue[1..size']
+     *       R = queue[size]
      */
     public static Object remove() {
         assert size > 0;
@@ -98,25 +125,7 @@ public class ArrayQueueModule {
     }
 
     /**
-     * Pre: Queue must contains at least one element (size > 0)
-     * Post: Returns the head element in the queue, without changes in queue
-     */
-    public static Object element() {
-        assert size > 0;
-        return elements[head];
-    }
-
-    /**
-     * Pre: Queue must contains at least one element (size > 0)
-     * Post: Returns the tail element in the queue, without changes in queue
-     */
-    public static Object peek() {
-        assert size > 0;
-        return elements[(tail - 1 >= 0) ? tail - 1 : capacity - 1];
-    }
-
-    /**
-     * Pre: -
+     * Pre:  -
      * Post: Returns current size of the queue, without changes in queue
      */
     public static int size() {
@@ -124,7 +133,7 @@ public class ArrayQueueModule {
     }
 
     /**
-     * Pre: -
+     * Pre:  -
      * Post: Returns True, if queue is empty, otherwise False, without changes in queue
      */
     public static boolean isEmpty() {
@@ -132,9 +141,9 @@ public class ArrayQueueModule {
     }
 
     /**
-     * Pre: -
+     * Pre:  -
      * Post: Removes all elements from the queue
-     * Inv: size' = 0
+     * Inv:  size' = 0
      */
     public static void clear() {
         capacity = START_CAPACITY;
@@ -145,7 +154,7 @@ public class ArrayQueueModule {
     }
 
     /**
-     * Pre: -
+     * Pre:  -
      * Post: Returns a array with elements of the queue, from the first element to the last, without changes in queue
      */
     public static Object[] toArray() {

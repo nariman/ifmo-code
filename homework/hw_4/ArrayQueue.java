@@ -5,7 +5,7 @@
  */
 
 public class ArrayQueue extends AbstractQueue {
-    private static final int START_CAPACITY = 1 << 10;
+    private static final int START_CAPACITY = 2;
 
     private int capacity, head, tail;
     private Object[] elements;

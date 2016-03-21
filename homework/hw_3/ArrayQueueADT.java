@@ -48,12 +48,13 @@ public class ArrayQueueADT {
     }
 
     /**
-     * Pre: -
+     * Pre:  -
      * Post: Adds element to the head of the queue
-     * Inv: size' = size + 1
+     *       size' = size + 1 (Inv)
+     *       queue'[2..size'] = queue[1..size]
+     *       queue'[1] = element
      */
     public static void push(ArrayQueueADT queue, Object el) {
-        assert el != null;
         ensureCapacity(queue, queue.size + 1);
         queue.size++;
 
@@ -66,9 +67,11 @@ public class ArrayQueueADT {
     }
 
     /**
-     * Pre: -
+     * Pre:  -
      * Post: Adds element to the tail of the queue
-     * Inv: size' = size + 1
+     *       size' = size + 1 (Inv)
+     *       queue'[1..size] = queue[1..size]
+     *       queue'[size'] = element
      */
     public static void enqueue(ArrayQueueADT queue, Object el) {
         ensureCapacity(queue, queue.size + 1);
@@ -79,9 +82,31 @@ public class ArrayQueueADT {
     }
 
     /**
-     * Pre: Queue must contains at least one element (size > 0)
+     * Pre:  Queue must contains at least one element (size > 0)
+     * Post: Returns the head element in the queue, without changes in queue
+     *       R = queue[1]
+     */
+    public static Object element(ArrayQueueADT queue) {
+        assert queue.size > 0;
+        return queue.elements[queue.head];
+    }
+
+    /**
+     * Pre:  Queue must contains at least one element (size > 0)
+     * Post: Returns the tail element in the queue, without changes in queue
+     *       R = queue[size]
+     */
+    public static Object peek(ArrayQueueADT queue) {
+        assert queue.size > 0;
+        return queue.elements[(queue.tail - 1 >= 0) ? queue.tail - 1 : queue.capacity - 1];
+    }
+
+    /**
+     * Pre:  Queue must contains at least one element (size > 0)
      * Post: Returns the head element at the queue and removes it from the queue
-     * Inv: size' = size - 1
+     *       size' = size - 1 (Inv)
+     *       queue' = queue[2..size]
+     *       R = queue[1]
      */
     public static Object dequeue(ArrayQueueADT queue) {
         assert queue.size > 0;
@@ -93,9 +118,11 @@ public class ArrayQueueADT {
     }
 
     /**
-     * Pre: Queue must contains at least one element (size > 0)
+     * Pre:  Queue must contains at least one element (size > 0)
      * Post: Returns the tail element at the queue and removes it from the queue
-     * Inv: size' = size - 1
+     *       size' = size - 1 (Inv)
+     *       queue' = queue[1..size']
+     *       R = queue[size]
      */
     public static Object remove(ArrayQueueADT queue) {
         assert queue.size > 0;
@@ -106,25 +133,7 @@ public class ArrayQueueADT {
     }
 
     /**
-     * Pre: Queue must contains at least one element (size > 0)
-     * Post: Returns the head element in the queue, without changes in queue
-     */
-    public static Object element(ArrayQueueADT queue) {
-        assert queue.size > 0;
-        return queue.elements[queue.head];
-    }
-
-    /**
-     * Pre: Queue must contains at least one element (size > 0)
-     * Post: Returns the tail element in the queue, without changes in queue
-     */
-    public static Object peek(ArrayQueueADT queue) {
-        assert queue.size > 0;
-        return queue.elements[(queue.tail - 1 >= 0) ? queue.tail - 1 : queue.capacity - 1];
-    }
-
-    /**
-     * Pre: -
+     * Pre:  -
      * Post: Returns current size of the queue, without changes in queue
      */
     public static int size(ArrayQueueADT queue) {
@@ -132,7 +141,7 @@ public class ArrayQueueADT {
     }
 
     /**
-     * Pre: -
+     * Pre:  -
      * Post: Returns True, if queue is empty, otherwise False, without changes in queue
      */
     public static boolean isEmpty(ArrayQueueADT queue) {
@@ -140,9 +149,9 @@ public class ArrayQueueADT {
     }
 
     /**
-     * Pre: -
+     * Pre:  -
      * Post: Removes all elements from the queue
-     * Inv: size' = 0
+     * Inv:  size' = 0
      */
     public static void clear(ArrayQueueADT queue) {
         queue.capacity = START_CAPACITY;
@@ -153,7 +162,7 @@ public class ArrayQueueADT {
     }
 
     /**
-     * Pre: -
+     * Pre:  -
      * Post: Returns a array with elements of the queue, from the first element to the last, without changes in queue
      */
     public static Object[] toArray(ArrayQueueADT queue) {
