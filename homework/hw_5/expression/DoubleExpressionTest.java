@@ -1,9 +1,13 @@
+package expression;
+
+import static expression.Util.*;
+
 /**
  * @author Georgiy Korneev (kgeorgiy@kgeorgiy.info)
  */
-public class ExpressionTest {
+public class DoubleExpressionTest {
     public static void main(final String[] args) {
-        Util.checkAssert(ExpressionTest.class);
+        checkAssert(DoubleExpressionTest.class);
         testExpression("10", new Const(10), x -> 10);
         testExpression("x", new Variable("x"), x -> x);
         testExpression("x+2", new Add(new Variable("x"), new Const(2)), x -> x + 2);
@@ -21,10 +25,10 @@ public class ExpressionTest {
         System.out.println("OK");
     }
 
-    private static void testExpression(final String description, final ExpressionObject actual, final ExpressionObject expected) {
+    private static void testExpression(final String description, final DoubleExpression actual, final DoubleExpression expected) {
         System.out.println("Testing " + description);
         for (int i = 0; i < 10; i++) {
-            Util.assertEquals(String.format("f(%d)", i), actual.evaluate(i), expected.evaluate(i));
+            assertEquals(String.format("f(%d)", i), actual.evaluate(i), expected.evaluate(i));
         }
     }
 }
