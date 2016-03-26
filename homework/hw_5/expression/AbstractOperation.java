@@ -10,10 +10,13 @@ public abstract class AbstractOperation implements Operation {
     private final ExpressionObject left;
     private final ExpressionObject right;
 
-    AbstractOperation(ExpressionObject left, ExpressionObject right) {
+    public AbstractOperation(ExpressionObject left, ExpressionObject right) {
         this.left = left;
         this.right = right;
     }
+
+    abstract protected int operate(int left, int right);
+    abstract protected double operate(double left, double right);
 
     @Override
     public int evaluate(int x) {

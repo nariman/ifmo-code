@@ -1,7 +1,7 @@
 /**
  * Nariman Safiulin (woofilee)
  * File: Variable.java
- * Created on: Март 27, 2016
+ * Created on: Mar 27, 2016
  */
 
 package expression;
@@ -9,7 +9,7 @@ package expression;
 public class Variable implements ExpressionObject {
     private final String name;
 
-    Variable(String name) {
+    public Variable(String name) {
         this.name = name;
     }
 

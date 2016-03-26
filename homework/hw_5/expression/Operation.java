@@ -7,6 +7,4 @@
 package expression;
 
 public interface Operation extends ExpressionObject {
-    int operate(int left, int right);
-    double operate(double left, double right);
 }

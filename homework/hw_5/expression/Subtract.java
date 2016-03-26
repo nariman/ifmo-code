@@ -8,7 +8,7 @@ package expression;
 
 public class Subtract extends AbstractOperation {
 
-    Subtract(ExpressionObject left, ExpressionObject right) {
+    public Subtract(ExpressionObject left, ExpressionObject right) {
         super(left, right);
     }
 

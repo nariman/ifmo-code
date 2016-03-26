@@ -8,7 +8,7 @@ package expression;
 
 public class Multiply extends AbstractOperation {
 
-    Multiply(ExpressionObject left, ExpressionObject right) {
+    public Multiply(ExpressionObject left, ExpressionObject right) {
         super(left, right);
     }
 

@@ -8,7 +8,7 @@ package expression;
 
 public class Divide extends AbstractOperation {
 
-    Divide(ExpressionObject left, ExpressionObject right) {
+    public Divide(ExpressionObject left, ExpressionObject right) {
         super(left, right);
     }
 

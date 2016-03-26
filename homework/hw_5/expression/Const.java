@@ -10,12 +10,12 @@ public class Const implements ExpressionObject {
     private final Number value;
     private final Class type;
 
-    Const(int value) {
+    public Const(int value) {
         this.value = value;
         type = int.class;
     }
 
-    Const(double value) {
+    public Const(double value) {
         this.value = value;
         type = double.class;
     }
