@@ -22,7 +22,6 @@ public class Main {
                         ),
                         new Const(1)
                 );
-
         try {
             System.out.print(exp.evaluate(Integer.parseInt(args[0])));
         } catch (NumberFormatException e) {

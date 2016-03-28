@@ -1,6 +1,6 @@
 /**
  * Nariman Safiulin (woofilee)
- * File: Operation.java
+ * File: CheckedOperation.java
  * Created on: Mar 27, 2016
  */
 

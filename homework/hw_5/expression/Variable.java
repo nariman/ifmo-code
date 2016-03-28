@@ -1,6 +1,6 @@
 /**
  * Nariman Safiulin (woofilee)
- * File: Variable.java
+ * File: CheckedVariable.java
  * Created on: Mar 27, 2016
  */
 

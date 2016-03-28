@@ -1,12 +1,12 @@
 /**
  * Nariman Safiulin (woofilee)
- * File: Add.java
+ * File: CheckedAdd.java
  * Created on: Mar 27, 2016
  */
 
 package expression;
 
-public class Add extends AbstractOperation {
+public class Add extends AbstractBinaryOperation {
 
     public Add(ExpressionObject first, ExpressionObject second) {
         super(first, second);

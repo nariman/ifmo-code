@@ -1,12 +1,12 @@
 /**
  * Nariman Safiulin (woofilee)
- * File: Divide.java
+ * File: CheckedDivide.java
  * Created on: Mar 27, 2016
  */
 
 package expression;
 
-public class Divide extends AbstractOperation {
+public class Divide extends AbstractBinaryOperation {
 
     public Divide(ExpressionObject left, ExpressionObject right) {
         super(left, right);

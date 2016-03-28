@@ -1,12 +1,12 @@
 /**
  * Nariman Safiulin (woofilee)
- * File: Subtract.java
+ * File: CheckedSubtract.java
  * Created on: Mar 27, 2016
  */
 
 package expression;
 
-public class Subtract extends AbstractOperation {
+public class Subtract extends AbstractBinaryOperation {
 
     public Subtract(ExpressionObject left, ExpressionObject right) {
         super(left, right);

@@ -1,16 +1,16 @@
 /**
  * Nariman Safiulin (woofilee)
- * File: AbstractOperation.java
+ * File: CheckedAbstractBinaryOperation.java
  * Created on: Mar 24, 2016
  */
 
 package expression;
 
-public abstract class AbstractOperation implements Operation {
+public abstract class AbstractBinaryOperation implements Operation {
     private final ExpressionObject left;
     private final ExpressionObject right;
 
-    public AbstractOperation(ExpressionObject left, ExpressionObject right) {
+    public AbstractBinaryOperation(ExpressionObject left, ExpressionObject right) {
         this.left = left;
         this.right = right;
     }

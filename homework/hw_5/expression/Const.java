@@ -1,6 +1,6 @@
 /**
  * Nariman Safiulin (woofilee)
- * File: Const.java
+ * File: CheckedConst.java
  * Created on: Mar 27, 2016
  */
 
@@ -22,30 +22,16 @@ public class Const implements ExpressionObject {
 
     @Override
     public int evaluate(int x) {
-        if (type == int.class) {
-            return (int) value;
-        } else {
-            return 0;
-        }
+        return type == int.class ? value.intValue() : 0;
     }
 
     @Override
     public double evaluate(double x) {
-        if (type == double.class) {
-            return (double) value;
-        } else if (type == int.class) {
-            return value.doubleValue();
-        } else {
-            return 0.0;
-        }
+        return type == double.class || type == int.class ? value.doubleValue() : 0.0;
     }
 
     @Override
     public int evaluate(int x, int y, int z) {
-        if (type == int.class) {
-            return (int) value;
-        } else {
-            return 0;
-        }
+        return evaluate(x);
     }
 }

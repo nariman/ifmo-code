@@ -1,12 +1,12 @@
 /**
  * Nariman Safiulin (woofilee)
- * File: Multiply.java
+ * File: CheckedMultiply.java
  * Created on: Mar 27, 2016
  */
 
 package expression;
 
-public class Multiply extends AbstractOperation {
+public class Multiply extends AbstractBinaryOperation {
 
     public Multiply(ExpressionObject left, ExpressionObject right) {
         super(left, right);
