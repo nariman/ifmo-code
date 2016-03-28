@@ -1,3 +1,5 @@
+import java.util.function.Predicate;
+
 /**
  * Nariman Safiulin (woofilee)
  * File: ArrayQueue.java
@@ -86,6 +88,10 @@ public class ArrayQueue extends AbstractQueue {
         this.capacity = START_CAPACITY;
         this.size = this.head = this.tail = 0;
         this.elements = new Object[START_CAPACITY];
+    }
+
+    public AbstractQueue getNewInstance() {
+        return new ArrayQueue();
     }
 
 //    @Override

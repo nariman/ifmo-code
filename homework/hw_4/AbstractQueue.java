@@ -77,9 +77,11 @@ public abstract class AbstractQueue implements Queue {
         return elements;
     }
 
+     protected abstract AbstractQueue getNewInstance();
+
     @Override
-    public AbstractQueue filter(Predicate<Object> predicate) throws IllegalAccessException, InstantiationException {
-        AbstractQueue elements = this.getClass().newInstance();
+     public AbstractQueue filter(Predicate<Object> predicate) {
+        AbstractQueue elements = getNewInstance();
         int count = this.size;
 
         while (count-- > 0) {
