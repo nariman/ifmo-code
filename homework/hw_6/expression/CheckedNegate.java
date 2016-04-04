@@ -12,15 +12,20 @@ public class CheckedNegate extends CheckedAbstractUnaryOperation {
         super(object);
     }
 
-    private void assertOverflow(int object) {
-        if (object == Integer.MIN_VALUE) {
-            throw new ArithmeticException("[ERROR] Overflow");
+    @Override
+    public String nameSelfOperation() {
+        return "CheckedNegate";
+    }
+
+    private void assertSafeOperation(int value) {
+        if (value == Integer.MIN_VALUE) {
+            throw new ArithmeticException("[ERROR] Overflow: cannot to safely negate value of " + value);
         }
     }
 
     @Override
-    protected int operate(int object) {
-        assertOverflow(object);
-        return -object;
+    protected int operate(int value) {
+        assertSafeOperation(value);
+        return -value;
     }
 }

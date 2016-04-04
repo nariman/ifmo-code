@@ -7,4 +7,5 @@
 package expression;
 
 public interface CheckedOperation extends TripleExpression {
+    String nameSelfOperation();
 }

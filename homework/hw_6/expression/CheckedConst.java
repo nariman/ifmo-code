@@ -14,6 +14,11 @@ public class CheckedConst implements TripleExpression {
     }
 
     @Override
+    public String nameSelf() {
+        return "new CheckedConst(" + value + ")";
+    }
+
+    @Override
     public int evaluate(int x, int y, int z) {
         return value;
     }

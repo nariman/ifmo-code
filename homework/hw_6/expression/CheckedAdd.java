@@ -12,7 +12,12 @@ public class CheckedAdd extends CheckedAbstractBinaryOperation {
         super(first, second);
     }
 
-    private void assertOverflow(int left, int right) {
+    @Override
+    public String nameSelfOperation() {
+        return "CheckedAdd";
+    }
+
+    private void assertSafeOperation(int left, int right) {
         if (right > 0 ? left > Integer.MAX_VALUE - right : left < Integer.MIN_VALUE - right) {
             throw new ArithmeticException("[ERROR] Overflow");
         }
@@ -20,7 +25,7 @@ public class CheckedAdd extends CheckedAbstractBinaryOperation {
 
     @Override
     public int operate(int left, int right) {
-        assertOverflow(left, right);
+        assertSafeOperation(left, right);
         return left + right;
     }
 }

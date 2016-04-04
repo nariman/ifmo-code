@@ -1,5 +1,7 @@
 package expression.exceptions;
 
+import expression.Either;
+import expression.TripleExpression;
 import expression.*;
 
 import java.util.ArrayList;

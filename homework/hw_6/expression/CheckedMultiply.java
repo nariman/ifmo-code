@@ -12,19 +12,24 @@ public class CheckedMultiply extends CheckedAbstractBinaryOperation {
         super(left, right);
     }
 
-    private void assertOverflow(int left, int right) {
-        if (right > 0 ? left > Integer.MAX_VALUE/right
-                || left < Integer.MIN_VALUE/right
-                : (right < -1 ? left > Integer.MIN_VALUE/right
-                || left < Integer.MAX_VALUE/right
+    @Override
+    public String nameSelfOperation() {
+        return "CheckedMultiply";
+    }
+
+    private void assertSafeOperation(int left, int right) {
+        if (right > 0 ? left > Integer.MAX_VALUE / right
+                || left < Integer.MIN_VALUE / right
+                : (right < -1 ? left > Integer.MIN_VALUE / right
+                || left < Integer.MAX_VALUE / right
                 : right == -1 && left == Integer.MIN_VALUE)) {
-            throw new ArithmeticException("[ERROR] Overflow");
+            throw new ArithmeticException("[ERROR] Overflow: cannot to safely multiply " + left + "*" + right);
         }
     }
 
     @Override
     public int operate(int left, int right) {
-        assertOverflow(left, right);
+        assertSafeOperation(left, right);
         return left * right;
     }
 }

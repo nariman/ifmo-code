@@ -13,6 +13,10 @@ public abstract class CheckedAbstractUnaryOperation implements CheckedOperation 
         this.object = object;
     }
 
+    public String nameSelf() {
+        return "new " + this.nameSelfOperation() + "(" + object.nameSelf() + ")";
+    }
+
     abstract protected int operate(int object);
 
     @Override

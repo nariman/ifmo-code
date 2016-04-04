@@ -15,6 +15,10 @@ public abstract class CheckedAbstractBinaryOperation implements CheckedOperation
         this.right = right;
     }
 
+    public String nameSelf() {
+        return "new " + this.nameSelfOperation() + "(" + left.nameSelf() + ", " + right.nameSelf() + ")";
+    }
+
     abstract protected int operate(int left, int right);
 
     @Override

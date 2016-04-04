@@ -14,6 +14,11 @@ public class CheckedVariable implements TripleExpression {
     }
 
     @Override
+    public String nameSelf() {
+        return "new CheckedVariable(\"" + name + "\")";
+    }
+
+    @Override
     public int evaluate(int x, int y, int z) {
         switch (name) {
             case "x":

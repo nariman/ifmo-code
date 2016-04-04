@@ -12,22 +12,24 @@ public class CheckedDivide extends CheckedAbstractBinaryOperation {
         super(left, right);
     }
 
-    private void assertOverflow(int left, int right) {
-        if ((left == Integer.MIN_VALUE) && (right == -1)) {
-            throw new ArithmeticException("[ERROR] Overflow");
-        }
+    @Override
+    public String nameSelfOperation() {
+        return "CheckedDivide";
     }
 
-    private void assertDBZ(int right) {
+    private void assertSafeOperation(int left, int right) {
+        if ((left == Integer.MIN_VALUE) && (right == -1)) {
+            throw new ArithmeticException("[ERROR] Overflow: cannot to safely divide " + left + "/" + right);
+        }
+
         if (right == 0) {
-            throw new ArithmeticException("[ERROR] Division by zero");
+            throw new ArithmeticException("[ERROR] Division by zero " + left + "/" + right);
         }
     }
 
     @Override
     public int operate(int left, int right) throws RuntimeException {
-        assertOverflow(left, right);
-        assertDBZ(right);
+        assertSafeOperation(left, right);
         return left / right;
     }
 }
