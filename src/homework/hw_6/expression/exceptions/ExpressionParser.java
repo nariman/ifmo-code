@@ -230,11 +230,9 @@ public class ExpressionParser implements Parser {
                     return new CheckedAbs(parseExpressionObject(false));
                 case NEGATE:
                     TripleExpression innerObject = parseExpressionObject(true);
-
+                    return (negated) ? new CheckedNegate(innerObject) : innerObject;
 //                    System.out.println(innerObject.nameSelf());
 //                    System.out.println(innerObject instanceof CheckedConst);
-
-                    return (negated) ? new CheckedNegate(innerObject) : innerObject;
             }
         } else if (token instanceof Token.ArithmeticToken) {
             if (token == Token.ArithmeticToken.OPENING_PARENTHESIS) {
