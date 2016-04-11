@@ -5,9 +5,14 @@
  */
 
 import expression.*;
+import expression.exceptions.ExceptionsTest;
 import expression.exceptions.ExpressionParser;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
 import java.util.Random;
+import java.util.Scanner;
 import java.util.Timer;
 
 
@@ -27,13 +32,12 @@ public class Main {
                 div = 16383;
             else
                 div = 1023;
-        else if((value & 65280) > 0)
+        else if ((value & 65280) > 0)
             div = 63;
         else
             div = (value > 4) ? 7 : value;
 
-        while (true)
-        {
+        while (true) {
 //            iters++;
 //            maxIterations = Math.max(maxIterations, iters);
             div = (value / div + div) >> 1;
@@ -46,31 +50,37 @@ public class Main {
     }
 
     public static void main(String[] args) throws Exception {
-        Random random = new Random();
-        int[] ints = new int[1 << 24];
-        double[] doubles = new double[1 << 24];
-        long startTime, endTime;
+        Scanner in = new Scanner(new BufferedReader(new FileReader("test.txt")));
+        ExpressionParser ep = new ExpressionParser();
+        TripleExpression te = ep.parse(in.nextLine());
 
-        for (int i = 0; i < (1 << 24); i++) {
-            ints[i] = random.nextInt(Integer.MAX_VALUE);
-            doubles[i] = (double) ints[i];
-        }
+        System.out.println(te.evaluate(1, 2, 3));
 
-        startTime = System.currentTimeMillis();
-        for (int i = 0; i < (1 << 24); i++) {
-            Math.sqrt(doubles[i]);
-        }
-        endTime = System.currentTimeMillis();
-
-        System.out.println("Total execution time of Math.sqrt: " + (endTime - startTime) + " millis.");
-
-        startTime = System.currentTimeMillis();
-        for (int i = 0; i < (1 << 24); i++) {
-            sqrt(ints[i]);
-        }
-        endTime = System.currentTimeMillis();
-
-        System.out.println("Total execution time of own sqrt: " + (endTime - startTime) + " millis.");
+//        Random random = new Random();
+//        int[] ints = new int[1 << 24];
+//        double[] doubles = new double[1 << 24];
+//        long startTime, endTime;
+//
+//        for (int i = 0; i < (1 << 24); i++) {
+//            ints[i] = random.nextInt(Integer.MAX_VALUE);
+//            doubles[i] = (double) ints[i];
+//        }
+//
+//        startTime = System.currentTimeMillis();
+//        for (int i = 0; i < (1 << 24); i++) {
+//            Math.sqrt(doubles[i]);
+//        }
+//        endTime = System.currentTimeMillis();
+//
+//        System.out.println("Total execution time of Math.sqrt: " + (endTime - startTime) + " millis.");
+//
+//        startTime = System.currentTimeMillis();
+//        for (int i = 0; i < (1 << 24); i++) {
+//            sqrt(ints[i]);
+//        }
+//        endTime = System.currentTimeMillis();
+//
+//        System.out.println("Total execution time of own sqrt: " + (endTime - startTime) + " millis.");
 //        System.out.println("Max iterations - " + maxIterations);
 
 //        String exp = "(2 * 2 / 2 + -1 + 2) * 3";

@@ -317,6 +317,7 @@ public class ExpressionParser implements Parser {
     public TripleExpression parse(String expression) throws ParseException {
         setParserState(expression);
         return parseExpression(0, false);
+
 //        System.out.println("[DEBUG] Expression received: " + expression);
 //        try {
 //            TripleExpression te = parseExpression(0, false);
