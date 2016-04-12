@@ -1,7 +1,7 @@
 /**
  * Nariman Safiulin (woofilee)
- * File: F.kt
- * Created on: Mar 31, 2016
+ * File: I.kt
+ * Created on: Apr 06, 2016
  */
 
 import java.io.BufferedReader
@@ -10,7 +10,7 @@ import java.io.FileReader
 import java.io.PrintWriter
 import java.util.*
 
-private val PROBLEM_NAME = "topsort"
+private val PROBLEM_NAME = "game"
 
 private class Scanner(file: File) {
     val br = BufferedReader(FileReader(file))
@@ -34,30 +34,45 @@ private class Scanner(file: File) {
 private fun solve(`in`: Scanner, out: PrintWriter) {
     val n = `in`.nextInt()
     val m = `in`.nextInt()
-    val graph = Array(n) { ArrayList<Int>() }
-    val status = Array(n) { 0 }
-    val res = ArrayList<Int>()
+    val s = `in`.nextInt() - 1
+    val edges = Array(n) { ArrayList<Int>() }
+    (1..m).forEach { edges[`in`.nextInt() - 1].add(`in`.nextInt() - 1) }
 
-    (1..m).forEach { i -> graph[`in`.nextInt() - 1].add(`in`.nextInt() - 1) }
+    val whois = Array(n) { -1 }
+    val multi = Array(n) { -1 }
 
-    fun dfs(v: Int): Boolean {
-        if (status[v] == 1) return true
-        if (status[v] == 2) return false
-        status[v] = 1
-        (0..graph[v].size - 1).forEach { i -> if (dfs(graph[v][i])) return true }
-        res.add(v)
-        status[v] = 2
-        return false
-    }
-
-    for (i in 0..n - 1) {
-        if (dfs(i)) {
-            out.print("-1")
-            return
+    fun dfs(v: Int, d: Int): Int {
+        if (whois[v] != -1) {
+            if (d % 2 == whois[v]) return multi[v] else return (multi[v] + 1) % 2
         }
+
+        whois[v] = d % 2
+
+        if (edges[v].size == 0) {
+            multi[v] = d % 2
+        } else {
+            var mv = -1
+
+            edges[v].forEach { c ->
+                if (mv == -1) {
+                    mv = dfs(c, d + 1)
+                } else if (mv != dfs(c, d + 1)) {
+                    multi[v] = (d + 1) % 2
+                    return multi[v]
+                }
+            }
+
+            multi[v] = mv
+        }
+
+        return multi[v]
     }
 
-    (res.size - 1 downTo 0).forEach { i -> out.print("${res[i] + 1} ") }
+    if (dfs(s, 0) == 0) out.println("Second player wins") else out.println("First player wins")
+
+//    multi.forEach { i ->
+//        println(i)
+//    }
 }
 
 fun main(args: Array<String>) {
