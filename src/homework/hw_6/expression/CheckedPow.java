@@ -37,10 +37,8 @@ public class CheckedPow extends CheckedAbstractBinaryOperation {
 
         int res = 1;
         for (int i = 0; i < right; i++) {
-            if (left > 0 ? res > Integer.MAX_VALUE / left
-                    || res < Integer.MIN_VALUE / left
-                    : (left < -1 ? res > Integer.MIN_VALUE / left
-                    || res < Integer.MAX_VALUE / left
+            if (left > 0 ? res > Integer.MAX_VALUE / left || res < Integer.MIN_VALUE / left
+                    : (left < -1 ? res > Integer.MIN_VALUE / left || res < Integer.MAX_VALUE / left
                     : left == -1 && res == Integer.MIN_VALUE)) {
                 throw new ArithmeticException("[ERROR] Overflow: cannot to safely pow " + left + "**" + right);
             }

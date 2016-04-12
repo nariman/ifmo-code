@@ -18,6 +18,10 @@ public class CheckedAdd extends CheckedAbstractBinaryOperation {
     }
 
     private void assertSafeOperation(int left, int right) {
+//        if ((right > 0 && left > Integer.MAX_VALUE - right) || (right <= 0 && left < Integer.MIN_VALUE - right)) {
+//            throw new ArithmeticException("[ERROR] Overflow");
+//        }
+
         if (right > 0 ? left > Integer.MAX_VALUE - right : left < Integer.MIN_VALUE - right) {
             throw new ArithmeticException("[ERROR] Overflow");
         }

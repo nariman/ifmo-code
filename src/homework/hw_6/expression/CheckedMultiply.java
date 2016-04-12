@@ -18,10 +18,14 @@ public class CheckedMultiply extends CheckedAbstractBinaryOperation {
     }
 
     private void assertSafeOperation(int left, int right) {
-        if (right > 0 ? left > Integer.MAX_VALUE / right
-                || left < Integer.MIN_VALUE / right
-                : (right < -1 ? left > Integer.MIN_VALUE / right
-                || left < Integer.MAX_VALUE / right
+//        if ((right > 0 && (left > Integer.MAX_VALUE / right || left < Integer.MIN_VALUE / right))
+//                || (right < -1 && (left > Integer.MIN_VALUE / right || left < Integer.MAX_VALUE / right))
+//                || (right == -1 && left == Integer.MIN_VALUE)) {
+//            throw new ArithmeticException("[ERROR] Overflow: cannot to safely multiply " + left + "*" + right);
+//        }
+
+        if (right > 0 ? left > Integer.MAX_VALUE / right || left < Integer.MIN_VALUE / right
+                : (right < -1 ? left > Integer.MIN_VALUE / right || left < Integer.MAX_VALUE / right
                 : right == -1 && left == Integer.MIN_VALUE)) {
             throw new ArithmeticException("[ERROR] Overflow: cannot to safely multiply " + left + "*" + right);
         }
