@@ -12,7 +12,7 @@ import java.util.*
 
 private val PROBLEM_NAME = "spantree2"
 
-internal class Scanner(file: File) {
+private class Scanner(file: File) {
     val br = BufferedReader(FileReader(file))
     var st = StringTokenizer("")
 
