@@ -8,7 +8,7 @@ package expression.exceptions;
 
 import expression.*;
 
-public class ExpressionParserTwo implements Parser {
+public class ExpressionParser implements Parser {
     private static class Token {
         enum SystemToken {
             UNEXPECTED,
@@ -96,7 +96,7 @@ public class ExpressionParserTwo implements Parser {
         setParserState(expressionString, -1);
     }
 
-    public ExpressionParserTwo() {
+    public ExpressionParser() {
         setParserState("");
     }
 
@@ -231,7 +231,7 @@ public class ExpressionParserTwo implements Parser {
                 token = parseToken();
                 if (token != Token.ArithmeticToken.CLOSING_PARENTHESIS) {
                     throw new ParseException(
-                            "[ERROR] Closing parenthesis expected, unexpected token found :( at pos %d",
+                            "[ERROR] Closing parenthesis expected, eof found :( at pos %d",
                             position
                     );
                 }
@@ -239,14 +239,16 @@ public class ExpressionParserTwo implements Parser {
                 return (negated) ? new CheckedNegate(innerExpression) : innerExpression;
             } else {
                 throw new ParseException(
-                        "[ERROR] Unexpected closing parenthesis `" +
+                        "[ERROR] Constant, Variable, Unary or opening bracket expected, unexpected closing parenthesis `" +
                                 Token.ArithmeticToken.CLOSING_PARENTHESIS.string + "` found at pos %d",
                         position
                 );
             }
         }
 
-        throw new ParseException("[ERROR] Unexpected token found at pos %d :(", position);
+        throw new ParseException("[ERROR] Constant, Variable, Unary or " +
+                "opening bracket expected, error symbol found at " +
+                "pos %d :(", position);
     }
 
     private TripleExpression parseExpression(int minPriority, boolean isRecursive) throws ParseException {
@@ -272,7 +274,7 @@ public class ExpressionParserTwo implements Parser {
                 // else continue working
             } else {
                 throw new ParseException(
-                            "[ERROR] Unexpected token found at pos %d :(",
+                            "[ERROR] Binary operation or closing bracket expected, other token found at pos %d :(",
                         position
                 );
             }

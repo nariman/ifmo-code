@@ -17,6 +17,15 @@ public class CheckedPow extends CheckedAbstractBinaryOperation {
         return "CheckedPow";
     }
 
+    private int log(int left, int right) {
+        int answer = 0;
+        while (left >= right) {
+            left /= right;
+            ++answer;
+        }
+        return answer;
+    }
+
     private void assertSafeOperation(int left, int right) {
         if (right < 0) {
             throw new ArithmeticException("[ERROR] Cannot to get pow due " +
@@ -27,28 +36,43 @@ public class CheckedPow extends CheckedAbstractBinaryOperation {
             throw new ArithmeticException("[ERROR] Cannot to get pow due " +
                     "undefined answer for 0**0");
         }
+
+        if (right * Math.log10(left) >= Math.log10(Integer.MAX_VALUE)) {
+            throw new ArithmeticException("[ERROR] Overflow: cannot to " +
+                    "safely multiply " + left + "*" + right);
+        }
+    }
+
+    private int checkedMultiply(int left, int right) {
+        if (right > 0
+                ? left > Integer.MAX_VALUE / right || left < Integer.MIN_VALUE / right
+                : (right < -1
+                ? left > Integer.MIN_VALUE / right || left < Integer.MAX_VALUE / right
+                : right == -1 && left == Integer.MIN_VALUE)) {
+            throw new ArithmeticException("[ERROR] Overflow: cannot to " +
+                    "safely multiply " + left + "*" + right);
+        }
+        return left * right;
     }
 
     @Override
     public int operate(int left, int right) {
         assertSafeOperation(left, right);
-//        return (int) Math.pow((double) left, (double) right);
         if (left == 0) {
             return 0;
         }
+//        return (int) Math.pow((double) left, (double) right);
 
         int res = 1;
-        for (int i = 0; i < right; i++) {
-            if (left > 0 ?
-                    res > Integer.MAX_VALUE / left || res < Integer.MIN_VALUE / left
-                    : (left < -1
-                    ? res > Integer.MIN_VALUE / left || res < Integer.MAX_VALUE / left
-                    : left == -1 && res == Integer.MIN_VALUE)) {
-                throw new ArithmeticException("[ERROR] Overflow: cannot to " +
-                        "safely pow " + left + "**" + right);
+        while (right != 0) {
+            if (right % 2 == 1) {
+                res = res * left;
+                if (right == 1) {
+                    break;
+                }
             }
-
-            res *= left;
+            right /= 2;
+            left = left * left;
         }
 
         return res;

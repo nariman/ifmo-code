@@ -50,35 +50,6 @@ public class ExceptionsHardTest extends ExceptionsEasyTest {
 
     public static void main(final String[] args) {
         checkAssert(ExceptionsHardTest.class);
-
-        Thread scheduler = new Thread(new Runnable() {
-
-            @Override
-            public void run() {
-                final int limiter = 20, slimiter = 1000 / limiter;
-                int iterations = 0;
-
-                while (true) {
-                    if (++iterations % limiter == 0) {
-                        System.out.printf("--===%d second(s) passed===--\n", iterations / limiter);
-                    }
-                    try {
-                        Thread.sleep(slimiter);
-                    } catch (InterruptedException ex) {
-                    }
-                }
-            }
-
-        });
-        scheduler.setDaemon(true);
-        long startTime, endTime;
-
-        scheduler.start();
-        startTime = System.currentTimeMillis();
-
         new ExceptionsHardTest().test();
-
-        endTime = System.currentTimeMillis();
-        System.out.println("--===Total execution time: " + (endTime - startTime) + " millis===--\n");
     }
 }
