@@ -19,11 +19,13 @@ public class CheckedDivide extends CheckedAbstractBinaryOperation {
 
     private void assertSafeOperation(int left, int right) {
         if ((left == Integer.MIN_VALUE) && (right == -1)) {
-            throw new ArithmeticException("[ERROR] Overflow: cannot to safely divide " + left + "/" + right);
+            throw new ArithmeticException("[ERROR] Overflow: cannot to " +
+                    "safely divide " + left + "/" + right);
         }
 
         if (right == 0) {
-            throw new ArithmeticException("[ERROR] Division by zero " + left + "/" + right);
+            throw new ArithmeticException("[ERROR] Division by zero "+
+                    left + "/" + right);
         }
     }
 

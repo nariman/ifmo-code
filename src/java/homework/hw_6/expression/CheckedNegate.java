@@ -19,7 +19,8 @@ public class CheckedNegate extends CheckedAbstractUnaryOperation {
 
     private void assertSafeOperation(int value) {
         if (value == Integer.MIN_VALUE) {
-            throw new ArithmeticException("[ERROR] Overflow: cannot to safely negate value of " + value);
+            throw new ArithmeticException("[ERROR] Overflow: cannot to " +
+                    "safely negate value of " + value);
         }
     }
 

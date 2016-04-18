@@ -8,16 +8,14 @@ package expression.exceptions;
 
 import expression.*;
 
-import java.text.ParseException;
-
-public class ExpressionParser implements Parser {
-    public static class Token {
-        public enum SystemToken {
+public class ExpressionParserTwo implements Parser {
+    private static class Token {
+        enum SystemToken {
             UNEXPECTED,
             EOF
         }
 
-        public static class ConstantToken {
+        static class ConstantToken {
             public final String value;
 
             ConstantToken(String value) {
@@ -25,48 +23,48 @@ public class ExpressionParser implements Parser {
             }
         }
 
-        public enum VariableToken {
+        enum VariableToken {
             X("x"),
             Y("y"),
             Z("z");
 
-            public final String stringRepresentation;
-            public final char[] charArrayRepresentation;
+            public final String string;
+            public final char[] charArray;
 
-            VariableToken(String stringRepresentation) {
-                this.stringRepresentation = stringRepresentation;
-                this.charArrayRepresentation = stringRepresentation.toCharArray();
+            VariableToken(String string) {
+                this.string = string;
+                this.charArray = string.toCharArray();
             }
         }
 
-        public enum ArithmeticToken {
+        enum ArithmeticToken {
             OPENING_PARENTHESIS("("),
             CLOSING_PARENTHESIS(")");
 
-            public final String stringRepresentation;
-            public final char[] charArrayRepresentation;
+            public final String string;
+            public final char[] charArray;
 
-            ArithmeticToken(String stringRepresentation) {
-                this.stringRepresentation = stringRepresentation;
-                this.charArrayRepresentation = stringRepresentation.toCharArray();
+            ArithmeticToken(String string) {
+                this.string = string;
+                this.charArray = string.toCharArray();
             }
         }
 
-        public enum UnaryOperationToken {
+        enum UnaryOperationToken {
             SQRT("sqrt"), // Longer first
             ABS("abs"),
             NEGATE("-");
 
-            public final String stringRepresentation;
-            public final char[] charArrayRepresentation;
+            public final String string;
+            public final char[] charArray;
 
-            UnaryOperationToken(String stringRepresentation) {
-                this.stringRepresentation = stringRepresentation;
-                this.charArrayRepresentation = stringRepresentation.toCharArray();
+            UnaryOperationToken(String string) {
+                this.string = string;
+                this.charArray = string.toCharArray();
             }
         }
 
-        public enum BinaryOperationToken {
+        enum BinaryOperationToken {
             LOGARITHM("//", 3), // High priority first, Longer first
             POW("**", 3),
             DIVIDE("/", 2),
@@ -74,65 +72,62 @@ public class ExpressionParser implements Parser {
             ADD("+", 1),
             SUBTRACT("-", 1);
 
-            public final String stringRepresentation;
-            public final char[] charArrayRepresentation;
+            public final String string;
+            public final char[] charArray;
             public final int priority;
 
-            BinaryOperationToken(String stringRepresentation, int priority) {
-                this.stringRepresentation = stringRepresentation;
-                this.charArrayRepresentation = stringRepresentation.toCharArray();
+            BinaryOperationToken(String string, int priority) {
+                this.string = string;
+                this.charArray = string.toCharArray();
                 this.priority = priority;
             }
         }
     }
 
-    private char[] expressionString;
-    private int expressionPos;
+    private char[] expression;
+    private int position;
 
     private void setParserState(String expressionString, int expressionPos) {
-        this.expressionString = expressionString.toCharArray();
-        this.expressionPos = expressionPos;
+        this.expression = expressionString.toCharArray();
+        this.position = expressionPos;
     }
 
     private void setParserState(String expressionString) {
         setParserState(expressionString, -1);
     }
 
-    public ExpressionParser() {
+    public ExpressionParserTwo() {
         setParserState("");
     }
 
     private Character nextSymbol() {
-        if (expressionPos == expressionString.length) {
+        if (position == expression.length) {
             return null;
         }
 
         do {
-            ++expressionPos;
-        } while (expressionPos < expressionString.length
-                && Character.isWhitespace(expressionString[expressionPos]));
+            ++position;
+        } while (position < expression.length
+                && Character.isWhitespace(expression[position]));
 
-        if (expressionPos == expressionString.length) {
+        if (position == expression.length) {
             return null;
         }
 
-//        System.out.println("[DEBUG] " + expressionString.charAt(expressionPos) + " will be returned, with current pos = " + expressionPos);
-
-        return expressionString[expressionPos];
+        return expression[position];
     }
 
     private void returnSymbol() {
-        expressionPos--;
-//        System.out.println("[DEBUG] Symbol returned...");
+        position--;
     }
 
     private boolean compareInputToken(char[] token) {
-        int pos = expressionPos;
+        int pos = position;
         int tokenLen = token.length;
         int tokenPos = 0;
 
         while (tokenPos < tokenLen) {
-            if (pos < expressionString.length && expressionString[pos] == token[tokenPos]) {
+            if (pos < expression.length && expression[pos] == token[tokenPos]) {
                 pos++;
                 tokenPos++;
             } else {
@@ -165,32 +160,32 @@ public class ExpressionParser implements Parser {
 
         // Variable
         for (Token.VariableToken token : Token.VariableToken.values()) {
-            if (compareInputToken(token.charArrayRepresentation)) {
-                expressionPos += token.charArrayRepresentation.length - 1;
+            if (compareInputToken(token.charArray)) {
+                position += token.charArray.length - 1;
                 return token;
             }
         }
 
         // Parenthesis
         for (Token.ArithmeticToken token : Token.ArithmeticToken.values()) {
-            if (compareInputToken(token.charArrayRepresentation)) {
-                expressionPos += token.charArrayRepresentation.length - 1;
+            if (compareInputToken(token.charArray)) {
+                position += token.charArray.length - 1;
                 return token;
             }
         }
 
         // Unary operation
         for (Token.UnaryOperationToken token : Token.UnaryOperationToken.values()) {
-            if (compareInputToken(token.charArrayRepresentation)) {
-                expressionPos += token.charArrayRepresentation.length - 1;
+            if (compareInputToken(token.charArray)) {
+                position += token.charArray.length - 1;
                 return token;
             }
         }
 
         // Binary operation
         for (Token.BinaryOperationToken token : Token.BinaryOperationToken.values()) {
-            if (compareInputToken(token.charArrayRepresentation)) {
-                expressionPos += token.charArrayRepresentation.length - 1;
+            if (compareInputToken(token.charArray)) {
+                position += token.charArray.length - 1;
                 return token;
             }
         }
@@ -200,23 +195,20 @@ public class ExpressionParser implements Parser {
     }
 
     private void returnToken(String token) {
-        expressionPos -= token.length();
+        position -= token.length();
     }
 
     private TripleExpression parseExpressionObject(boolean negated) throws ParseException {
-//        System.out.println("[DEBUG] parseExpressionObject called with negated = " + negated);
         Object token = parseToken();
 
         if (token instanceof Token.ConstantToken) {
             return new CheckedConst(Integer.parseInt(((negated) ? "-" : "") + ((Token.ConstantToken) token).value));
         } else if (token instanceof Token.VariableToken) {
             if (negated) {
-                return new CheckedNegate(new CheckedVariable(((Token.VariableToken) token).stringRepresentation));
+                return new CheckedNegate(new CheckedVariable(((Token.VariableToken) token).string));
             }
-            return new CheckedVariable(((Token.VariableToken) token).stringRepresentation);
+            return new CheckedVariable(((Token.VariableToken) token).string);
         } else if (token instanceof Token.UnaryOperationToken) {
-//            TripleExpression innerObject = parseExpressionObject();
-
             switch (((Token.UnaryOperationToken) token)) {
                 case SQRT:
                     if (negated) {
@@ -231,8 +223,6 @@ public class ExpressionParser implements Parser {
                 case NEGATE:
                     TripleExpression innerObject = parseExpressionObject(true);
                     return (negated) ? new CheckedNegate(innerObject) : innerObject;
-//                    System.out.println(innerObject.nameSelf());
-//                    System.out.println(innerObject instanceof CheckedConst);
             }
         } else if (token instanceof Token.ArithmeticToken) {
             if (token == Token.ArithmeticToken.OPENING_PARENTHESIS) {
@@ -241,8 +231,8 @@ public class ExpressionParser implements Parser {
                 token = parseToken();
                 if (token != Token.ArithmeticToken.CLOSING_PARENTHESIS) {
                     throw new ParseException(
-                            "[ERROR] Closing parenthesis expected, unexpected token found :(",
-                            expressionPos
+                            "[ERROR] Closing parenthesis expected, unexpected token found :( at pos %d",
+                            position
                     );
                 }
 
@@ -250,17 +240,16 @@ public class ExpressionParser implements Parser {
             } else {
                 throw new ParseException(
                         "[ERROR] Unexpected closing parenthesis `" +
-                                Token.ArithmeticToken.CLOSING_PARENTHESIS.stringRepresentation + "` found",
-                        expressionPos
+                                Token.ArithmeticToken.CLOSING_PARENTHESIS.string + "` found at pos %d",
+                        position
                 );
             }
         }
 
-        throw new ParseException("[ERROR] Unexpected token found :(", expressionPos);
+        throw new ParseException("[ERROR] Unexpected token found at pos %d :(", position);
     }
 
     private TripleExpression parseExpression(int minPriority, boolean isRecursive) throws ParseException {
-//        System.out.println("[DEBUG] parseExpression called with minPriority = " + minPriority + " and isRecursive = " + isRecursive);
         TripleExpression left = parseExpressionObject(false);
 
         while (true) {
@@ -273,18 +262,18 @@ public class ExpressionParser implements Parser {
             if (token == Token.SystemToken.EOF) {
                 return left;
             } else if (token == Token.ArithmeticToken.CLOSING_PARENTHESIS && isRecursive) {
-                returnToken(((Token.ArithmeticToken) token).stringRepresentation);
+                returnToken(((Token.ArithmeticToken) token).string);
                 return left;
             } else if (token instanceof Token.BinaryOperationToken) {
                 if (((Token.BinaryOperationToken) token).priority <= minPriority) {
-                    returnToken(((Token.BinaryOperationToken) token).stringRepresentation);
+                    returnToken(((Token.BinaryOperationToken) token).string);
                     return left;
                 }
                 // else continue working
             } else {
                 throw new ParseException(
-                        "[ERROR] Unexpected token found :(",
-                        expressionPos
+                            "[ERROR] Unexpected token found at pos %d :(",
+                        position
                 );
             }
 
@@ -317,15 +306,11 @@ public class ExpressionParser implements Parser {
     public TripleExpression parse(String expression) throws ParseException {
         setParserState(expression);
         return parseExpression(0, false);
-//        System.out.println("[DEBUG] Expression received: " + expression);
-//        try {
-//            TripleExpression te = parseExpression(0, false);
-//            System.out.println("[DEBUG] Expression successfully parsed");
-//            System.out.println(te.nameSelf());
-//            return te;
-//        } catch (ParseException e) {
-//            System.out.println("[DEBUG] Parse Error: " + e.getMessage());
-//            throw e;
-//        }
+    }
+
+    class ParseException extends java.text.ParseException {
+        public ParseException(String s, int errorOffset) {
+            super(String.format(s, errorOffset), errorOffset);
+        }
     }
 }

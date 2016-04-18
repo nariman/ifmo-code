@@ -19,7 +19,8 @@ public class CheckedAbs extends CheckedAbstractUnaryOperation {
 
     private void assertSafeOperation(int value) {
         if (value == Integer.MIN_VALUE) {
-            throw new ArithmeticException("[ERROR] Overflow: cannot to safely get absolute value of " + value);
+            throw new ArithmeticException("[ERROR] Overflow: cannot to safely" +
+                    " get absolute value of " + value);
         }
     }
 

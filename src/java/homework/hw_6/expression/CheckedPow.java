@@ -19,11 +19,13 @@ public class CheckedPow extends CheckedAbstractBinaryOperation {
 
     private void assertSafeOperation(int left, int right) {
         if (right < 0) {
-            throw new ArithmeticException("[ERROR] Cannot to get pow due exponent number less than zero");
+            throw new ArithmeticException("[ERROR] Cannot to get pow due " +
+                    "exponent number less than zero");
         }
 
         if (left == 0 && right == 0) {
-            throw new ArithmeticException("[ERROR] Cannot to get pow due undefined answer for 0**0");
+            throw new ArithmeticException("[ERROR] Cannot to get pow due " +
+                    "undefined answer for 0**0");
         }
     }
 
@@ -37,14 +39,18 @@ public class CheckedPow extends CheckedAbstractBinaryOperation {
 
         int res = 1;
         for (int i = 0; i < right; i++) {
-            if (left > 0 ? res > Integer.MAX_VALUE / left || res < Integer.MIN_VALUE / left
-                    : (left < -1 ? res > Integer.MIN_VALUE / left || res < Integer.MAX_VALUE / left
+            if (left > 0 ?
+                    res > Integer.MAX_VALUE / left || res < Integer.MIN_VALUE / left
+                    : (left < -1
+                    ? res > Integer.MIN_VALUE / left || res < Integer.MAX_VALUE / left
                     : left == -1 && res == Integer.MIN_VALUE)) {
-                throw new ArithmeticException("[ERROR] Overflow: cannot to safely pow " + left + "**" + right);
+                throw new ArithmeticException("[ERROR] Overflow: cannot to " +
+                        "safely pow " + left + "**" + right);
             }
 
             res *= left;
         }
+
         return res;
     }
 }

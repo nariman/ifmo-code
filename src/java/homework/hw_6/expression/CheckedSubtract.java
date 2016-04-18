@@ -18,12 +18,11 @@ public class CheckedSubtract extends CheckedAbstractBinaryOperation {
     }
 
     private void assertSafeOperation(int left, int right) {
-//        if ((right > 0 && left < Integer.MIN_VALUE + right) || (right <= 0 && left > Integer.MAX_VALUE + right)) {
-//            throw new ArithmeticException("[ERROR] Overflow: cannot to safely subtract " + left + "-" + right);
-//        }
-
-        if (right > 0 ? left < Integer.MIN_VALUE + right : left > Integer.MAX_VALUE + right) {
-            throw new ArithmeticException("[ERROR] Overflow: cannot to safely subtract " + left + "-" + right);
+        if (right > 0
+                ? left < Integer.MIN_VALUE + right
+                : left > Integer.MAX_VALUE + right) {
+            throw new ArithmeticException("[ERROR] Overflow: cannot to " +
+                    "safely subtract " + left + "-" + right);
         }
     }
 

@@ -19,13 +19,20 @@ public class CheckedLogarithm extends CheckedAbstractBinaryOperation {
     private void assertSafeOperation(int left, int right) {
         if (left <= 0 || right <= 0 || right == 1) {
             throw new ArithmeticException(
-                    "[ERROR] Cannot to get logarithm due incorrect expression " + left + "//" + right);
+                    "[ERROR] Cannot to get logarithm due incorrect " +
+                            "expression " + left + "//" + right);
         }
     }
 
     @Override
     protected int operate(int left, int right) {
         assertSafeOperation(left, right);
-        return (int) ((Math.log(left) / Math.log(right)));
+
+        int answer = 0;
+        while (left >= right) {
+            left /= right;
+            ++answer;
+        }
+        return answer;
     }
 }
