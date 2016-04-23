@@ -66,6 +66,10 @@ public class LinkedQueue extends AbstractQueue {
         this.tail = this.tail.next;
     }
 
+    public AbstractQueue getNewInstance() {
+        return new LinkedQueue();
+    }
+
 //    @Override
 //    public Object[] toArray() {
 //        Node next = this.head;

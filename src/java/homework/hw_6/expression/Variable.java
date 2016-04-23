@@ -6,21 +6,11 @@
 
 package expression;
 
-public class Variable implements ExpressionObject {
+public class Variable implements TripleExpression {
     private final String name;
 
     public Variable(String name) {
         this.name = name;
-    }
-
-    @Override
-    public int evaluate(int x) {
-        return x;
-    }
-
-    @Override
-    public double evaluate(double x) {
-        return x;
     }
 
     @Override

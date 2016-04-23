@@ -18,6 +18,8 @@ public abstract class AbstractQueue implements Queue {
 
     protected abstract void removeRealization();
 
+    protected abstract AbstractQueue getNewInstance();
+
     @Override
     public void push(Object element) {
         this.pushRealization(element);
@@ -77,10 +79,8 @@ public abstract class AbstractQueue implements Queue {
         return elements;
     }
 
-     protected abstract AbstractQueue getNewInstance();
-
     @Override
-     public AbstractQueue filter(Predicate<Object> predicate) {
+    public AbstractQueue filter(Predicate<Object> predicate) {
         AbstractQueue elements = getNewInstance();
         int count = this.size;
 

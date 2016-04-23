@@ -1,6 +1,6 @@
 /**
  * Nariman Safiulin (woofilee)
- * File: CheckedAbstractBinaryOperation.java
+ * File: AbstractBinaryOperation.java
  * Created on: Mar 24, 2016
  */
 

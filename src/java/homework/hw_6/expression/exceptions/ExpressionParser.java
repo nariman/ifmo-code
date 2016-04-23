@@ -205,9 +205,9 @@ public class ExpressionParser implements Parser {
             return new CheckedConst(Integer.parseInt(((negated) ? "-" : "") + ((Token.ConstantToken) token).value));
         } else if (token instanceof Token.VariableToken) {
             if (negated) {
-                return new CheckedNegate(new CheckedVariable(((Token.VariableToken) token).string));
+                return new CheckedNegate(new Variable(((Token.VariableToken) token).string));
             }
-            return new CheckedVariable(((Token.VariableToken) token).string);
+            return new Variable(((Token.VariableToken) token).string);
         } else if (token instanceof Token.UnaryOperationToken) {
             switch (((Token.UnaryOperationToken) token)) {
                 case SQRT:

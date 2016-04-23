@@ -6,5 +6,5 @@
 
 package expression;
 
-public interface Operation extends ExpressionObject {
+public interface Operation extends TripleExpression {
 }
