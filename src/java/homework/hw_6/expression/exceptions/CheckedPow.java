@@ -15,15 +15,6 @@ public class CheckedPow extends AbstractBinaryOperation {
         super(left, right);
     }
 
-    private int log(int left, int right) {
-        int answer = 0;
-        while (left >= right) {
-            left /= right;
-            ++answer;
-        }
-        return answer;
-    }
-
     private void assertSafeOperation(int left, int right) {
         if (right < 0) {
             throw new ArithmeticException("[ERROR] Cannot to get pow due " +

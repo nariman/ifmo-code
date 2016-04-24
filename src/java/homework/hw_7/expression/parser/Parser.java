@@ -1,12 +1,14 @@
 /**
  * Nariman Safiulin (woofilee)
- * File: ExpressionParser.java
+ * File: Parser.java
  * Created on: Apr 23, 2016
  */
 
-package expression.exceptions;
+package expression.parser;
 
-import expression.*;
+import expression.ExpressionObject;
+import expression.object.*;
+import expression.object.operation.*;
 
 class ParseException extends java.text.ParseException {
     public ParseException(String s, int errorOffset) {
@@ -14,15 +16,14 @@ class ParseException extends java.text.ParseException {
     }
 }
 
-public class ExpressionParser implements Parser {
-    private Tokenizer tokenizer;
+public class Parser<T> {
+    private Tokenizer<T> tokenizer;
 
-    public ExpressionParser() {
-        this.tokenizer = new Tokenizer();
+    public Parser(Tokenizer<T> tokenizer) {
+        this.tokenizer = tokenizer;
     }
 
-    @Override
-    public TripleExpression parse(String expression) throws ParseException {
+    public ExpressionObject<T> parse(String expression) throws ParseException {
         tokenizer.ready(expression.toCharArray());
         return parseExpression(0, false);
     }
@@ -30,17 +31,17 @@ public class ExpressionParser implements Parser {
     private int priority(Token token) {
         if (token == Token.LOG || token == Token.POW) {
             return 3;
-        } else if (token == Token.DIVIDE || token == Token.MULTIPLY) {
+        } else if (token == Token.DIVIDE || token == Token.MOD || token == Token.MULTIPLY) {
             return 2;
         }
         return 1;
     }
 
-    private TripleExpression parseExpressionObject() throws ParseException {
+    private ExpressionObject<T> parseExpressionObject() throws ParseException {
         switch (tokenizer.next()) {
             // ARITHMETIC
             case OPENING_PARENTHESIS:
-                TripleExpression innerExpression = parseExpression(0, true);
+                ExpressionObject<T> innerExpression = parseExpression(0, true);
                 if (tokenizer.next() != Token.CLOSING_PARENTHESIS) {
                     throw new ParseException(
                             "[ERROR] Closing parenthesis expected, end of expression reached :( at pos %d",
@@ -50,16 +51,18 @@ public class ExpressionParser implements Parser {
                 return innerExpression;
             // NUMERIC
             case VARIABLE:
-                return new Variable(tokenizer.getVariableToken());
+                return new Variable<>(tokenizer.getVariableToken());
             case CONST:
-                return new Constant(tokenizer.getConstToken());
+                return new Constant<>(tokenizer.getConstToken());
             // UNARY
             case ABS:
-                return new CheckedAbs(parseExpressionObject());
+                return new Abs<>(parseExpressionObject());
             case NEGATE:
-                return new CheckedNegate(parseExpressionObject());
+                return new Negate<>(parseExpressionObject());
             case SQRT:
-                return new CheckedSqrt(parseExpressionObject());
+                return new Sqrt<>(parseExpressionObject());
+            case SQUARE:
+                return new Square<>(parseExpressionObject());
             // OTHER
             default:
                 throw new ParseException(
@@ -69,15 +72,15 @@ public class ExpressionParser implements Parser {
         }
     }
 
-    private TripleExpression parseExpression(int minPriority, boolean isRecursive) throws ParseException {
-        TripleExpression left = parseExpressionObject();
+    private ExpressionObject<T> parseExpression(int minPriority, boolean isRecursive) throws ParseException {
+        ExpressionObject<T> left = parseExpressionObject();
 
         while (true) {
             Token operation = tokenizer.next();
 
             if (operation == Token.END) {
                 return left;
-            } else if (operation == Token.CLOSING_PARENTHESIS && isRecursive) {
+            } else if (operation == Token.CLOSING_PARENTHESIS) {
                 tokenizer.prev();
                 return left;
             } else if (operation.is(Token.BINARY)) {
@@ -93,26 +96,29 @@ public class ExpressionParser implements Parser {
                 );
             }
 
-            TripleExpression right = parseExpression(priority(operation), isRecursive);
+            ExpressionObject<T> right = parseExpression(priority(operation), isRecursive);
 
             switch (operation) {
                 case ADD:
-                    left = new CheckedAdd(left, right);
+                    left = new Add<>(left, right);
                     break;
                 case DIVIDE:
-                    left = new CheckedDivide(left, right);
+                    left = new Divide<>(left, right);
                     break;
                 case LOG:
-                    left = new CheckedLogarithm(left, right);
+                    left = new Log<>(left, right);
+                    break;
+                case MOD:
+                    left = new Mod<>(left, right);
                     break;
                 case MULTIPLY:
-                    left = new CheckedMultiply(left, right);
+                    left = new Multiply<>(left, right);
                     break;
                 case POW:
-                    left = new CheckedPow(left, right);
+                    left = new Pow<>(left, right);
                     break;
                 case SUBTRACT:
-                    left = new CheckedSubtract(left, right);
+                    left = new Subtract<>(left, right);
                     break;
             }
         }

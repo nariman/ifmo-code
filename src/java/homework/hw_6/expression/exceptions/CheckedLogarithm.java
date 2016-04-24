@@ -26,13 +26,13 @@ public class CheckedLogarithm extends AbstractBinaryOperation {
     protected int operate(int left, int right) {
         assertSafeOperation(left, right);
 
-        return (int) (Math.log((double) left) / Math.log((double) right));
+//        return (int) (Math.log((double) left) / Math.log((double) right));
 
-//        int answer = 0;
-//        while (left >= right) {
-//            left /= right;
-//            ++answer;
-//        }
-//        return answer;
+        int answer = 0;
+        while (left >= right) {
+            left /= right;
+            ++answer;
+        }
+        return answer;
     }
 }

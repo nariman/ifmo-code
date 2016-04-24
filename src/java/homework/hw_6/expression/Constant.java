@@ -1,17 +1,15 @@
 /**
  * Nariman Safiulin (woofilee)
- * File: CheckedConst.java
+ * File: Constant.java
  * Created on: Mar 27, 2016
  */
 
-package expression.exceptions;
+package expression;
 
-import expression.TripleExpression;
-
-public class CheckedConst implements TripleExpression {
+public class Constant implements TripleExpression {
     private final int value;
 
-    public CheckedConst(int value) {
+    public Constant(int value) {
         this.value = value;
     }
 
