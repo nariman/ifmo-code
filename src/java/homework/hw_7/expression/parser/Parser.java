@@ -80,7 +80,7 @@ public class Parser<T> {
 
             if (operation == Token.END) {
                 return left;
-            } else if (operation == Token.CLOSING_PARENTHESIS) {
+            } else if (operation == Token.CLOSING_PARENTHESIS && isRecursive) {
                 tokenizer.prev();
                 return left;
             } else if (operation.is(Token.BINARY)) {

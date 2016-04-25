@@ -15,6 +15,14 @@ public enum Token {
     DIVIDE, MOD, MULTIPLY, // Binary 2
     ADD, SUBTRACT; // Binary 1
 
+    public static class Operation {
+        Token token;
+        String assoc;
+        Operation(Token token, String assoc) {
+            this.token = token;
+            this.assoc = assoc;
+        }
+    }
 
     public static final Token[] ARITHMETIC = new Token[]{
             CLOSING_PARENTHESIS,

@@ -62,7 +62,7 @@ public class GenericTabulator implements Tabulator {
             default:
                 throw new IllegalArgumentException("Arithmetic Mode must be one " +
                         "of 'i' for Integer with overflow checks, 'd' for Double, " +
-                        "'bi' for BigInteger 'u' for Integer, 'b' for Byte or 'f' for Float");
+                        "'bi' for BigInteger, 'u' for Integer, 'b' for Byte or 'f' for Float");
         }
     }
 

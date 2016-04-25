@@ -11,8 +11,8 @@ import expression.ExpressionNumber;
 public abstract class Tokenizer<T> {
     private char[] expression;
     private int position;
-    Token prev;
-    Token current;
+    private Token prev;
+    private Token current;
 
     public void ready(char[] expression) {
         this.expression = expression;
