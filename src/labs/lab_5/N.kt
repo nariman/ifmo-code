@@ -1,7 +1,7 @@
 /**
  * Nariman Safiulin (woofilee)
- * File: M.kt
- * Created on: Apr 26, 2016
+ * File: N.kt
+ * Created on: Apr 27, 2016
  */
 
 import java.io.BufferedReader
@@ -10,7 +10,7 @@ import java.io.FileReader
 import java.io.PrintWriter
 import java.util.*
 
-private val PROBLEM_NAME = "cond"
+private val PROBLEM_NAME = "fire"
 
 private class Scanner(file: File) {
     val br = BufferedReader(FileReader(file))
@@ -86,22 +86,38 @@ private fun solve(`in`: Scanner, out: PrintWriter) {
         }
     }
 
-    var edgesCounter = 0
-    val table =  Array(componentCounter) { ArrayList<Int>(componentCounter) }
+    val firesEdges = Array(componentCounter) { ArrayList<Int>() } // Directed edges !!
 
     components.forEach { component ->
         component.forEach { from ->
             outEdges[from].forEach { edgeID ->
-                if (graph[from] != graph[edges[edgeID].to] && !table[graph[from]].contains(graph[edges[edgeID].to])) {
-                    table[graph[from]].add(graph[edges[edgeID].to])
-                    table[graph[edges[edgeID].to]].add(graph[from]) // safety from fucking mysterious
-                    edgesCounter++
+                if (graph[from] != graph[edges[edgeID].to] && !firesEdges[graph[from]].contains(graph[edges[edgeID].to])) {
+                    firesEdges[graph[from]].add(graph[edges[edgeID].to])
                 }
             }
         }
     }
 
-    out.println("$componentCounter $edgesCounter")
+    val firesVertices = Array(componentCounter) { false }
+    var firesCounter = 0
+    used = Array(componentCounter) { false }
+
+    fun third(c: Int) {
+        if (used[c])
+            return
+        used[c] = true
+
+        if (firesEdges[c].size == 0) {
+            firesVertices[c] = true
+            firesCounter++
+            return
+        }
+
+        firesEdges[c].forEach { c -> third(c) }
+    }
+
+    (0..componentCounter - 1).forEach { c -> third(c) }
+    out.println(firesCounter)
 }
 
 fun main(args: Array<String>) {
