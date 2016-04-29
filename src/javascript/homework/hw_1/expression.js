@@ -12,22 +12,6 @@ var expressionObject = function (f) {
     }
 };
 
-var binaryOperation = function (f) {
-    return function (left, right) {
-        return expressionObject(function (x, y, z) {
-            return f(left(x, y, z), right(x, y, z));
-        })
-    }
-};
-
-var unaryOperation = function (f) {
-    return function (value) {
-        return expressionObject(function (x, y, z) {
-            return f(value(x, y, z));
-        })
-    }
-};
-
 var cnst = function (value) {
     return expressionObject(function (x, y, z) {
         return value;
@@ -44,22 +28,40 @@ var variable = function (name) {
     })
 };
 
+var unaryOperation = function (f) {
+    return function (expression) {
+        return expressionObject(function (x, y, z) {
+            return f(expression(x, y, z));
+        })
+    }
+};
+
+var binaryOperation = function (f) {
+    return function (left, right) {
+        return expressionObject(function (x, y, z) {
+            return f(left(x, y, z), right(x, y, z));
+        })
+    }
+};
+
+
 var abs = unaryOperation(Math.abs);
+var log = unaryOperation(Math.log);
+var negate = unaryOperation(function (expression) {
+    return -expression;
+});
+
 var add = binaryOperation(function (left, right) {
     return left + right;
 });
 var divide = binaryOperation(function (left, right) {
     return left / right;
 });
-var log = unaryOperation(Math.log);
 var mod = binaryOperation(function (left, right) {
     return left % right;
 });
 var multiply = binaryOperation(function (left, right) {
     return left * right;
-});
-var negate = unaryOperation(function (value) {
-    return -value;
 });
 var power = binaryOperation(Math.pow);
 var subtract = binaryOperation(function (left, right) {
@@ -71,78 +73,84 @@ var square = function (value) {
 };
 
 var parse = function (expression) {
-    // println(expression);
-
-    var elements = expression.split(" ").filter(function (element, index, elements) {
+    return expression.split(" ").filter(function (element, index, elements) {
         return element.length > 0;
-    });
-    var stack = [];
+    }).reduce(function (stack, next) {
+        var binary = function (func) {
+            if (stack.size < 2) {
+                throw new SyntaxError("Cannot to parse this Reverse Polish notation expression due RPn expression contain mistake :(");
+            }
 
-    var binaryAction = function (f) {
-        if (stack.size < 1) {
-            throw new SyntaxError("Cannot to parse this Reverse Polish notation expression due RPn expression contain mistake :(");
-        }
+            var s = stack.pop();
+            var f = stack.pop();
+            stack.push(new func(f, s));
+            return stack;
+        };
 
-        var second = stack.pop();
-        var first = stack.pop();
-        stack.push(f(first, second));
-    };
+        var unary = function (func) {
+            if (stack.size < 1) {
+                throw new SyntaxError("Cannot to parse this Reverse Polish notation expression due RPn expression contain mistake :(");
+            }
 
-    var unaryAction = function (f) {
-        if (stack.size < 1) {
-            throw new SyntaxError("Cannot to parse this Reverse Polish notation expression due RPn expression contain mistake :(");
-        }
+            stack.push(new func(stack.pop()));
+            return stack;
+        };
 
-        stack.push(f(stack.pop()));
-    };
-
-    elements.forEach(function (element, index, elements) {
-        switch (element) {
+        switch (next) {
             case "+":
-                binaryAction(add);
-                break;
+                return binary(add);
             case "-":
-                binaryAction(subtract);
-                break;
+                return binary(subtract);
             case "*":
-                binaryAction(multiply);
-                break;
+                return binary(multiply);
             case "/":
-                binaryAction(divide);
-                break;
+                return binary(divide);
             case "**":
-                binaryAction(power);
-                break;
+                return binary(power);
             case "%":
-                binaryAction(mod);
-                break;
+                return binary(mod);
             case "abs":
-                unaryAction(abs);
-                break;
+                return unary(abs);
             case "log":
-                unaryAction(log);
-                break;
+                return unary(log);
             case "negate":
-                unaryAction(negate);
-                break;
+                return unary(negate);
             default:
-                if (element.match(/^[0-9\.\-]+$/)) {
-                    stack.push(cnst(parseInt(element)));
+                if (next.match(/^[0-9\.\-]+$/)) {
+                    stack.push(cnst(+next));
                 } else {
-                    stack.push(variable(element));
+                    stack.push(variable(next));
                 }
+                return stack;
         }
-    });
-
-    if (stack.size > 1) {
-        throw new SyntaxError("Cannot to parse this Reverse Polish notation expression due RPn expression contain a mistake :(");
-    }
-
-    return stack.pop();
+    }, [])[0];
 };
 
-// parse("x x 2 - * x * 1 +");
+
+// var expr = subtract(
+//     multiply(
+//         cnst(2),
+//         variable("x")
+//     ),
+//     cnst(3)
+// );
+// console.log(expr(5));
 
 // for (var i = 0; i < 11; i++) {
-//     add(subtract(square(variable('x')), multiply(cnst(2), variable('x'))), cnst(1))(i);
+//     console.log(
+//         add(
+//             subtract(
+//                 square(
+//                     variable('x')
+//                 ),
+//                 multiply(
+//                     cnst(2),
+//                     variable('x')
+//                 )
+//             ),
+//             cnst(1)
+//         )(i)
+//     );
 // }
+
+// parse("x x 2 - * x * 1 +");
