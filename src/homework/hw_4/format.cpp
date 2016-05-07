@@ -1,18 +1,33 @@
-//
-// Created by woofi on 25.03.2016.
-//
+/**
+ * Nariman Safiulin (woofilee)
+ * File: format.cpp
+ * Created on: May 06, 2016
+ */
 
+#include <string>
 #include "format.h"
-#include "string.h"
-#include <stdexcept>
 
-//std:string s = format("%d%d%s",500,5939,"al");
+namespace Format {
+    Token::Token(Specifier specifier) {
+        this->specifier = specifier;
+    }
 
-"""
-"""
+    void Tokenizer::skip() {
 
+    }
 
-template <typename ... Args>
-std::string format(std::string const &format, Args ... args) {
-    std::stringstream formatted;
+    Tokenizer::Tokenizer(const char *format) {
+        this->format = format;
+    }
+
+    Token Tokenizer::next() {
+        // skip();
+        return Token(Specifier::d);
+    }
 }
+
+// template <typename... Args>
+// std::string format(std::string const &format, Args... args) {
+//     std::stringstream formatted;
+//     return "Hello world";
+// }
