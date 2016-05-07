@@ -155,34 +155,35 @@ private fun judge() {
         testIn.close()
         println("OK")
         print("Generating correct solution... ")
-        val ansInt = Scanner(File(PROBLEM_NAME + ".in"))
+        val ansIn = Scanner(File(PROBLEM_NAME + ".in"))
         val ansOut = PrintWriter(File(PROBLEM_NAME + ".ans"))
-        generateAns(ansInt, ansOut)
-        ansInt.close()
+        generateAns(ansIn, ansOut)
+        ansIn.close()
         ansOut.close()
         println("OK")
         print("Starting program... ")
         solve()
-        println("OK. Program exited with status code 0")
+        println("OK - Program execution complete")
 
         print("Checking answer... ")
-        val outString = Files.readAllLines(Paths.get("transport.out"))[0]
-        val ansString = Files.readAllLines(Paths.get("transport.ans"))[0]
+        val outString = Files.readAllLines(Paths.get(PROBLEM_NAME + ".out"))[0]
+        val ansString = Files.readAllLines(Paths.get(PROBLEM_NAME + ".ans"))[0]
 
+        println("Correct (judge) solution: ${ansString}")
+        println("Solution for matching: ${outString}")
         println("Matching... ")
-        println(outString)
-        println(ansString)
+
         if (Math.abs(java.lang.Double.parseDouble(outString) - java.lang.Double.parseDouble(ansString)) < 0.000001) {
-            println("Test ${test} passed")
+            println("Test #${test} passed")
             correct++
         } else {
-            println("Test ${test} failed !!!")
-            return
+            println("Test #${test} failed !!!")
         }
 
         println()
     }
 
+    println("=== Checking complete ===")
     println("$tested tested, $correct passed, ${tested - correct} failed")
 }
 
