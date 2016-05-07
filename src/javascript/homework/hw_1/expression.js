@@ -73,9 +73,7 @@ var square = function (value) {
 };
 
 var parse = function (expression) {
-    return expression.split(" ").filter(function (element, index, elements) {
-        return element.length > 0;
-    }).reduce(function (stack, next) {
+    return expression.trim().split(/[\s]+/).reduce(function (stack, next) {
         var binary = function (func) {
             if (stack.size < 2) {
                 throw new SyntaxError("Cannot to parse this Reverse Polish notation expression due RPn expression contain mistake :(");
