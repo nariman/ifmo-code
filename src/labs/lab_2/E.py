@@ -12,6 +12,7 @@ May The 4th Be With You...
 ON PYTHON 3.5 FACED WITH TIME LIMIT
 USE PYPY (2.4.0 is ok)
 """
+# import numpy
 PROBLEM_NAME = "markchain"
 
 
@@ -19,8 +20,11 @@ def solve(fin, fout):
     n = int(fin.readline())
     matrix = [list(map(float, fin.readline().split())) for _ in range(n)]
 
+    # matrix = numpy.matrix([list(map(float, fin.readline().split())) for _ in range(n)])
+    # matrix = numpy.linalg.matrix_power(matrix, 1024)
+    # print(matrix[0])
+
     for _ in range(10):
-        # matrix @= matrix
         matrix = [[sum([matrix[i][k] * matrix[k][j] for k in range(n)]) for j in
                    range(n)] for i in range(n)]
 
