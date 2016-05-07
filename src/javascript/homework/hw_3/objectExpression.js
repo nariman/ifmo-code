@@ -23,6 +23,7 @@ ExpressionObject.prototype.evaluate = function () {
 ExpressionObject.prototype.simplify = function () {
     return this;
 };
+// ExpressionObject.prototype.postfix
 // ExpressionObject.prototype.prefix
 // ExpressionObject.prototype.toString
 
@@ -38,10 +39,10 @@ Const.prototype.evaluate = function (variables) {
 Const.prototype.diff = function (variable) {
     return new Const(0);
 };
-Const.prototype.prefix = function () {
+Const.prototype.postfix = function () {
     return this._value.toString();
 };
-Const.prototype.toString = function () {
+Const.prototype.prefix = function () {
     return this._value.toString();
 };
 
@@ -68,10 +69,10 @@ Variable.prototype.diff = function (variable) {
     }
     return new Const(0);
 };
-Variable.prototype.prefix = function () {
+Variable.prototype.postfix = function () {
     return this._name;
 };
-Variable.prototype.toString = function () {
+Variable.prototype.prefix = function () {
     return this._name;
 };
 
@@ -120,13 +121,15 @@ function Operation(oper, argnum, func, diff, simp) {
 
         return this._simple.apply(this, simplifiedArgs);
     };
+    OperationFunction.prototype.postfix = function () {
+        return "(" + this._args.map(function (element) {
+                return element.parsePostfix();
+            }).join(" ") + " " + this._operator + ")";
+    };
     OperationFunction.prototype.prefix = function () {
         return "(" + this._operator + " " + this._args.map(function (element) {
                 return element.prefix();
             }).join(" ") + ")";
-    };
-    OperationFunction.prototype.toString = function () {
-        return this._args.join(" ") + " " + this._operator;
     };
 
     operations.push({
@@ -137,10 +140,20 @@ function Operation(oper, argnum, func, diff, simp) {
     return OperationFunction;
 }
 
+var ArcTan = Operation("atan", 1, Math.atan, function (variable, expression) {
+    return new Multiply(new Divide(new Const(1), new Add(new Const(1), new Multiply(expression, expression))), expression.diff(variable));
+}, function (expression) {
+    return new ArcTan(expression);
+});
 var Cos = Operation("cos", 1, Math.cos, function (variable, expression) {
     return new Multiply(new Negate(new Sin(expression)), expression.diff(variable));
 }, function (expression) {
     return new Cos(expression);
+});
+var Exp = Operation("exp", 1, Math.exp, function (variable, expression) {
+    return new Multiply(new Exp(expression), expression.diff(variable));
+}, function (expression) {
+    return new Exp(expression);
 });
 var Negate = Operation("negate", 1, function (expression) {
     return -expression;
@@ -234,7 +247,7 @@ var Subtract = Operation("-", 2, function (left, right) {
 // But takes append function, for saving order of operands
 var buildExpression = function (expression, append) {
     var result = expression.reduce(function (stack, element, index, elements) {
-        if (element instanceof Object) {
+        if (element instanceof Array) {
             stack.push(buildExpression(element, append));
         } else if (!operations.some(function (operation) {
                 if (element == operation.operator) {
@@ -257,7 +270,8 @@ var buildExpression = function (expression, append) {
             })) {
             if (element.match(/^[0-9\.\-]+$/)) {
                 stack.push(new Const(+element));
-            } else if (element.match(/^[a-z]$/)) {
+            // } else if (element.match(/^[a-z]$/)) {
+            } else if (element.match(/^[xyz]$/)) {
                 stack.push(new Variable(element));
             } else {
                 throw new SyntaxError("[BUILDER] Unexpected symbols in token - token #" + (index + 1));
