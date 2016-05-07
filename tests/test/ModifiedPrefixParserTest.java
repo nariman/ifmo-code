@@ -6,12 +6,16 @@ import static expression.Util.list;
  * @author Georgiy Korneev (kgeorgiy@kgeorgiy.info)
  */
 public class ModifiedPrefixParserTest extends PrefixParserTest {
-    public static final Ops OPS = ModifiedObjectExpressionTest.OPS
+    protected static final Ops OPS = ModifiedObjectExpressionTest.OPS
             .unary("atan", "ArcTan", "atan", StrictMath::atan)
             .unary("exp", "Exp", "exp", StrictMath::exp);
 
     protected ModifiedPrefixParserTest(final boolean hard) {
-        super(hard, new AdvancedLanguage(OBJECT, PREFIX, OPS));
+        super(hard, new AdvancedLanguage(OBJECT, PREFIX, OPS), "prefix");
+    }
+
+    protected ModifiedPrefixParserTest(final boolean testParsing, final Language language, final String toString) {
+        super(testParsing, language, toString);
     }
 
     @Override

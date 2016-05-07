@@ -58,6 +58,9 @@ public class JSEngine implements Engine {
         final String context = String.format("\n    in %s\n    where expr = %s\n", code, expression);
         try {
             final Object result = engine.eval(code);
+            if (result == null) {
+                throw new EngineException("Result is null", null);
+            }
             if (token.isAssignableFrom(result.getClass())) {
                 return new Result<T>(context, token.cast(result));
             }

@@ -6,7 +6,7 @@ for %%m in (%*) do (
         echo ============================== TESTING BASE EASY ==============================
         echo ===============================================================================
         echo.
-        java -ea -cp "%~dp0;%~dp0..\..\tests;%~dp0..\..\..\java\tests" test.ObjectExpressionTest easy
+        java -ea -cp "%~dp0;%~dp0..\..\..\..\tests" test.ObjectExpressionTest easy
     )
 
     if %%m == base-hard (
@@ -15,7 +15,7 @@ for %%m in (%*) do (
         echo ============================== TESTING BASE HARD ==============================
         echo ===============================================================================
         echo.
-        java -ea -cp "%~dp0;%~dp0..\..\tests;%~dp0..\..\..\java\tests" test.ObjectExpressionTest hard
+        java -ea -cp "%~dp0;%~dp0..\..\..\..\tests" test.ObjectExpressionTest hard
     )
 
     if %%m == base-bonus (
@@ -24,7 +24,7 @@ for %%m in (%*) do (
         echo ============================== TESTING BASE BONUS ==============================
         echo ================================================================================
         echo.
-        java -ea -cp "%~dp0;%~dp0..\..\tests;%~dp0..\..\..\java\tests" test.ObjectExpressionTest bonus
+        java -ea -cp "%~dp0;%~dp0..\..\..\..\tests" test.ObjectExpressionTest bonus
     )
 
     if %%m == mod-easy (
@@ -33,7 +33,7 @@ for %%m in (%*) do (
         echo ============================== TESTING MOD EASY ==============================
         echo ==============================================================================
         echo.
-        java -ea -cp "%~dp0;%~dp0..\..\tests;%~dp0..\..\..\java\tests" test.ModifiedObjectExpressionTest easy
+        java -ea -cp "%~dp0;%~dp0..\..\..\..\tests" test.ModifiedObjectExpressionTest easy
     )
 
     if %%m == mod-hard (
@@ -42,7 +42,7 @@ for %%m in (%*) do (
         echo ============================== TESTING MOD HARD ==============================
         echo ==============================================================================
         echo.
-        java -ea -cp "%~dp0;%~dp0..\..\tests;%~dp0..\..\..\java\tests" test.ModifiedObjectExpressionTest hard
+        java -ea -cp "%~dp0;%~dp0..\..\..\..\tests" test.ModifiedObjectExpressionTest hard
     )
 
     if %%m == mod-bonus (
@@ -51,6 +51,6 @@ for %%m in (%*) do (
         echo ============================== TESTING MOD BONUS ==============================
         echo ===============================================================================
         echo.
-        java -ea -cp "%~dp0;%~dp0..\..\tests;%~dp0..\..\..\java\tests" test.ModifiedObjectExpressionTest bonus
+        java -ea -cp "%~dp0;%~dp0..\..\..\..\tests" test.ModifiedObjectExpressionTest bonus
     )
 )

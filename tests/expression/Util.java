@@ -1,6 +1,7 @@
 package expression;
 
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -8,7 +9,7 @@ import java.util.stream.Stream;
  * @author Georgiy Korneev (kgeorgiy@kgeorgiy.info)
  */
 public class Util {
-    public static final Random RNG = new Random(58L);
+    public static final Random RNG = new Random(59L);
 
     // Utility class
     private Util() {}
@@ -65,6 +66,10 @@ public class Util {
     @SafeVarargs
     public static <T> List<T> list(final T... items) {
         return new ArrayList<>(Arrays.asList(items));
+    }
+
+    public static <T, R> List<R> map(final Collection<T> items, final Function<? super T, ? extends R> f) {
+        return items.stream().map(f).collect(Collectors.toList());
     }
 
     public static void addRange(final List<Integer> values, final int d, final int c) {

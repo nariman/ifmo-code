@@ -8,7 +8,11 @@ import static expression.Util.*;
  * @author Georgiy Korneev (kgeorgiy@kgeorgiy.info)
  */
 public class ObjectExpressionTest extends BaseTest<JSEngine> {
-    public static final Dialect OBJECT = dialect("new Variable('%s')", "new Const(%s)", "new %s(%s)", "new %s(%s, %s)");
+    public static final Dialect OBJECT = dialect(
+            "new Variable('%s')",
+            "new Const(%s)",
+            (op, args) -> "new " + op + "(" + String.join(",", args) + ")"
+    );
     public static final Ops OPS = ops()
             .binary("+", "Add", "+", (a, b) -> a + b)
             .binary("-", "Subtract", "-", (a, b) -> a - b)

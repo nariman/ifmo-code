@@ -6,8 +6,16 @@ import static expression.Util.list;
  * @author Georgiy Korneev (kgeorgiy@kgeorgiy.info)
  */
 public class ExpressionTest extends BaseTest<Engine> {
-    public static final Dialect FUNCTIONS = dialect("variable('%s')", "cnst(%s)", "%s(%s)", "%s(%s, %s)");
-    public static final Dialect POLISH = dialect("%s", "%s", "%2$s %1$s", "%2$s %3$s %1$s");
+    public static final Dialect FUNCTIONS = dialect(
+            "variable('%s')",
+            "cnst(%s)",
+            (op, args) -> op + "(" + String.join(", ", args) + ")"
+    );
+    public static final Dialect POLISH = dialect(
+            "%s",
+            "%s",
+            (op, args) -> String.join(" ", args) + " " + op
+    );
 
     public static final Ops OPS = ops()
             .binary("+", "add", "+", (a, b) -> a + b)

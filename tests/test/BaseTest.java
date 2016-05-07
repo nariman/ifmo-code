@@ -2,6 +2,7 @@ package test;
 
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.function.BiFunction;
 import java.util.function.BinaryOperator;
@@ -15,7 +16,7 @@ import static expression.Util.*;
  */
 public abstract class BaseTest<E extends Engine> {
     public static final int N = 5;
-    public static final double EPS = 1e-6;
+    public static final double EPS = 1e-5;
 
     protected final E engine;
     protected final Language language;
@@ -114,8 +115,8 @@ public abstract class BaseTest<E extends Engine> {
         return generate(vars, randomInt(depth));
     }
 
-    public static Dialect dialect(final String variable, final String constant, final String unary, final String binary) {
-        return new Dialect(variable, constant, unary, binary);
+    public static Dialect dialect(final String variable, final String constant, final BiFunction<String, List<String>, String> nary) {
+        return new Dialect(variable, constant, nary);
     }
 
     public static Ops ops() {
@@ -146,14 +147,12 @@ public abstract class BaseTest<E extends Engine> {
     public static class Dialect {
         private final String variable;
         private final String constant;
-        private final String unary;
-        private final String binary;
+        private final BiFunction<String, List<String>, String> nary;
 
-        public Dialect(final String variable, final String constant, final String unary, final String binary) {
+        public Dialect(final String variable, final String constant, final BiFunction<String, List<String>, String> nary) {
             this.variable = variable;
             this.constant = constant;
-            this.unary = unary;
-            this.binary = binary;
+            this.nary = nary;
         }
 
         public String variable(final String name) {
@@ -165,11 +164,15 @@ public abstract class BaseTest<E extends Engine> {
         }
 
         public String unary(final String op, final String a) {
-            return String.format(unary, op, a);
+            return nary(op, list(a));
         }
 
         String binary(final String op, final String a, final String b) {
-            return String.format(binary, op, a, b);
+            return nary(op, list(a, b));
+        }
+
+        String nary(final String op, final List<String> as) {
+            return nary.apply(op, as);
         }
     }
 

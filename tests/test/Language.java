@@ -1,6 +1,9 @@
 package test;
 
+import expression.Util;
+
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.function.BinaryOperator;
@@ -82,6 +85,14 @@ public class Language {
         );
     }
 
+    protected <T> BaseTest.Expr<T> nary(final BaseTest.Expr<BinaryOperator<T>> op, final List<BaseTest.Expr<T>> ts) {
+        return expr(
+                parsed.nary(op.parsed, Util.map(ts, t -> t.parsed)),
+                unparsed.nary(op.unparsed, Util.map(ts, t -> t.unparsed)),
+                ts.stream().map(t -> t.answer).reduce(op.answer).get()
+        );
+    }
+
     protected BaseTest.Expr<BaseTest.TExpr> constant(final int value) {
         return constant(value, (x, y, z) -> value);
     }
@@ -113,6 +124,13 @@ public class Language {
         final BaseTest.Expr<BinaryOperator<Double>> op = bs.get(name);
         final BinaryOperator<BaseTest.TExpr> t = (q, r) -> (x, y, z) -> op.answer.apply(q.evaluate(x, y, z), r.evaluate(x, y, z));
         return binary(expr(op.parsed, op.unparsed, t), a, b);
+    }
+
+    @SafeVarargs
+    protected final BaseTest.Expr<BaseTest.TExpr> n(final String name, final BaseTest.Expr<BaseTest.TExpr>... as) {
+        final BaseTest.Expr<BinaryOperator<Double>> op = bs.get(name);
+        final BinaryOperator<BaseTest.TExpr> t = (q, r) -> (x, y, z) -> op.answer.apply(q.evaluate(x, y, z), r.evaluate(x, y, z));
+        return nary(expr(op.parsed, op.unparsed, t), Arrays.asList(as));
     }
 
     public static <T> BaseTest.Expr<T> expr(final String parsed, final String unparsed, final T answer) {
