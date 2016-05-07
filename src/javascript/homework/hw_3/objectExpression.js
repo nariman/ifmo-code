@@ -229,78 +229,96 @@ var Subtract = Operation("-", 2, function (left, right) {
     return new Subtract(left, right);
 });
 
-var parsePrefix = function (expression) {
-    println(expression);
-    var result = expression.split(" ").reduce(function (stack, element, index, elements) {
-        if (element.length === 0) {
-            return stack;
-        }
 
-        while (element.length > 0) {
-            if (element[0] == '(') {
-                stack.push('(');
-                element = element.substring(1);
-            } else if (element[0] == ')') {
-                stack.push(')');
-                element = element.substring(1);
-            } else {
-                stack.push(element);
-                break;
-            }
-        }
-
-        return stack;
-    }, []).reduceRight(function (stack, element, index, elements) {
-        if (element == ')') {
-            stack.level++;
-            stack[stack.level] = [];
-        } else if (element[0] == '(') {
-            if (stack.level === 0) {
-                throw new SyntaxError("[PARSER] Error due parsing: unexpected opening bracket - token #" + (index + 1));
-            } else if (stack[stack.level].length - 1 !== 0) {
-                throw new SyntaxError("[PARSER] Error due parsing: number of arguments in brackets after parsing not equals 1 - token #" + (index + 1));
-            }
-
-            stack[stack.level - 1].push(stack[stack.level].pop());
-            delete stack[stack.level];
-            stack.level--;
+// Valid for prefix notation only
+// But takes append function, for saving order of operands
+var buildExpression = function (expression, append) {
+    var result = expression.reduce(function (stack, element, index, elements) {
+        if (element instanceof Object) {
+            stack.push(buildExpression(element, append));
         } else if (!operations.some(function (operation) {
                 if (element == operation.operator) {
-                    if (stack[stack.level].length < operation.argnum) {
-                        throw new SyntaxError("[PARSER] Error due parsing: not enough arguments in expression for operation \"" + operation.operator + "\" - token #" + (index + 1));
+                    if (stack.length < operation.argnum) {
+                        throw new SyntaxError("[BUILDER] Not enough arguments in expression for operation \"" + 
+                            operation.operator + "\" - operator #" + (index + 1) + ". Needed: " + operation.argnum + 
+                            ". Found: " + stack.length + ".");
                     }
 
                     var parts = [];
-                    for (var i = operation.argnum; i-- > 0;) {
-                        parts.push(stack[stack.level].pop());
+                    for (var i = operation.argnum; i --> 0;) {
+                        append.call(parts, stack.pop());
                     }
 
-                    stack[stack.level].push(operation.class.apply(new (operation.class)(), parts));
+                    stack.push(operation.class.apply(new (operation.class)(), parts));
                     return true;
                 }
 
                 return false;
             })) {
             if (element.match(/^[0-9\.\-]+$/)) {
-                stack[stack.level].push(new Const(+element));
-            } else if (element.match(/^[xyz]$/)) {
-                stack[stack.level].push(new Variable(element));
+                stack.push(new Const(+element));
+            } else if (element.match(/^[a-z]$/)) {
+                stack.push(new Variable(element));
             } else {
-                throw new SyntaxError("[PARSER] Error due parsing: unexpected symbols in token - token #" + (index + 1));
+                throw new SyntaxError("[BUILDER] Unexpected symbols in token - token #" + (index + 1));
             }
         }
 
         return stack;
-    }, {'level': 0, 0: []});
+    }, []);
 
-    if (result.level !== 0) {
-        throw new SyntaxError("[PARSER] Error due parsing: expression contains incorrect bracket sequence");
-    } else if (result[0].length - 1 !== 0) {
-        throw new SyntaxError("[PARSER] Error due parsing: number of arguments in expression after parsing not equals 1");
+    if (result.length != 1) {
+        throw new SyntaxError("[BUILDER] Number of arguments in expression after building not equals 1");
     }
 
-    return result[0].pop();
+    return result[0];
 };
+
+var parseExpression = function (expression, token, depthIn, depthOut, append) {
+    expression = expression.trim();
+    var stack = {'level': 0, 0: []};
+    var tokenCounter = 0;
+
+    while (expression.length > 0) {
+        var matched = expression.match(token); // Always return something in our case!
+        var element = matched[1];
+        tokenCounter++;
+
+        if (element[0] == depthIn) {
+            stack.level++;
+            stack[stack.level] = [];
+        } else if (element == depthOut) {
+            if (stack.level === 0) {
+                throw new SyntaxError("[PARSER] Unexpected bracket - token #" + tokenCounter);
+            }
+
+            stack[stack.level - 1].push(stack[stack.level]);
+            delete stack[stack.level];
+            stack.level--;
+        } else {
+            stack[stack.level].push(element);
+        }
+
+        expression = expression.replace(token, "");
+    }
+
+    if (stack.level !== 0) {
+        throw new SyntaxError("[PARSER] Expression contains incorrect bracket sequence");
+    }
+
+    return buildExpression(stack[0], append);
+};
+
+var parsePostfix = function(expression) {
+    // Int/Float -OR- "(" -OR- ")" -OR- Variable FROM START
+    return parseExpression(expression, /^[\s]*((\-?\d+(\.\d+)?)|(\()|(\))|([^\d\(\)\s]+))/, "(", ")", Array.prototype.unshift);
+};
+
+var parsePrefix = function(expression) {
+    // Int/Float -OR- "(" -OR- ")" -OR- Variable FROM END
+    return parseExpression(expression, /((\-?\d+(\.\d+)?)|(\()|(\))|([^\d\(\)\s]+))[\s]*$/, ")", "(", Array.prototype.push);
+};
+
 
 // var expr = new Subtract(
 //     new Multiply(

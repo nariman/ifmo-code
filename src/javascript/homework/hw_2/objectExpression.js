@@ -222,7 +222,9 @@ var parse = function (expression) {
         if (!operations.some(function (operation) {
                 if (element == operation.operator) {
                     if (stack.length < operation.argnum) {
-                        throw new SyntaxError("[PARSER] Error due parsing: not enough arguments in expression for operation \"" + operation.operator + "\" - operator #" + (index + 1));
+                        throw new SyntaxError("[PARSER] Not enough arguments in expression for operation \"" + 
+                            operation.operator + "\" - operator #" + (index + 1) + ". Needed: " + operation.argnum + 
+                            ". Found: " + stack.length + ".");
                     }
 
                     var parts = [];
@@ -238,11 +240,13 @@ var parse = function (expression) {
             })) {
             if (element.match(/^[0-9\.\-]+$/)) {
                 stack.push(new Const(+element));
+            } else if (element.match(/^[a-z]$/)) {
+                stack.push(new Variable(element));
             } else {
-                stack.push(new Variable(element)); // All other tokens!
+                throw new SyntaxError("[PARSER] Unexpected symbols in token - token #" + (index + 1));
             }
         }
-
+        
         return stack;
     }, [])[0];
 };
