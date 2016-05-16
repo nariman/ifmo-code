@@ -38,7 +38,7 @@ public abstract class BaseTest<E extends Engine> {
             }
         }
 
-        testRandom(500, (v, i) -> generate(v, i / 5 + 2));
+        testRandom(400, (v, i) -> generate(v, i / 5 + 2));
         System.out.println("OK");
     }
 

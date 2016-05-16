@@ -20,14 +20,14 @@ public class PostfixParserTest extends ModifiedPrefixParserTest {
         printParsingError("Empty input", "");
         printParsingError("Unknown variable", "a");
         printParsingError("Invalid number", "-a");
-        printParsingError("Missing )", "(* z (+ x y)");
-        printParsingError("Unknown operation", "(@@  x y)");
-        printParsingError("Excessive info", "(+ x y) x");
+        printParsingError("Missing )", "(z (x y +) *");
+        printParsingError("Unknown operation", "( x y @@)");
+        printParsingError("Excessive info", "(x y +) x");
         printParsingError("Invalid unary (0 args)", "(negate)");
-        printParsingError("Invalid unary (2 args)", "(negate x y)");
+        printParsingError("Invalid unary (2 args)", "(x y negate)");
         printParsingError("Invalid binary (0 args)", "(+)");
-        printParsingError("Invalid binary (1 args)", "(+ x)");
-        printParsingError("Invalid binary (3 args)", "(+ x y z)");
+        printParsingError("Invalid binary (1 args)", "(x +)");
+        printParsingError("Invalid binary (3 args)", "(x y z +)");
     }
 
     @Override

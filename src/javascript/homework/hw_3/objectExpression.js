@@ -123,7 +123,7 @@ function Operation(oper, argnum, func, diff, simp) {
     };
     OperationFunction.prototype.postfix = function () {
         return "(" + this._args.map(function (element) {
-                return element.parsePostfix();
+                return element.postfix();
             }).join(" ") + " " + this._operator + ")";
     };
     OperationFunction.prototype.prefix = function () {
@@ -247,13 +247,15 @@ var Subtract = Operation("-", 2, function (left, right) {
 // But takes append function, for saving order of operands
 var buildExpression = function (expression, append) {
     var result = expression.reduce(function (stack, element, index, elements) {
+        position = element[1];
+        element = element[0];
         if (element instanceof Array) {
             stack.push(buildExpression(element, append));
         } else if (!operations.some(function (operation) {
                 if (element == operation.operator) {
                     if (stack.length < operation.argnum) {
                         throw new SyntaxError("[BUILDER] Not enough arguments in expression for operation \"" + 
-                            operation.operator + "\" - operator #" + (index + 1) + ". Needed: " + operation.argnum + 
+                            operation.operator + "\" - pos #" + position + ", token #" + (index + 1) + ". Needed: " + operation.argnum + 
                             ". Found: " + stack.length + ".");
                     }
 
@@ -274,7 +276,7 @@ var buildExpression = function (expression, append) {
             } else if (element.match(/^[xyz]$/)) {
                 stack.push(new Variable(element));
             } else {
-                throw new SyntaxError("[BUILDER] Unexpected symbols in token - token #" + (index + 1));
+                throw new SyntaxError("[BUILDER] Unexpected symbols in token - pos #" + position + ", token #" + (index + 1));
             }
         }
 
@@ -288,31 +290,33 @@ var buildExpression = function (expression, append) {
     return result[0];
 };
 
-var parseExpression = function (expression, token, depthIn, depthOut, append) {
+var parseExpression = function (expression, token, DEPTH_IN, DEPTH_OUT, append) {
     expression = expression.trim();
-    var stack = {'level': 0, 0: []};
+    var stack = {'level': 0, 0: [[], 0]};
     var tokenCounter = 0;
+    var posCounter = 0;
 
     while (expression.length > 0) {
         var matched = expression.match(token); // Always return something in our case!
         var element = matched[1];
         tokenCounter++;
 
-        if (element[0] == depthIn) {
+        if (element[0] == DEPTH_IN) {
             stack.level++;
-            stack[stack.level] = [];
-        } else if (element == depthOut) {
+            stack[stack.level] = [[], posCounter];
+        } else if (element == DEPTH_OUT) {
             if (stack.level === 0) {
-                throw new SyntaxError("[PARSER] Unexpected bracket - token #" + tokenCounter);
+                throw new SyntaxError("[PARSER] Unexpected bracket - pos #" + posCounter + ", token #" + tokenCounter);
             }
 
-            stack[stack.level - 1].push(stack[stack.level]);
+            stack[stack.level - 1][0].push(stack[stack.level]);
             delete stack[stack.level];
             stack.level--;
         } else {
-            stack[stack.level].push(element);
+            stack[stack.level][0].push([element, posCounter]);
         }
 
+        posCounter += matched[0].length;
         expression = expression.replace(token, "");
     }
 
@@ -320,7 +324,7 @@ var parseExpression = function (expression, token, depthIn, depthOut, append) {
         throw new SyntaxError("[PARSER] Expression contains incorrect bracket sequence");
     }
 
-    return buildExpression(stack[0], append);
+    return buildExpression(stack[0][0], append);
 };
 
 var parsePostfix = function(expression) {
