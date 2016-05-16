@@ -7,6 +7,9 @@ for %%m in (%*) do (
         echo ===============================================================================
         echo.
         java -ea -cp "%~dp0;%~dp0..\..\..\..\tests" test.PrefixParserTest easy
+        echo.
+        echo TESTING BASE EASY COMPLETED
+        echo.
     )
 
     if %%m == base-hard (
@@ -16,6 +19,9 @@ for %%m in (%*) do (
         echo ===============================================================================
         echo.
         java -ea -cp "%~dp0;%~dp0..\..\..\..\tests" test.PrefixParserTest hard
+        echo.
+        echo TESTING BASE HARD COMPLETED
+        echo.
     )
 
     if %%m == mod-one-easy (
@@ -25,6 +31,9 @@ for %%m in (%*) do (
         echo ================================================================================
         echo.
         java -ea -cp "%~dp0;%~dp0..\..\..\..\tests" test.ModifiedPrefixParserTest easy
+        echo.
+        echo TESTING MOD 1 EASY COMPLETED
+        echo.
     )
 
     if %%m == mod-one-hard (
@@ -34,6 +43,9 @@ for %%m in (%*) do (
         echo ================================================================================
         echo.
         java -ea -cp "%~dp0;%~dp0..\..\..\..\tests" test.ModifiedPrefixParserTest hard
+        echo.
+        echo TESTING MOD 1 HARD COMPLETED
+        echo.
     )
 
     if %%m == mod-two-easy (
@@ -43,6 +55,9 @@ for %%m in (%*) do (
         echo ================================================================================
         echo.
         java -ea -cp "%~dp0;%~dp0..\..\..\..\tests" test.PostfixParserTest easy
+        echo.
+        echo TESTING MOD 2 EASY COMPLETED
+        echo.
     )
 
     if %%m == mod-two-hard (
@@ -52,5 +67,8 @@ for %%m in (%*) do (
         echo ================================================================================
         echo.
         java -ea -cp "%~dp0;%~dp0..\..\..\..\tests" test.PostfixParserTest hard
+        echo.
+        echo TESTING MOD 2 HARD COMPLETED
+        echo.
     )
 )

@@ -7,6 +7,9 @@ for %%m in (%*) do (
         echo ===============================================================================
         echo.
         java -ea -cp "%~dp0;%~dp0..\..\..\..\tests" test.ExpressionTest easy
+        echo.
+        echo TESTING BASE EASY COMPLETED
+        echo.
     )
 
     if %%m == base-hard (
@@ -16,6 +19,9 @@ for %%m in (%*) do (
         echo ===============================================================================
         echo.
         java -ea -cp "%~dp0;%~dp0..\..\..\..\tests" test.ExpressionTest hard
+        echo.
+        echo TESTING BASE HARD COMPLETED
+        echo.
     )
 
     if %%m == mod-easy (
@@ -25,6 +31,9 @@ for %%m in (%*) do (
         echo ==============================================================================
         echo.
         java -ea -cp "%~dp0;%~dp0..\..\..\..\tests" test.ModifiedExpressionTest easy
+        echo.
+        echo TESTING MOD EASY COMPLETED
+        echo.
     )
 
     if %%m == mod-hard (
@@ -34,5 +43,8 @@ for %%m in (%*) do (
         echo ==============================================================================
         echo.
         java -ea -cp "%~dp0;%~dp0..\..\..\..\tests" test.ModifiedExpressionTest hard
+        echo.
+        echo TESTING MOD HARD COMPLETED
+        echo.
     )
 )
