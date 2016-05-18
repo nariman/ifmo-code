@@ -92,16 +92,16 @@ namespace Format {
 
     class Tokenizer {
     private:
-        const char* format;
+        std::string format;
 
         void skip();
     public:
-        Tokenizer(const char *format);
+        Tokenizer(const std::string &format);
         Token next();
     };
 };
 
-// template <typename... Args>
-// std::string format(std::string const &format, Args... args);
+template <typename... Args>
+std::string format(const std::string &format, Args... args);
 
 #endif // IFMO_CPP_FORMAT_H

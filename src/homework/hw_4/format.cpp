@@ -16,7 +16,7 @@ namespace Format {
 
     }
 
-    Tokenizer::Tokenizer(const char *format) {
+    Tokenizer::Tokenizer(const std::string &format) {
         this->format = format;
     }
 
@@ -26,8 +26,7 @@ namespace Format {
     }
 }
 
-// template <typename... Args>
-// std::string format(std::string const &format, Args... args) {
-//     std::stringstream formatted;
-//     return "Hello world";
-// }
+template <typename... Args>
+std::string format(const std::string &format, Args... args) {
+    return "Nil";
+}
