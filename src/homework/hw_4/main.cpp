@@ -5,11 +5,14 @@
  */
 
 #include <cstdio>
+#include <iostream>
 #include "format.h"
 
 int main() {
-    const char *c = "Hello world";
-    Format::Tokenizer tokenizer(c);
-    // std::printf("%d", tokenizer->next()->specifier);
+    std::string s = "Hello world";
+    Format::Tokenizer tokenizer(s);
+    printf("%\n");
+    printf("%%\n");
+    printf("%15%\n");
     return 0;
 }

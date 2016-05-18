@@ -10,7 +10,9 @@
 #include <string>
 
 namespace Format {
+    // %([\-+\s\#]*)([0-9]+|[\*])?(\.([0-9]+|[\*]))?(hh|h|l|ll|j|z|t|L)?([d|i|u|o|x|X|f|F|e|E|g|G|a|A|c|s|p|n|%])
     enum class Specifier {
+        none,
         d, // Signed decimal integer
         i, // Signed decimal integer 
         u, // Unsigned decimal integer
@@ -87,21 +89,40 @@ namespace Format {
         Precision precision = Precision::none;
         Length length = Length::none;
 
-        Token(Specifier specifier);
+        std::string before;
+        std::string after;
+
+        Token(Specifier specifier, std::string before, std::string after);
     };
 
     class Tokenizer {
     private:
-        const char* format;
+        std::string format;
+        std::vector<Token> tokens;
+        int position;
+        bool resetted;
 
-        void skip();
+        void accumulate();
     public:
-        Tokenizer(const char *format);
+        Tokenizer(const std::string &format);
         Token next();
+        tokenize();
+        reset();
     };
+
+    class Formatter {
+    private:
+        std::string format;
+        Tokenizer &tokenizer;
+        std::vector<Token> tokens;
+        bool firstFormatted;
+    public:
+        Formatter(const std::string &format)
+        std::string format(Args.. args);
+    }
 };
 
-// template <typename... Args>
-// std::string format(std::string const &format, Args... args);
+template <typename... Args>
+std::string format(const std::string &format, Args... args);
 
 #endif // IFMO_CPP_FORMAT_H
