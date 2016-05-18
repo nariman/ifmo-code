@@ -1,0 +1,3 @@
+#!/bin/bash
+kotlin $1Kt
+
