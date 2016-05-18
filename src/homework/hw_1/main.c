@@ -39,7 +39,7 @@ int main(int argc, char** argv) {
 
         for (i = x1; i <= x2; i++) {
             for (j = y1; j <= y2; j++) {
-                printf("%*d", digits(table[x2 - 1][j]) + 1, table[i][j]);
+                printf("%*d", digits(table[x2 - 1][j]) + 2, table[i][j]);
             }
             printf("\n");
         }
