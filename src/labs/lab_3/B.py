@@ -1,5 +1,4 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 """
 Nariman Safiulin (woofilee)
 File: B.py
@@ -7,6 +6,9 @@ Created on: May 09, 2016
 """
 from functools import reduce
 
+"""
+RUNTIME ERROR ON THE FIRST TEST :(
+"""
 PROBLEM_NAME = "problem2"
 
 

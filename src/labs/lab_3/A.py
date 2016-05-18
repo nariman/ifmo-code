@@ -1,5 +1,4 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 """
 Nariman Safiulin (woofilee)
 File: A.py
