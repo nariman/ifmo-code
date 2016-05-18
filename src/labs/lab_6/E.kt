@@ -72,7 +72,7 @@ private fun solve(`in`: Scanner, out: PrintWriter) {
         end = -1
         edges.forEach { edge ->
             if (distances[edge.from] != INF && distances[edge.to] > distances[edge.from] + edge.weight) {
-                distances[edge.to] = Math.max(-INF, distances[edge.from] + edge.weight)
+                distances[edge.to] = distances[edge.from] + edge.weight
                 from[edge.to] = edge.from
                 end = edge.to
             }

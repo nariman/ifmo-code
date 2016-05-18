@@ -34,7 +34,7 @@ private class Scanner(file: File) {
 data class DirectedEdge(val from: Int, val to: Int, val weight: Int)
 
 private fun solve(`in`: Scanner, out: PrintWriter) {
-    val nonExistEdge = 1000000000
+    val NON_EXIST_EDGE = 1000000000
 
     val n = `in`.nextInt()
     val edges = ArrayList<DirectedEdge>()
@@ -44,7 +44,7 @@ private fun solve(`in`: Scanner, out: PrintWriter) {
     (0..n - 1).forEach { i ->
         (0..n - 1).forEach { j ->
             val w = `in`.nextInt()
-            if (w != nonExistEdge) {
+            if (w != NON_EXIST_EDGE) {
                 edges.add(DirectedEdge(i, j, w))
             }
         }
@@ -55,7 +55,7 @@ private fun solve(`in`: Scanner, out: PrintWriter) {
         end = -1
         edges.forEach { edge ->
             if (distances[edge.to] > distances[edge.from] + edge.weight) {
-                distances[edge.to] = Math.max(-nonExistEdge, distances[edge.from] + edge.weight)
+                distances[edge.to] = Math.max(-NON_EXIST_EDGE, distances[edge.from] + edge.weight)
                 from[edge.to] = edge.from
                 end = edge.to
             }
