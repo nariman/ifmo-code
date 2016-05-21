@@ -537,17 +537,16 @@ namespace Format
  * Returns a formatted string according to the format string.
  *
  * @param   fmt     Format string
- * @param   args    Arguments required by the format specifiers in the format
- *                  string. If there are more arguments than format specifiers,
- *                  the extra arguments are ignored. The number of arguments is
- *                  variable and may be zero.
+ * @param   args    Arguments, accroding to the specifiers in the format string.
+ *                  If more arguments provided, than needed, the extra arguments
+ *                  are ignored.
  *
  * @return  Formatted string
  *
- * @throws  std::invalid_format If a format string contains an unexpected 
- *                              specifier, an argument can not be converted to 
- *                              required format, or in other illegal conditions
- * @throws  std::out_of_range   If there are not enough arguments
+ * @throws  std::invalid_argument If a format string contains an unexpected 
+ *                                specifier, an argument can not be converted to 
+ *                                required format, or other errors
+ * @throws  std::out_of_range     If there are not enough arguments
  */
 template <typename... Args> std::string format(const std::string& format,
                                                Args... args)
