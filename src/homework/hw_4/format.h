@@ -8,11 +8,7 @@
 #define IFMO_CPP_FORMAT_H
 
 #include <cstddef>
-#include <cstdio>
-#include <iomanip>
-#include <iostream>
 #include <sstream>
-#include <string>
 
 namespace Format
 {
@@ -471,7 +467,13 @@ namespace Format
                         t.append((token->type == Type::a) ? "a" : "A");
 
                         char buff[2048];
-                        snprintf(buff, sizeof(buff), t.c_str(), first);
+
+                        if (token->length == Length::none)
+                            snprintf(buff, sizeof(buff), t.c_str(), 
+                                     cast<double>(first));
+                        else
+                            snprintf(buff, sizeof(buff), t.c_str(), 
+                                     cast<long double>(first));
 
                         token_result << buff;
                         break;

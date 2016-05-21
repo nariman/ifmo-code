@@ -4,9 +4,6 @@
  * Created on: May 06, 2016
  */
 
-#include <cctype>
-#include <stdexcept>
-#include <string>
 #include "format.h"
 
 namespace Format
