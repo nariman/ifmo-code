@@ -10,7 +10,6 @@
 #include <cstddef>
 #include <cstdio>
 #include <iomanip>
-#include <ios>
 #include <iostream>
 #include <sstream>
 #include <string>
@@ -170,7 +169,6 @@ namespace Format
                  // The corresponding argument must be a pointer to a signed int
                  // The number of characters written so far is stored in the
                  // pointed location
-        unknown,
     };
 
 
@@ -199,16 +197,19 @@ namespace Format
         /**
          * Parses a text until `%` symbol from the format string.
          * 
-         * @return a matched text
+         * @return A matched text
          */
         std::string accumulate();
     public:
+        /**
+         * Creates a new tokenizer with specified format string.
+         */
         Tokenizer(const std::string &format);
 
         /**
          * Parses a next token in the format string and returns it.
          * 
-         * @return a token
+         * @return A token
          */
         Token* next();
     };
@@ -237,22 +238,22 @@ namespace Format
         /**
          * Takes arguments and formats them according to the format string. 
          * 
-         * @param   result  accumulating result string
-         * @param   token   token with format data
+         * @param   result  Accumulating result string
+         * @param   token   Token with format data
          *
-         * @return  formatted string
+         * @return  Formatted string
          */
         std::string apply(std::string& result, Token* token);
 
         /**
          * Takes arguments and formats them according to the format string. 
          * 
-         * @param   result  accumulating result string
-         * @param   token   token with format data
-         * @param   first   arguments to format
-         * @param   rest    arguments to format
+         * @param   result  Accumulating result string
+         * @param   token   Token with format data
+         * @param   first   Arguments to format
+         * @param   rest    Arguments to format
          *
-         * @return  formatted string
+         * @return  Formatted string
          */
         template <typename First, typename... Rest>
         std::string apply(std::string& result, Token* token, First& first, 
@@ -273,6 +274,16 @@ namespace Format
                 return apply(result, token, rest...);
             }
 
+            if (token->width_value < 0) {
+                token->width_value *= -1;
+                token->flag |= Flag::minus;
+                token->flag &= ~Flag::zero;
+            }
+
+            if (token->precision_value < 0)
+                throw std::invalid_argument(
+                    "Precision specifier cannot be negative");
+
             std::ostringstream token_result;
 
             if (static_cast<bool>(token->flag & Flag::minus))
@@ -283,9 +294,10 @@ namespace Format
                 token_result << std::showbase << std::showpoint;
             if (static_cast<bool>(token->flag & Flag::zero))
                 token_result.fill('0');
-            if (token->width_value != 0)
+            if (token->width == Width::number && token->width_value >= 0)
                 token_result.width(token->width_value);
-            if (token->precision_value >= 0)
+            if (token->precision == Precision::number 
+                && token->precision_value >= 0)
                 token_result.precision(token->precision_value);
 
             switch (token->type)
@@ -295,6 +307,19 @@ namespace Format
                     break;
                 case Type::d: 
                 case Type::i:
+                    if (token->precision == Precision::number 
+                        && token->precision_value == 0)
+                    {
+                        break;
+                    }
+
+                    if (token->precision_value > 0)
+                    {
+                        token_result << std::right;
+                        token_result.fill('0');
+                        token_result.width(token->precision_value);
+                    }
+
                     switch (token->length)
                     {
                         case Length::none: token_result << cast<int>           (first); break;
@@ -307,12 +332,38 @@ namespace Format
                         case Length::t:    token_result << cast<ptrdiff_t>     (first); break;
                         default: throw std::invalid_argument("Length specifier is not supported");
                     }
+
+                    if (token->precision_value > 0 && token->width_value >= 0)
+                    {
+                        std::string t = token_result.str();
+                        token_result.str(std::string());
+
+                        if (static_cast<bool>(token->flag & Flag::minus))
+                            token_result << std::left;
+
+                        token_result.fill(' ');
+                        token_result.width(token->width_value);
+                        token_result << t;
+                    }
                     break;
                 case Type::X:
                     token_result << std::uppercase;
                 case Type::u:
                 case Type::o: 
                 case Type::x:
+                    if (token->precision == Precision::number 
+                        && token->precision_value == 0)
+                    {
+                        break;
+                    }
+
+                    if (token->precision_value > 0)
+                    {
+                        token_result << std::right;
+                        token_result.fill('0');
+                        token_result.width(token->precision_value);
+                    }
+
                     switch (token->type)
                     {
                         case Type::o:
@@ -336,6 +387,19 @@ namespace Format
                         case Length::t:    token_result << cast<ptrdiff_t>              (first); break;
                         default: throw std::invalid_argument("Length specifier is not supported");
                     }
+
+                    if (token->precision_value > 0 && token->width_value >= 0)
+                    {
+                        std::string t = token_result.str();
+                        token_result.str(std::string());
+
+                        if (static_cast<bool>(token->flag & Flag::minus))
+                            token_result << std::left;
+
+                        token_result.fill(' ');
+                        token_result.width(token->width_value);
+                        token_result << t;
+                    }
                     break;
                 case Type::F:
                 case Type::E:
@@ -346,21 +410,24 @@ namespace Format
                 case Type::e:
                 case Type::g:
                 case Type::a:
-                    switch (token->type)
+                    if (token->precision == Precision::none
+                        && (
+                            token->type == Type::f || token->type == Type::F
+                            || token->type == Type::e || token->type == Type::E
+                            || token->type == Type::a || token->type == Type::A
+                        ))
                     {
-                        case Type::g:
-                        case Type::G:
-                            token_result << std::fixed;
-                            break;
-                        case Type::e:
-                        case Type::E:
-                            token_result << std::scientific;
-                            break;
-                        case Type::a:
-                        case Type::A:
-                            // token_result << std::hexfloat;
-                            break;
+                        token_result.precision(6);
                     }
+
+                    if (token->type == Type::f || token->type == Type::F)
+                        token_result << std::fixed;
+
+                    if (token->type == Type::e || token->type == Type::E)
+                        token_result << std::scientific;
+
+                    if (token->type == Type::a || token->type == Type::A)
+                        token_result << std::hexfloat;
 
                     switch (token->length)
                     {
@@ -370,13 +437,36 @@ namespace Format
                     }
                     break;
                 case Type::s:
-                    // TODO: test precision specifier
-                    switch (token->length)
+                    if (token->length == Length::none)
                     {
-                        case Length::none: token_result << cast<std::string>  (first); break;
-                        // case Length::l:    token_result << cast<std::wstring> (first); break;
-                        default: throw std::invalid_argument("Length specifier is not supported");
+                        std::string s = cast<std::string>(first);
+
+                        if (token->precision == Precision::number)
+                            token_result << s.substr(0, token->precision_value);
+                        else
+                            token_result << s;
                     }
+                    else if (token->length == Length::l)
+                    {
+                        // std::wostringstream woss;
+
+                        // if (auto ws = dynamic_cast<std::wstring*>(first))
+                        // {
+                        //     if (token->precision == Precision::number)
+                        //         woss << ws->substr(0, token->precision_value);
+                        //     else
+                        //         woss << ws;
+                        // }
+                        // else
+                        // {
+                        //     throw std::invalid_argument("Invalid argument type");
+                        // }
+                    }
+                    else
+                    {
+                        throw std::invalid_argument("Length specifier is not supported");
+                    }
+
                     break;
                 case Type::c:
                     switch (token->length)
@@ -389,7 +479,12 @@ namespace Format
                 case Type::p: 
                     if (token->length != Length::none)
                         throw std::invalid_argument("Unsupported length specifier");
-                    token_result << first;
+
+                    if (cast<void*>(first) != NULL)
+                        token_result << cast<void*>(first);
+                    else
+                        token_result << "(nil)";
+
                     break;
                 case Type::n:
                     switch (token->length)
@@ -424,9 +519,9 @@ namespace Format
         /**
          * Takes arguments and formats them according to the format string. 
          * 
-         * @param   args    arguments to format
+         * @param   args    Arguments to format
          *
-         * @return  formatted string
+         * @return  Formatted string
          */
         template <typename... Args>
         std::string apply(Args... args)
@@ -441,17 +536,18 @@ namespace Format
 /**
  * Returns a formatted string according to the format string.
  *
- * @param   fmt     format string
- * @param   args    arguments required by the format specifiers in the format
+ * @param   fmt     Format string
+ * @param   args    Arguments required by the format specifiers in the format
  *                  string. If there are more arguments than format specifiers,
  *                  the extra arguments are ignored. The number of arguments is
  *                  variable and may be zero.
+ *
+ * @return  Formatted string
+ *
  * @throws  std::invalid_format If a format string contains an unexpected 
  *                              specifier, an argument can not be converted to 
- *                              required format, or in other illegal conditions.
- * @throws  std::out_of_range   If there are not enough arguments in args list.
- *
- * @return  formatted string
+ *                              required format, or in other illegal conditions
+ * @throws  std::out_of_range   If there are not enough arguments
  */
 template <typename... Args> std::string format(const std::string& format,
                                                Args... args)

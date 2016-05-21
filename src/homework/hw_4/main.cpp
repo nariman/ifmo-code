@@ -135,10 +135,7 @@ void test()
     printf("%p\n", p);
     printf("%s\n", format("%p", p).c_str());
     
-    int tt = 15;
-    int* ttp = &tt;
-    printf("%p\n", ttp);
-    printf("%s\n", format("%p", ttp).c_str());
+    
     
     // std::nullptr_t k;
     // printf("nullptr: %s\n", format("%@", k).c_str());
@@ -163,5 +160,14 @@ void test()
 int main()
 {
     test();
+
+    printf("%25.15d-\n", 15555);
+    printf(format("%25.15d-\n", 15555).c_str());
+    printf("%-25.15d-\n", 15555);
+    printf(format("%-25.15d-\n", 15555).c_str());
+
+    printf("%.10s\n", "yo-yo! hello my big world!");
+    printf(format("%.10s\n", "yo-yo! hello my big world!").c_str());
+
     return 0;
 }
