@@ -33,7 +33,7 @@ namespace Format
 
     Token* Tokenizer::next()
     {
-        if (this->position == this->format.length())
+        if (this->position >= this->format.length())
             return NULL;
 
         Token *token = new Token();
@@ -107,22 +107,22 @@ namespace Format
             this->position++;
             if (this->format[this->position] == '*')
             {
-                token->width = Width::asterisk;
+                token->precision = Precision::asterisk;
                 this->position++;
             }
             else
             {
-                token->width = Width::number;
+                token->precision = Precision::number;
                 if (isdigit(this->format[this->position]))
                 {
-                    std::string width_value = "";
+                    std::string precision_value = "";
                     while (this->position < this->format.length() 
                            && isdigit(this->format[this->position]))
                     {
-                        width_value.push_back(this->format[this->position]);
+                        precision_value.push_back(this->format[this->position]);
                         this->position++;
                     }
-                    token->width_value = std::stoi(width_value);
+                    token->precision_value = std::stoi(precision_value);
                 }
             }
         }
@@ -193,8 +193,21 @@ namespace Format
     }
 
     std::string Formatter::apply(std::string& result, Token* token) {
-        if (token != NULL)
-            std::out_of_range("Not enough arguments to format");
+        while(token != NULL)
+        {
+            if (token->type == Type::none | token->type == Type::percent)
+            {
+                result.append(token->before);
+                result.append(token->after);
+            }
+            else
+            {
+                throw std::out_of_range("Not enough arguments to format");
+            }
+
+            token = this->tokenizer->next();
+        }
+
         return result;
     }
 }

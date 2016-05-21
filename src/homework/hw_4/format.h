@@ -9,11 +9,11 @@
 
 #include <cstddef>
 #include <cstdio>
-#include <functional>
 #include <iomanip>
 #include <iostream>
 #include <sstream>
 #include <string>
+#include <typeinfo> 
 
 namespace Format
 {
@@ -176,7 +176,7 @@ namespace Format
     class Token
     {
     public:
-        Type type;
+        Type type = Type::none;
         Flag flag = Flag::none;
         Width width = Width::none;
         Precision precision = Precision::none;
@@ -280,15 +280,17 @@ namespace Format
                 token_result << std::showpos;
             if (static_cast<bool>(token->flag & Flag::sharp))
                 token_result << std::showbase << std::showpoint;
+            if (static_cast<bool>(token->flag & Flag::zero))
+                token_result.fill('0');
             if (token->width_value != 0)
-                token_result << std::setw(token->width_value);
+                token_result.width(token->width_value);
             if (token->precision_value >= 0)
-                token_result << std::setprecision(token->precision_value);
+                token_result.precision(token->precision_value);
 
             switch (token->type)
             {
                 case Type::percent:
-                    token_result << "%";
+                    token_result << '%';
                     break;
                 case Type::d: 
                 case Type::i:
@@ -309,7 +311,18 @@ namespace Format
                     token_result << std::uppercase;
                 case Type::u:
                 case Type::o: 
-                case Type::x: 
+                case Type::x:
+                    switch (token->type)
+                    {
+                        case Type::o:
+                            token_result << std::oct;
+                            break;
+                        case Type::x:
+                        case Type::X:
+                            token_result << std::hex;
+                            break;
+                    }
+
                     switch (token->length)
                     {
                         case Length::none: token_result << cast<unsigned int>           (first); break;
@@ -332,12 +345,29 @@ namespace Format
                 case Type::e:
                 case Type::g:
                 case Type::a:
+                    switch (token->type)
+                    {
+                        case Type::g:
+                        case Type::G:
+                            token_result << std::fixed;
+                            break;
+                        case Type::e:
+                        case Type::E:
+                            token_result << std::scientific;
+                            break;
+                        case Type::a:
+                        case Type::A:
+                            token_result << std::hexfloat;
+                            break;
+                    }
+
                     switch (token->length)
                     {
                         case Length::none: token_result << cast<double>      (first); break;
                         case Length::L:    token_result << cast<long double> (first); break;
                         default: throw std::invalid_argument("Length specifier is not supported");
                     }
+                    break;
                 case Type::s:
                     // TODO: test precision specifier
                     switch (token->length)
@@ -355,7 +385,11 @@ namespace Format
                         default: throw std::invalid_argument("Length specifier is not supported");
                     }
                     break;
-                case Type::p: break;
+                case Type::p: 
+                    if (token->length != Length::none)
+                        throw std::invalid_argument("Unsupported length specifier");
+                    token_result << first;
+                    break;
                 case Type::n:
                     switch (token->length)
                     {
@@ -377,7 +411,11 @@ namespace Format
             result.append(token->before);
             result.append(token_result.str());
             result.append(token->after);
-            return apply(result, this->tokenizer->next(), rest...);
+
+            if (token->type == Type::percent)
+                return apply(result, this->tokenizer->next(), first, rest...);
+            else
+                return apply(result, this->tokenizer->next(), rest...);
         }
     public:
         Formatter(const std::string &format);

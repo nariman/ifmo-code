@@ -5,7 +5,6 @@
  */
 
 #include <climits>
-#include <cstdio>
 #include <iostream>
 #include "format.h"
 
@@ -136,6 +135,10 @@ void test()
     printf("%p\n", p);
     printf("%s\n", format("%p", p).c_str());
     
+    int tt = 15;
+    int* ttp = &tt;
+    printf("%p\n", ttp);
+    printf("%s\n", format("%p", ttp).c_str());
     
     // std::nullptr_t k;
     // printf("nullptr: %s\n", format("%@", k).c_str());
@@ -159,18 +162,6 @@ void test()
 
 int main()
 {
-    std::string s = "hello world%+015.7llfafter hello blabla %-*.*d hell";
     test();
-    // format(s);
-    // Format::Formatter formatter(s);
-    // formatter.apply(s);
-    // formatter.apply(15, 30, 45);
-    // printf("%*d\n", 15, 15);
-    // Format::Tokenizer tokenizer(s);
-    // Format::Token *token = tokenizer.next();
-    // printf("%s\n", token->before.begin());
-    // printf("%d\n", token->flag);
-    // printf("%d\n", token->type);
-    // printf("%s\n", token->after.begin());
     return 0;
 }
