@@ -4,6 +4,7 @@
  * Created on: May 06, 2016
  */
 
+#include <stdexcept>
 #include "format.h"
 
 namespace Format

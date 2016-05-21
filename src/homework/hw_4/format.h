@@ -9,6 +9,7 @@
 
 #include <cstddef>
 #include <sstream>
+#include <stdexcept>
 
 namespace Format
 {
