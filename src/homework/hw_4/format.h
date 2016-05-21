@@ -10,6 +10,7 @@
 #include <cstddef>
 #include <cstdio>
 #include <iomanip>
+#include <ios>
 #include <iostream>
 #include <sstream>
 #include <string>
@@ -357,7 +358,7 @@ namespace Format
                             break;
                         case Type::a:
                         case Type::A:
-                            token_result << std::hexfloat;
+                            // token_result << std::hexfloat;
                             break;
                     }
 
