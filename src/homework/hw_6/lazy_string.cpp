@@ -15,19 +15,27 @@ lazy_string::lazy_char::lazy_char(lazy_string* ls, size_t pos) : ls(ls),
 
 lazy_string::lazy_char::operator char() const
 {
+    if (this->pos >= ls->len)
+        throw std::out_of_range(
+            "Lazy string: given position is out of string length");
+
     return (*ls->string)[ls->start + this->pos];
 }
 
 lazy_string::lazy_char& lazy_string::lazy_char::operator=(char c)
 {
+    if (this->pos >= ls->len)
+        throw std::out_of_range(
+            "Lazy string: given position is out of string length");
+
     if (ls->string.use_count() > 1)
     {
         ls->string = std::make_shared<std::string>(ls->string->substr(
             ls->start, ls->len));
         ls->start = 0;
     }
-    (*ls->string)[ls->start + this->pos] = c;
 
+    (*ls->string)[ls->start + this->pos] = c;
     return *this;
 }
 
@@ -59,10 +67,6 @@ size_t lazy_string::length() const
 
 lazy_string::lazy_char lazy_string::at(size_t pos)
 {
-    if (pos >= this->len)
-        throw std::out_of_range(
-            "Lazy string: given position is out of string length");
-
     return lazy_char(this, pos);
 }
 

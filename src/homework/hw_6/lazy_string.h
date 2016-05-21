@@ -17,6 +17,7 @@
  */
 class lazy_string
 {
+private:
     struct lazy_char
     {
         friend class lazy_string;
@@ -42,8 +43,7 @@ class lazy_string
          */
         lazy_char& operator=(char c);
     };
-
-private:
+    
     std::shared_ptr<std::string> string;
     size_t start;
     size_t len;
