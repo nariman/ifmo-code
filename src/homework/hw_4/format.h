@@ -13,7 +13,6 @@
 #include <iostream>
 #include <sstream>
 #include <string>
-#include <typeinfo> 
 
 namespace Format
 {
@@ -183,8 +182,8 @@ namespace Format
 
         std::string before = "";
         std::string after = "";
-        int width_value = 0;
-        int precision_value = 0;
+        int width_value = -1;
+        int precision_value = -1;
     };
 
 
@@ -262,6 +261,8 @@ namespace Format
             if (token == NULL)
                 return result;
 
+            // ADDITIONAL ARGUMENTS
+
             if (token->width == Width::asterisk) {
                 token->width = Width::number;
                 token->width_value = cast<int>(first);
@@ -274,17 +275,29 @@ namespace Format
                 return apply(result, token, rest...);
             }
 
-            if (token->width_value < 0) {
-                token->width_value *= -1;
-                token->flag |= Flag::minus;
-                token->flag &= ~Flag::zero;
-            }
-
-            if (token->precision_value < 0)
-                throw std::invalid_argument(
-                    "Precision specifier cannot be negative");
+            // FORMAT OPTIONS
 
             std::ostringstream token_result;
+
+            if (token->width == Width::number)
+            {
+                if (token->width_value < 0)
+                {
+                    token->width_value *= -1;
+                    token->flag |= Flag::minus;
+                    token->flag &= ~Flag::zero;
+                }
+
+                token_result.width(token->width_value);
+            }
+
+            if (token->precision == Precision::number)
+            {
+                if (token->precision_value < 0)
+                    throw std::invalid_argument(
+                        "Precision specifier cannot be negative");
+                token_result.precision(token->precision_value);
+            }
 
             if (static_cast<bool>(token->flag & Flag::minus))
                 token_result << std::left;
@@ -292,32 +305,30 @@ namespace Format
                 token_result << std::showpos;
             if (static_cast<bool>(token->flag & Flag::sharp))
                 token_result << std::showbase << std::showpoint;
-            if (static_cast<bool>(token->flag & Flag::zero))
-                token_result.fill('0');
-            if (token->width == Width::number && token->width_value >= 0)
-                token_result.width(token->width_value);
-            if (token->precision == Precision::number 
-                && token->precision_value >= 0)
-                token_result.precision(token->precision_value);
+
+            // TYPES MATCHING
 
             switch (token->type)
             {
                 case Type::percent:
+
                     token_result << '%';
                     break;
+
                 case Type::d: 
                 case Type::i:
-                    if (token->precision == Precision::number 
-                        && token->precision_value == 0)
-                    {
+
+                    if (token->precision_value == 0)
                         break;
-                    }
+
+                    if (static_cast<bool>(token->flag & Flag::zero))
+                        token_result.fill('0');
 
                     if (token->precision_value > 0)
                     {
                         token_result << std::right;
-                        token_result.fill('0');
                         token_result.width(token->precision_value);
+                        token_result.fill('0');
                     }
 
                     switch (token->length)
@@ -341,27 +352,30 @@ namespace Format
                         if (static_cast<bool>(token->flag & Flag::minus))
                             token_result << std::left;
 
-                        token_result.fill(' ');
                         token_result.width(token->width_value);
+                        token_result.fill(' ');
                         token_result << t;
                     }
+
                     break;
+
                 case Type::X:
                     token_result << std::uppercase;
                 case Type::u:
                 case Type::o: 
                 case Type::x:
-                    if (token->precision == Precision::number 
-                        && token->precision_value == 0)
-                    {
+
+                    if (token->precision_value == 0)
                         break;
-                    }
+
+                    if (static_cast<bool>(token->flag & Flag::zero))
+                        token_result.fill('0');
 
                     if (token->precision_value > 0)
                     {
                         token_result << std::right;
-                        token_result.fill('0');
                         token_result.width(token->precision_value);
+                        token_result.fill('0');
                     }
 
                     switch (token->type)
@@ -396,11 +410,13 @@ namespace Format
                         if (static_cast<bool>(token->flag & Flag::minus))
                             token_result << std::left;
 
-                        token_result.fill(' ');
                         token_result.width(token->width_value);
+                        token_result.fill(' ');
                         token_result << t;
                     }
+
                     break;
+
                 case Type::F:
                 case Type::E:
                 case Type::G:
@@ -410,6 +426,10 @@ namespace Format
                 case Type::e:
                 case Type::g:
                 case Type::a:
+
+                    if (static_cast<bool>(token->flag & Flag::zero))
+                        token_result.fill('0');
+
                     if (token->precision == Precision::none
                         && (
                             token->type == Type::f || token->type == Type::F
@@ -426,8 +446,36 @@ namespace Format
                     if (token->type == Type::e || token->type == Type::E)
                         token_result << std::scientific;
 
+                    // WHERE IS STD::HEXFLOAT IN THE JUDGE SYSTEM????? WHY :(
+                    // THIS FEATURE WAS INTRODUCED 6! YEARS AGO!!
+
                     if (token->type == Type::a || token->type == Type::A)
-                        token_result << std::hexfloat;
+                    {
+                        std::string t = "%";
+                        if (static_cast<bool>(token->flag & Flag::minus))
+                            t.append("-");
+                        if (static_cast<bool>(token->flag & Flag::plus))
+                            t.append("+");
+                        if (static_cast<bool>(token->flag & Flag::space))
+                            t.append(" ");
+                        if (static_cast<bool>(token->flag & Flag::zero))
+                            t.append("0");
+                        if (static_cast<bool>(token->flag & Flag::sharp))
+                            t.append("#");
+                        if (token->width_value >= 0)
+                            t.append(std::to_string(token->width_value));
+                        if (token->precision_value >= 0)
+                            t.append("." + std::to_string(token->precision_value));
+                        if (token->length == Length::L)
+                            t.append("L");
+                        t.append((token->type == Type::a) ? "a" : "A");
+
+                        char buff[2048];
+                        snprintf(buff, sizeof(buff), t.c_str(), first);
+
+                        token_result << buff;
+                        break;
+                    }
 
                     switch (token->length)
                     {
@@ -435,8 +483,11 @@ namespace Format
                         case Length::L:    token_result << cast<long double> (first); break;
                         default: throw std::invalid_argument("Length specifier is not supported");
                     }
+
                     break;
+
                 case Type::s:
+
                     if (token->length == Length::none)
                     {
                         std::string s = cast<std::string>(first);
@@ -448,19 +499,7 @@ namespace Format
                     }
                     else if (token->length == Length::l)
                     {
-                        // std::wostringstream woss;
-
-                        // if (auto ws = dynamic_cast<std::wstring*>(first))
-                        // {
-                        //     if (token->precision == Precision::number)
-                        //         woss << ws->substr(0, token->precision_value);
-                        //     else
-                        //         woss << ws;
-                        // }
-                        // else
-                        // {
-                        //     throw std::invalid_argument("Invalid argument type");
-                        // }
+                        // WIDE STRING VERY HARD
                     }
                     else
                     {
@@ -468,15 +507,20 @@ namespace Format
                     }
 
                     break;
+
                 case Type::c:
+
                     switch (token->length)
                     {
                         case Length::none: token_result << cast<char>        (first); break;
                         case Length::l:    token_result << cast<std::wint_t> (first); break;
                         default: throw std::invalid_argument("Length specifier is not supported");
                     }
+
                     break;
+
                 case Type::p: 
+
                     if (token->length != Length::none)
                         throw std::invalid_argument("Unsupported length specifier");
 
@@ -486,7 +530,9 @@ namespace Format
                         token_result << "(nil)";
 
                     break;
+
                 case Type::n:
+
                     switch (token->length)
                     {
                         case Length::none: *(cast<int*>           (first)) = result.length(); break;
@@ -499,7 +545,9 @@ namespace Format
                         case Length::t:    *(cast<ptrdiff_t*>     (first)) = result.length(); break;
                         default: throw std::invalid_argument("Length specifier is not supported");
                     }
+
                     break;
+
                 default:
                     throw std::invalid_argument("Type specifier is not supported");
             }
