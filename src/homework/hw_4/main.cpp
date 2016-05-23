@@ -159,8 +159,6 @@ void test()
 
 int main()
 {
-    format("", 1, 4);
-    return 0;
     test();
 
     printf("%25.15d-\n", 15555);
