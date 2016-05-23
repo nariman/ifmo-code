@@ -36,9 +36,11 @@ namespace Format
 
         Token *token = new Token();
         token->before = accumulate();
-        this->position++;
 
-        if (this->position >= this->format.length())
+        if (this->position < this->format.length()
+            && this->format[this->position] == '%')
+            this->position++;
+        else
             return token;
         
         // FLAGS
@@ -155,7 +157,7 @@ namespace Format
         if (token->length == Length::unknown)
             throw std::invalid_argument("Length specifier is not recognized");
 
-        if (this->position == this->format.length())
+        if (this->position >= this->format.length())
             throw std::invalid_argument("Type specifier is not recognized");
 
         switch (this->format[this->position])
