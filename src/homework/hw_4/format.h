@@ -115,7 +115,8 @@ namespace Format
             t.append(length);
             t.append(type);
 
-            char buff[2048]; // Long buffer not for snprintf, i want w/o it
+            int len = snprintf(NULL, 0, t.c_str(), first);
+            char buff[len + 2]; // Long buffer not for snprintf, i want w/o it
             snprintf(buff, sizeof(buff), t.c_str(), first);
             return std::string(buff);
         }

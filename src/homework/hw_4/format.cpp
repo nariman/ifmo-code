@@ -25,6 +25,8 @@ namespace Format
 
     Tokenizer::Tokenizer(const std::string& format)
     {
+        if (format.length() == 0)
+            throw std::invalid_argument("Nothing to format");
         this->format = format;
         this->position = 0;
     }
