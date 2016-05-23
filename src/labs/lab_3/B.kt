@@ -24,7 +24,7 @@ private class Scanner(file: File) {
         return true
     }
 
-    fun next(): String? = if (hasNext()) st.nextToken() else null
+    fun next(): String = if (hasNext()) st.nextToken() else ""
     fun nextInt(): Int = Integer.parseInt(next())
     fun nextLong(): Long = java.lang.Long.parseLong(next())
     fun nextDouble(): Double = java.lang.Double.parseDouble(next())
@@ -32,45 +32,35 @@ private class Scanner(file: File) {
 }
 
 private fun solve(`in`: Scanner, out: PrintWriter) {
-    val word = `in`.next()!!
+    val word = `in`.next()
     val n = `in`.nextInt()
     val m = `in`.nextInt()
     val k = `in`.nextInt()
-    val states = Array(n + 1) { HashMap<Char, ArrayList<Int>>() }
-    val acceptStates = HashSet<Int>(k)
+    val states = Array(n) { Array('z' - 'a' + 1) { HashSet<Int>() } }
+    val acceptStates = Array(n) { false }
 
-    (1..k).forEach { acceptStates.add(`in`.nextInt()) }
-
+    (1..k).forEach { acceptStates[`in`.nextInt() - 1] = true }
     (1..m).forEach {
-        val f = `in`.nextInt()
-        val t = `in`.nextInt()
-        val sym = `in`.next()!![0]
-
-        if (!states[f].contains(sym)) {
-            states[f].put(sym, ArrayList<Int>())
-        }
-        states[f][sym]!!.add(t)
+        val f = `in`.nextInt() - 1
+        val t = `in`.nextInt() - 1
+        val sym = `in`.next()[0] - 'a'
+        states[f][sym].add(t)
     }
 
-    fun f(currentState: Int, position: Int): Boolean {
-        if (position == word.length) {
-            if (acceptStates.contains(currentState)) {
-                return true
-            }
-            return false
-        }
-
-        if (states[currentState].contains(word[position])) {
-            states[currentState][word[position]]!!.forEach { nextState ->
-                if (f(nextState, position + 1)) {
-                    return true
-                }
-            }
-        }
-        return false
+    var currR = HashSet<Int>()
+    currR.add(0)
+    word.forEach { sym ->
+        val nextR = HashSet<Int>()
+        currR.forEach { f -> nextR.addAll(states[f][sym - 'a']) }
+        currR = nextR
+        if (currR.isEmpty()) { out.println("Rejects"); return }
     }
 
-    if (f(1, 0)) out.println("Accepts") else out.println("Rejects")
+    (0..n - 1).forEach { i ->
+        if (acceptStates[i] && currR.contains(i)) { out.println("Accepts"); return }
+    }
+
+    out.println("Rejects");
 }
 
 fun main(args: Array<String>) {

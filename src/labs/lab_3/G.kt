@@ -1,7 +1,7 @@
 /**
  * Nariman Safiulin (woofilee)
- * File: F.kt
- * Created on: May 18, 2016
+ * File: G.kt
+ * Created on: May 23, 2016
  */
 
 import java.io.BufferedReader
@@ -10,7 +10,7 @@ import java.io.FileReader
 import java.io.PrintWriter
 import java.util.*
 
-private val PROBLEM_NAME = "isomorphism"
+private val PROBLEM_NAME = "equivalence"
 
 private class Scanner(file: File) {
     val br = BufferedReader(FileReader(file))
@@ -31,40 +31,50 @@ private class Scanner(file: File) {
     fun close() = br.close()
 }
 
+private data class Pair(val first: Int, val second: Int)
+
 private data class DFA(val n: Int, val m: Int, val k: Int) {
-    val states = Array(n) { Array('z' - 'a' + 1) { -1 } }
-    val acceptStates = Array(n) { false }
+    val states = Array(n + 1) { Array('z' - 'a' + 1) { 0 } }
+    val acceptStates = Array(n + 1) { false }
+    val used = Array(n + 1) { false }
     fun addTransition(from: Int, to: Int, symbol: Int) { states[from][symbol] = to }
     fun setAcceptState(state: Int) { acceptStates[state] = true }
 }
 
 private fun solve(`in`: Scanner, out: PrintWriter) {
+    val alpha = 'z' - 'a' + 1
+
     val DFAs = ArrayList<DFA>()
     (0..1).forEach { i ->
         DFAs.add(DFA(`in`.nextInt(), `in`.nextInt(), `in`.nextInt()))
-        (1..DFAs[i].k).forEach { DFAs[i].setAcceptState(`in`.nextInt() - 1) }
-        (1..DFAs[i].m).forEach { DFAs[i].addTransition(`in`.nextInt() - 1, `in`.nextInt() - 1, `in`.next()[0] - 'a') }
+        (1..DFAs[i].k).forEach { DFAs[i].setAcceptState(`in`.nextInt()) }
+        (1..DFAs[i].m).forEach { DFAs[i].addTransition(`in`.nextInt(), `in`.nextInt(), `in`.next()[0] - 'a') }
     }
 
-    val visited = Array(DFAs[0].n) { false }
-    fun dfs(first: Int, second: Int): Boolean {
-        visited[first] = true
-        if (DFAs[0].acceptStates[first] != DFAs[1].acceptStates[second])
-            return false
+    fun bfsEq(): Boolean {
+        val queue = ArrayDeque<Pair>()
+        queue.addLast(Pair(1, 1))
+        DFAs[0].used[1] = true
+        DFAs[1].used[1] = true
 
-        var result = true
-        DFAs[0].states[first].forEachIndexed { symbol, to ->
-            if (to == -1)
-                return@forEachIndexed
-            if (DFAs[1].states[second][symbol] == -1)
+        while (!queue.isEmpty()) {
+            val p = queue.removeFirst()
+            if (DFAs[0].acceptStates[p.first] != DFAs[1].acceptStates[p.second])
                 return false
-            if (!visited[to])
-                result = result and dfs(to, DFAs[1].states[second][symbol])
+
+            (0..alpha - 1).forEach { symbol ->
+                if (!DFAs[0].used[DFAs[0].states[p.first][symbol]] || !DFAs[1].used[DFAs[1].states[p.second][symbol]]) {
+                    queue.addLast(Pair(DFAs[0].states[p.first][symbol], DFAs[1].states[p.second][symbol]))
+                    DFAs[0].used[DFAs[0].states[p.first][symbol]] = true
+                    DFAs[1].used[DFAs[1].states[p.second][symbol]] = true
+                }
+            }
         }
+
         return true
     }
 
-    if (dfs(0, 0)) out.println("YES") else out.println("NO")
+    if (bfsEq()) out.println("YES") else out.println("NO")
 }
 
 fun main(args: Array<String>) {
