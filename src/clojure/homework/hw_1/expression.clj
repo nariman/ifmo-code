@@ -34,7 +34,11 @@
             ([a b & more] (reduce divide (divide a b) more)))))
 (def negate (operation -))
 
-(def operations {'+ add '- subtract '* multiply '/ divide 'negate negate})
+(def sin (operation (fn [x] (Math/sin x))))
+(def cos (operation (fn [x] (Math/cos x))))
+
+
+(def operations {'+ add '- subtract '* multiply '/ divide 'negate negate 'sin sin 'cos cos})
 
 (defn build-expression [expression]
     (cond
