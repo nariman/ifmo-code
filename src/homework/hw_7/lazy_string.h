@@ -1,16 +1,31 @@
 /**
  * Nariman Safiulin (woofilee)
  * File: lazy_string.h
- * Created on: May 21, 2016
+ * Created on: May 20, 2016
  */
 
 #ifndef IFMO_CPP_LAZY_STRING_H
 #define IFMO_CPP_LAZY_STRING_H
 
+#include <atomic>
 #include <iostream>
 #include <memory>
 #include <mutex>
 #include <string>
+
+class lazy_lock
+{
+private:
+    std::atomic<int> readers;
+    std::mutex mutex;
+public:
+    lazy_lock();
+    lazy_lock(const lazy_lock& lock);
+    void read_lock();
+    void read_unlock();
+    void write_lock();
+    void write_unlock();
+};
 
 /**
  * Lazy String class
@@ -46,18 +61,20 @@ private:
     };
     
     std::shared_ptr<std::string> string;
+    std::shared_ptr<lazy_lock> lock;
     size_t start;
     size_t len;
-    std::mutex mutex;
 
     /**
      * Creates lazy string from existing lazy string.
      *
      * @param   string  existing string by reference
+     * @param   string  existing lock by reference
      * @param   start   position of the first character in string
      * @param   len     length of string
      */
-    lazy_string(const std::shared_ptr<std::string> string, size_t start,
+    lazy_string(const std::shared_ptr<std::string> string,
+                const std::shared_ptr<lazy_lock> lock, size_t start,
                 size_t len);
 public:
     /**
@@ -77,14 +94,14 @@ public:
      *
      * @return  string's length
      */
-    size_t size() const;
-    
+    size_t length() const;
+
     /**
      * Returns length of current string.
      *
      * @return  string's length
      */
-    size_t length() const;
+    size_t size() const;
 
     /**
      * Returns character at the specified index.

@@ -19,7 +19,7 @@ void test()
     printf("Returned: %d\n", ecls.length());
 
     printf("Checking empty string\n");
-    lazy_string els; // empty ls
+    lazy_string els(""); // empty ls
     printf("Expected: 0\n");
     printf("Returned: %d\n", els.length());
 
@@ -33,11 +33,28 @@ void test()
 
     s = "hello world";
     printf("Checking string: %s\n", s.c_str());
+    std::string cs = s;
+    lazy_string cls(s); // constructor ls
     s[4] = ' ';
     printf("symbol 4 changed ->: %s\n", s.c_str());
-    lazy_string cls(s); // constructor ls
+    printf("Expected: %c\n", cs[4]);
+    printf("Returned: %c\n", static_cast<char>(cls[4]));
+    printf("Expected: %s\n", cs.c_str());
+    printf("Returned: %s\n", static_cast<std::string>(cls).c_str());
+
+    printf("\nChecking chars:\n\n");
+
+    s = "hello world";
+    printf("Checking string: %s\n", s.c_str());
+    printf("Symbol 4 checking:\n");
+    lazy_string ccls(s); // checking chars ls
     printf("Expected: %c\n", s[4]);
-    printf("Returned: %c\n", cls[4]);
+    printf("Returned: %c\n", static_cast<char>(ccls[4]));
+    s[4] = 'p';
+    ccls[4] = 'p';
+    printf("symbol 4 changed ->: %s\n", s.c_str());
+    printf("Expected: %c\n", s[4]);
+    printf("Returned: %c\n", static_cast<char>(ccls[4]));
 
     printf("\nChecking substring:\n\n");
 
