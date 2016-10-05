@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/activity_main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:background="@color/gray_a"
+    tools:context="ru.ifmo.droid2016.worldcam.worldcamdemo.SelectCoordsActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:orientation="vertical"
+        android:padding="16dp"
+        android:background="@drawable/bg_white_round">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Введите координаты:" />
+
+        <EditText
+            android:id="@+id/lat_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Широта"
+            android:inputType="numberSigned|numberDecimal"/>
+
+        <TextView
+            android:id="@+id/lat_error"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="-8dp"
+            android:paddingLeft="4dp"
+            android:textAppearance="@style/TextAppearance_InputError"
+            android:text="@string/invalid_value"
+            android:visibility="invisible"/>
+
+        <EditText
+            android:id="@+id/lng_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Долгота"
+            android:inputType="numberSigned|numberDecimal"/>
+
+        <TextView
+            android:id="@+id/lng_error"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="-8dp"
+            android:paddingLeft="4dp"
+            android:textAppearance="@style/TextAppearance_InputError"
+            android:text="@string/invalid_value"
+            android:visibility="invisible"/>
+
+        <Button
+            android:id="@+id/btn_enter"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:text="Вперёд"/>
+
+    </LinearLayout>
+
+</FrameLayout>
