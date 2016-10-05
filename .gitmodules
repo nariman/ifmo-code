@@ -4,3 +4,6 @@
 [submodule "paradigms/java-intro-2015"]
 	path = paradigms/src/intro/java-intro-2015
 	url = https://github.com/kgeorgiy/java-intro-2015
+[submodule "android/remotes/info"]
+	path = android/remotes/info
+	url = git@github.com:IFMO-Android-2016/info.git
