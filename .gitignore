@@ -120,6 +120,28 @@ ENV/
 .spyderproject
 .ropeproject
 
+# Android
+
+*.apk
+*.ap_
+*.dex
+*.class
+bin/
+gen/
+out/
+.gradle/
+build/
+local.properties
+proguard/
+*.log
+.navigation/
+captures/
+*.iml
+.idea/workspace.xml
+.idea/libraries
+*.jks
+.externalNativeBuild
+
 # Kotlin
 
 *.class
