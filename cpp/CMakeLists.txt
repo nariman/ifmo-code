@@ -8,5 +8,5 @@ set(HOMEWORK_DIR homework)
 # set(SOURCE_FILES main.cpp)
 # add_executable(ifmo_cpp ${SOURCE_FILES})
 
-add_executable(hw_1 ${HOMEWORK_DIR}/hw_1/main.c)
-add_executable(hw_2 ${HOMEWORK_DIR}/hw_2/main.c)
+add_executable(hw_1 ${HOMEWORK_DIR}/hw-1/main.c)
+add_executable(hw_2 ${HOMEWORK_DIR}/hw-2/main.c)
