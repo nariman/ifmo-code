@@ -1,3 +1,8 @@
+"""
+Nariman Safiulin (woofilee)
+File: testgen.py
+"""
+
 import random
 
 alpha = "abcdefgihjklmnopqrstuvwxyzABCDEFGIHJKLMNOPQRSTUVWXYZ"

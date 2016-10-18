@@ -331,7 +331,7 @@ namespace Format
                     }
                     else if (token->length == Length::l)
                     {
-                        // WIDE STRING VERY HARD
+                        // WIDE STRING === VERY HARD
                     }
                     else
                     {
