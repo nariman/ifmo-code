@@ -1,12 +1,15 @@
+/**
+ * Nariman Safiulin (woofilee)
+ * File: E.java
+ * Created on: Dec 20, 2015
+ */
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.PrintWriter;
 import java.util.StringTokenizer;
 
-/**
- * Created by woofi on 20.12.2015.
- */
 public class E {
     static class SegmentTree {
         static class Node implements Comparable<Node> {

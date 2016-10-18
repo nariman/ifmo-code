@@ -1,12 +1,15 @@
+/**
+ * Nariman Safiulin (woofilee)
+ * File: D.java
+ * Created on: Dec 19, 2015
+ */
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.PrintWriter;
 import java.util.StringTokenizer;
 
-/**
- * Created by woofi on 19.12.2015.
- */
 public class D {
     static class SegmentTree {
         static class MatrixNode {

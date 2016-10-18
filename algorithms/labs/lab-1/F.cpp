@@ -1,3 +1,8 @@
+/**
+ * Nariman Safiulin (woofilee)
+ * File: F.cpp
+ */
+
 #include <bits/stdc++.h>
 
 #define TASK "antiqs"

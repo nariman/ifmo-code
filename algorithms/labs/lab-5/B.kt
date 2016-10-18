@@ -1,6 +1,6 @@
 /**
  * Nariman Safiulin (woofilee)
- * File: A.kt
+ * File: B.kt
  * Created on: Apr 1, 2016
  */
 

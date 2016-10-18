@@ -1,3 +1,8 @@
+/**
+ * Nariman Safiulin (woofilee)
+ * File: E.cpp
+ */
+
 #include <bits/stdc++.h>
 
 using namespace std;

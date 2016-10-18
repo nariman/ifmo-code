@@ -1,3 +1,9 @@
+/**
+ * Nariman Safiulin (woofilee)
+ * File: I.java
+ * Created on: Dec 23, 2015
+ */
+
 import java.net.ServerSocket;
 import java.util.Arrays;
 import java.io.BufferedReader;
@@ -6,9 +12,6 @@ import java.io.FileReader;
 import java.io.PrintWriter;
 import java.util.StringTokenizer;
 
-/**
- * Created by woofi on 23.12.2015.
- */
 public class I {
 //    static class Guest {
 //        int num;

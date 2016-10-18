@@ -1,3 +1,9 @@
+/**
+ * Nariman Safiulin (woofilee)
+ * File: L.java
+ * Created on: Jan 05, 2016
+ */
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -5,9 +11,6 @@ import java.io.PrintWriter;
 import java.util.Random;
 import java.util.StringTokenizer;
 
-/**
- * Created by woofi on 05.01.2016.
- */
 public class L {
     static class DisjointSetForest {
         Random random = new Random();

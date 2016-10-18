@@ -1,12 +1,15 @@
+/**
+ * Nariman Safiulin (woofilee)
+ * File: I.java
+ * Created on: Nov 16, 2015
+ */
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.PrintWriter;
 import java.util.StringTokenizer;
 
-/**
- * Created by woofi on 16.11.2015.
- */
 public class I {
     static class Queue {
         public static class Node {

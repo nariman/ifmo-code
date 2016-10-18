@@ -1,3 +1,9 @@
+/**
+ * Nariman Safiulin (woofilee)
+ * File: G.java
+ * Created on: Dec 20, 2015
+ */
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -5,9 +11,6 @@ import java.io.PrintWriter;
 import java.util.Random;
 import java.util.StringTokenizer;
 
-/**
- * Created by woofi on 20.12.2015.
- */
 public class G {
     private static final Random rand = new Random();
 

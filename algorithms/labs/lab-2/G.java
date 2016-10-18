@@ -1,3 +1,9 @@
+/**
+ * Nariman Safiulin (woofilee)
+ * File: G.java
+ * Created on: Nov 14, 2015
+ */
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -5,9 +11,6 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.StringTokenizer;
 
-/**
- * Created by woofi on 14.11.2015.
- */
 public class G {
     static class Queue {
         ArrayList<Integer> queue = new ArrayList<>();

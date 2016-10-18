@@ -1,6 +1,8 @@
-//
-// Created by WooFi on 05.10.2015.
-//
+/**
+ * Nariman Safiulin (woofilee)
+ * File: D_qs.cpp
+ * Created on: Oct 05, 2015
+ */
 
 #include <bits/stdc++.h>
 

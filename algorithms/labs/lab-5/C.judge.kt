@@ -1,6 +1,6 @@
 /**
  * Nariman Safiulin (woofilee)
- * File: C.kt
+ * File: C.judge.kt
  * Created on: Apr 13, 2016
  */
 

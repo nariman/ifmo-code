@@ -1,3 +1,8 @@
+/**
+ * Nariman Safiulin (woofilee)
+ * File: B_old.cpp
+ */
+
 #include <stdio.h>
 #include <algorithm>
 #include <vector>

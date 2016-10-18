@@ -1,12 +1,15 @@
+/**
+ * Nariman Safiulin (woofilee)
+ * File: M.java
+ * Created on: Jan 06, 2016
+ */
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.PrintWriter;
 import java.util.*;
 
-/**
- * Created by woofi on 06.01.2016.
- */
 public class M {
     static class DisjointSetForest {
         Random random = new Random();
