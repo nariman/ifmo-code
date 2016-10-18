@@ -1,4 +1,3 @@
-#!/usr/bin/python
 """
 Nariman Safiulin (woofilee)
 File: C.py

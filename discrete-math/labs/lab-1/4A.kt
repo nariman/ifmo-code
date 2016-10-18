@@ -1,6 +1,6 @@
 /**
  * Nariman Safiulin (woofilee)
- * File: 4A.kt.kt
+ * File: 4A.kt
  * Created on: Apr 14, 2016
  */
 

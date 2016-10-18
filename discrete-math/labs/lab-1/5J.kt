@@ -1,7 +1,7 @@
 /**
  * Nariman Safiulin (woofilee)
  * File: 5J.kt
- * Created on: Апр. 25, 2016
+ * Created on: Apr 25, 2016
  */
 
 import java.io.BufferedReader
