@@ -1,0 +1,17 @@
+{
+    "build": {
+        "task": [
+            "*.java"
+        ],
+        "tests": [
+            "search/*.java"
+        ]
+    },
+    "test": {
+        "difficulty": {
+            "base": "search.BinarySearchTest",
+            "easy": "search.BinarySearchMissingTest",
+            "hard": "search.BinarySearchSpanTest"
+        }
+    }
+}

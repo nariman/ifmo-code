@@ -1,0 +1,19 @@
+{
+    "build": {
+        "task": [],
+        "tests": [
+            "test/ObjectExpressionTest.java",
+            "test/ModifiedObjectExpressionTest.java"
+        ]
+    },
+    "test": {
+        "difficulty": {
+            "base-easy": "test.ObjectExpressionTest easy",
+            "base-hard": "test.ObjectExpressionTest hard",
+            "base-bonus": "test.ObjectExpressionTest bonus",
+            "mod-easy": "test.ModifiedObjectExpressionTest easy",
+            "mod-hard": "test.ModifiedObjectExpressionTest hard",
+            "mod-bonus": "test.ModifiedObjectExpressionTest bonus"
+        }
+    }
+}
