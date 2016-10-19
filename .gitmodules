@@ -1,6 +1,6 @@
-[submodule "paradigms/lead"]
+[submodule "paradigms/paradigms-2016"]
 	path = paradigms/paradigms-2016
-	url = https://github.com/kgeorgiy/paradigms-2016
-[submodule "paradigms/java-intro-2015"]
-	path = paradigms/src/intro/java-intro-2015
-	url = https://github.com/kgeorgiy/java-intro-2015
+	url = git@github.com:kgeorgiy/paradigms-2016.git
+[submodule "paradigms/intro/java-intro-2015"]
+	path = paradigms/intro/java-intro-2015
+	url = git@github.com:kgeorgiy/java-intro-2015.git

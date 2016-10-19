@@ -1,0 +1,17 @@
+{
+    "build": {
+        "task": [
+            "*.java"
+        ],
+        "tests": [
+            "queue/*.java"
+        ]
+    },
+    "test": {
+        "difficulty": {
+            "base": "queue.QueueTest",
+            "easy": "queue.QueueToArrayTest",
+            "hard": "queue.QueueFunctionsTest"
+        }
+    }
+}

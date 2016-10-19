@@ -1,0 +1,17 @@
+{
+    "build": {
+        "task": [],
+        "tests": [
+            "test/ExpressionTest.java",
+            "test/ModifiedExpressionTest.java"
+        ]
+    },
+    "test": {
+        "difficulty": {
+            "base-easy": "test.ExpressionTest easy",
+            "base-hard": "test.ExpressionTest hard",
+            "mod-easy": "test.ModifiedExpressionTest easy",
+            "mod-hard": "test.ModifiedExpressionTest hard"
+        }
+    }
+}

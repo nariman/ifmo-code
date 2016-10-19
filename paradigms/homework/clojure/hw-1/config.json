@@ -1,0 +1,17 @@
+{
+    "build": {
+        "task": [],
+        "tests": [
+            "test/ClojureFunctionExpressionTest.java",
+            "test/ModifiedClojureFunctionExpressionTest.java"
+        ]
+    },
+    "test": {
+        "difficulty": {
+            "base-easy": "test.ClojureFunctionExpressionTest easy",
+            "base-hard": "test.ClojureFunctionExpressionTest hard",
+            "mod-easy": "test.ModifiedClojureFunctionExpressionTest easy",
+            "mod-hard": "test.ModifiedClojureFunctionExpressionTest hard"
+        }
+    }
+}

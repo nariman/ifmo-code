@@ -1,0 +1,17 @@
+{
+    "build": {
+        "task": [
+            "*.java"
+        ],
+        "tests": [
+            "hash/*.java"
+        ]
+    },
+    "test": {
+        "difficulty": {
+            "base": "hash.CalcMD5Test",
+            "easy": "hash.CalcSHA256Test",
+            "hard": "hash.SHA256SumTest"
+        }
+    }
+}
