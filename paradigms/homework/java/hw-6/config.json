@@ -1,0 +1,17 @@
+{
+    "build": {
+        "task": [
+            "expression/exceptions/*.java"
+        ],
+        "tests": [
+            "expression/exceptions/*.java"
+        ]
+    },
+    "test": {
+        "difficulty": {
+            "base": "expression.exceptions.ExceptionsTest",
+            "easy": "expression.exceptions.ExceptionsEasyTest",
+            "hard": "expression.exceptions.ExceptionsHardTest"
+        }
+    }
+}

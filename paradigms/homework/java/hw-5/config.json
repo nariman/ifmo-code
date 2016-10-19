@@ -1,0 +1,17 @@
+{
+    "build": {
+        "task": [
+            "*.java"
+        ],
+        "tests": [
+            "expression/*.java"
+        ]
+    },
+    "test": {
+        "difficulty": {
+            "base": "expression.ExpressionTest",
+            "easy": "expression.DoubleExpressionTest",
+            "hard": "expression.TripleExpressionTest"
+        }
+    }
+}

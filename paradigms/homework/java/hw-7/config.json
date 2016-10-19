@@ -1,0 +1,17 @@
+{
+    "build": {
+        "task": [
+            "expression/generic/*.java"
+        ],
+        "tests": [
+            "expression/generic/*.java"
+        ]
+    },
+    "test": {
+        "difficulty": {
+            "base": "expression.generic.GenericTest",
+            "easy": "expression.generic.GenericEasyTest",
+            "hard": "expression.generic.GenericHardTest"
+        }
+    }
+}

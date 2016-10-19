@@ -1,0 +1,20 @@
+{
+    "build": {
+        "task": [],
+        "tests": [
+            "test/PrefixParserTest.java",
+            "test/ModifiedPrefixParserTest.java",
+            "test/PostfixParserTest.java"
+        ]
+    },
+    "test": {
+        "difficulty": {
+            "base-easy": "test.PrefixParserTest easy",
+            "base-hard": "test.PrefixParserTest hard",
+            "mod-one-easy": "test.ModifiedPrefixParserTest easy",
+            "mod-one-hard": "test.ModifiedPrefixParserTest hard",
+            "mod-two-easy": "test.PostfixParserTest easy",
+            "mod-two-hard": "test.PostfixParserTest hard"
+        }
+    }
+}
