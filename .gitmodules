@@ -4,3 +4,6 @@
 [submodule "paradigms/intro/java-intro-2015"]
 	path = paradigms/intro/java-intro-2015
 	url = https://github.com/kgeorgiy/java-intro-2015
+[submodule "math-logic/logic2016"]
+	path = math-logic/logic2016
+	url = https://github.com/shd/logic2016.git
