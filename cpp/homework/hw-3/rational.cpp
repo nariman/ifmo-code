@@ -1,8 +1,8 @@
-//
-// Nariman Safiulin (woofilee)
-// File: rational.cpp
-// Created on: Mar 5, 2016
-//
+/**
+ * Nariman Safiulin (woofilee)
+ * File: rational.cpp
+ * Created on: Mar 5, 2016
+ */
 
 #include "rational.h"
 

@@ -1,8 +1,8 @@
-//
-// Nariman Safiulin (woofilee)
-// File: main.c
-// Created on: Feb 27, 2016
-//
+/**
+ * Nariman Safiulin (woofilee)
+ * File: main.c
+ * Created on: Feb 27, 2016
+ */
 
 #include <stdio.h>
 #include <stdlib.h>

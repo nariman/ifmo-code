@@ -1,8 +1,8 @@
-//
-// Nariman Safiulin (woofilee)
-// File: rational.h
-// Created on: Mar 5, 2016
-//
+/**
+ * Nariman Safiulin (woofilee)
+ * File: rational.h
+ * Created on: Mar 5, 2016
+ */
 
 #ifndef IFMO_CPP_RATIONAL_H
 #define IFMO_CPP_RATIONAL_H

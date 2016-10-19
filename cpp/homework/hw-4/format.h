@@ -10,7 +10,6 @@
 #include <cstddef>
 #include <sstream>
 #include <stdexcept>
-#include <typeinfo>
 
 namespace Format
 {
@@ -22,7 +21,7 @@ namespace Format
     enum class Width { none, number, asterisk };
     enum class Precision { none, number, asterisk };
     enum class Length { none, hh, h, l, ll, L, z, j, t, unknown };
-    enum class Type { none, percent, d, i, u, f, F, e, E, g, G, x, X, o, s, c, p, a, A, n, at, unknown };
+    enum class Type { none, percent, d, i, u, f, F, e, E, g, G, x, X, o, s, c, p, a, A, n, unknown };
 
     inline constexpr Flag operator|(Flag l, Flag r)
     {
@@ -104,7 +103,7 @@ namespace Format
         }
 
         template <typename T>
-        std::string format_number(Token* token, std::string type, 
+        std::string format_number(Token* token, std::string type,
                                   const T& value, std::string length)
         {
             std::string t = "%";
@@ -121,80 +120,6 @@ namespace Format
             char buff[snprintf(NULL, 0, t.c_str(), value) + 2]; // Long buffer not for snprintf, i want w/o it
             snprintf(buff, sizeof(buff), t.c_str(), value);
             return std::string(buff);
-        }
-
-        template<typename T>
-        typename std::enable_if<!std::is_convertible<T, std::string>::value
-                                    && !std::is_pointer<T>::value
-                                    && !std::is_integral<T>::value,
-                                std::string>::type
-        format_at(const T& value)
-        {
-            throw std::invalid_argument("Invalid argument type");
-        }
-
-        template<typename T, size_t dimsize>
-        typename std::enable_if<!std::is_convertible<T*, std::string>::value,
-                                std::string>::type
-        format_at(const T (&array)[dimsize])
-        {
-            std::string r = "[";
-            for (size_t i = 0; i < dimsize; i++)
-            {
-                r.append(std::to_string(array[i]));
-                if (i + 1 != dimsize)
-                    r.append(",");
-            }
-            r.append("]");
-            return r;
-        }
-
-        template<typename T>
-        typename std::enable_if<std::is_integral<T>::value, std::string>::type
-        format_at(const T& value)
-        {
-            return std::to_string(value);
-        }
-
-        template<typename T>
-        typename std::enable_if<std::is_convertible<T, std::string>::value, 
-                                std::string>::type
-        format_at(const T& value)
-        {
-            return value;
-        }
-
-        template<typename T>
-        typename std::enable_if<!std::is_convertible<T, std::string>::value
-                                    && !std::is_array<T>::value
-                                    && std::is_pointer<T>::value,
-                                std::string>::type 
-        format_at(const T& value)
-        {
-            std::string r;
-            std::string t = typeid(*value).name();
-
-            if (t == "i")
-                t = "int";
-            else if (t == "Ss")
-                t = "std::string";
-
-            if (value == 0)
-            {
-                r.append("nullptr<")
-                 .append(t)
-                 .append(">");  
-            }
-            else
-            {
-                Formatter formatter("%@");
-                r.append("ptr<")
-                 .append(t)
-                 .append(">(")
-                 .append(formatter.apply(*value))
-                 .append(")");
-            }
-            return r;
         }
 
         /**
@@ -331,7 +256,7 @@ namespace Format
                     }
                     else if (token->length == Length::l)
                     {
-                        // WIDE STRING VERY HARD
+                        // WIDE STRING === VERY HARD
                     }
                     else
                     {
@@ -367,14 +292,6 @@ namespace Format
                         case Length::t:    *(cast<ptrdiff_t*>     (first)) = result.length(); break;
                         default: throw std::invalid_argument("Length specifier is not supported");
                     }
-                    break;
-                case Type::at:
-                    if (typeid(first) == typeid(std::nullptr_t))
-                        token_result << "nullptr";
-                    // else if (std::is_convertible<First, std::string>::value)
-                        // token_result << cast<std::string>(first);
-                    else
-                        token_result << format_at(first);
                     break;
                 default:
                     throw std::invalid_argument("Type specifier is not supported");
@@ -414,13 +331,6 @@ namespace Format
 
 /**
  * Returns a formatted string according to the format string.
- * Extra specifier `@`:
- *     If argument type is nullptr_t, prints `nullptr`
- *     If argument type is pointer with value 0, prints `ptr<TYPE>`
- *     If argument type is pointer with non-zero value, prints `ptr<TYPE>(format("%@", VALUE))`
- *     If argument type is array, prints array content in square brackets
- *     If argument can be converted into string, prints this string
- *     Otherwise an exception will be thrown
  *
  * @param   fmt     Format string
  * @param   args    Arguments, accroding to the specifiers in the format string.
