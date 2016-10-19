@@ -1,6 +1,6 @@
 /**
  * Nariman Safiulin (woofilee)
- * File: 6A.kt
+ * File: 6A.judge.kt
  * Created on: Apr 25, 2016
  */
 
