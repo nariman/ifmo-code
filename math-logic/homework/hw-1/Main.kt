@@ -10,82 +10,86 @@ import java.io.File
 import java.util.*
 
 interface Expression {
-    operator fun not() = Negation(this)
-    infix fun conj(rhs: Expression) = Conjunction(this, rhs)
-    infix fun disj(rhs: Expression) = Disjunction(this, rhs)
-    infix fun impl(rhs: Expression) = Implication(this, rhs)
+    /**
+     * Checks equality of expressions explicitly
+     */
+    infix fun equal(other: Expression): Boolean
 
-    fun stringify(expression: Expression): String = when (expression) {
-        is Variable -> expression.toString()
-        is Negation -> expression.toString()
-        else -> "(${expression.toString()})"
-    }
+
+    /**
+     * Checks equality of expressions with map matching, using this object as pattern, and `other` for pattern matching
+     */
+    fun match(other: Expression, map: MutableMap<String, Expression>): Boolean
+
+    infix fun match(other: Expression): Boolean = match(other, HashMap<String, Expression>())
+
+    override fun toString(): String
+    fun stringify(): String = "$this"
 }
 
 class Variable(val name: String) : Expression {
     override fun toString() = name
-    override fun equals(other: Any?) = other is Variable && name == other.name
+    override fun stringify() = toString()
+
+    override infix fun equal(other: Expression) = other is Variable && name == other.name
+
+    override fun match(other: Expression, map: MutableMap<String, Expression>): Boolean =
+            map[name]?.equal(other) ?: { map.put(name, other); true }()
 }
 
 abstract class Operator(val operator: String) : Expression
 
 abstract class Unary(operator: String, val value: Expression) : Operator(operator) {
-    override fun toString() = operator + stringify(value)
+    override fun toString() = "(" + operator + value.stringify() + ")"
+
+    override infix fun equal(other: Expression) =
+            other is Unary && this.javaClass == other.javaClass && value equal other.value
+
+    override fun match(other: Expression, map: MutableMap<String, Expression>) =
+            other is Unary && this.javaClass == other.javaClass && value.match(other.value, map)
 }
 
-abstract class Binary(operator: String, val rhs: Expression, val lhs: Expression) : Operator(operator) {
-    override fun toString(): String = stringify(lhs) + operator + stringify(rhs)
+abstract class Binary(operator: String, val lhs: Expression, val rhs: Expression) : Operator(operator) {
+    override fun toString(): String = "(" + lhs.stringify() + operator + rhs.stringify() + ")"
+
+    override infix fun equal(other: Expression) =
+            other is Binary && this.javaClass == other.javaClass && lhs equal other.lhs && rhs equal other.rhs
+
+    override fun match(other: Expression, map: MutableMap<String, Expression>) =
+            other is Binary && this.javaClass == other.javaClass && lhs.match(other.lhs, map) && rhs.match(other.rhs, map)
 }
 
+operator fun Expression.not() = Negation(this)
 class Negation(value: Expression) : Unary("!", value) {
-    override fun equals(other: Any?): Boolean {
-        return other is Negation && value == other.value
-    }
+//    override fun stringify() = toString()
 }
 
-class Conjunction(lhs: Expression, rhs: Expression) : Binary("&", rhs, lhs) {
-    override fun equals(other: Any?): Boolean {
-        return other is Conjunction && lhs == other.lhs && rhs == other.rhs
-    }
-}
+infix fun Expression.conj(rhs: Expression) = Conjunction(this, rhs)
+class Conjunction(lhs: Expression, rhs: Expression) : Binary("&", lhs, rhs)
 
-class Disjunction(lhs: Expression, rhs: Expression) : Binary("|", rhs, lhs) {
-    override fun equals(other: Any?): Boolean {
-        return other is Disjunction && lhs == other.lhs && rhs == other.rhs
-    }
-}
+infix fun Expression.disj(rhs: Expression) = Disjunction(this, rhs)
+class Disjunction(lhs: Expression, rhs: Expression) : Binary("|", lhs, rhs)
 
-class Implication(lhs: Expression, rhs: Expression) : Binary("->", rhs, lhs) {
-    override fun equals(other: Any?): Boolean {
-        return other is Implication && lhs == other.lhs && rhs == other.rhs
-    }
-}
+infix fun Expression.impl(rhs: Expression) = Implication(this, rhs)
+class Implication(lhs: Expression, rhs: Expression) : Binary("->", lhs, rhs)
 
-fun parse(e: String, l: Int, r: Int): Expression {
-    var brackets: Int = 0
-    fun bracket(i: Int) = if (e[i] == '(') brackets++ else if (e[i] == ')') brackets-- else brackets
-
-    (l..r).forEach { i -> // -> implication
-        if (brackets == 0 && e[i] == '>') return parse(e, l, i - 2) impl parse(e, i + 1, r)
-        bracket(i)
-    }
-    (r downTo l).forEach { i -> // | disjunction
-        if (brackets == 0 && e[i] == '|') return parse(e, l, i - 1) disj parse(e, i + 1, r)
-        bracket(i)
-    }
-    (r downTo l).forEach { i -> // & conjunction
-        if (brackets == 0 && e[i] == '&') return parse(e, l, i - 1) conj parse(e, i + 1, r)
-        bracket(i)
-    }
-
-    if (e[l] == '!') return !parse(e, l + 1, r)
-    if (e[l] == '(') return parse(e, l + 1, r - 1)
-
-    return Variable(e.substring(l..r).trim())
-}
 
 fun solve(`in`: BufferedReader, out: BufferedWriter) {
-    val regex = Regex("\\s")
+    fun parse(e: String, l: Int, r: Int): Expression {
+        var b: Int = 0
+        fun bracket(i: Int) = if (e[i] == '(') b++ else if (e[i] == ')') b-- else b
+
+        (l..r).forEach { i -> if (b == 0 && e[i] == '>') return parse(e, l, i - 2) impl parse(e, i + 1, r) else bracket(i) }
+        (r downTo l).forEach { i -> if (b == 0 && e[i] == '|') return parse(e, l, i - 1) disj parse(e, i + 1, r) else bracket(i) }
+        (r downTo l).forEach { i -> if (b == 0 && e[i] == '&') return parse(e, l, i - 1) conj parse(e, i + 1, r) else bracket(i) }
+
+        if (e[l] == '!') return !parse(e, l + 1, r)
+        if (e[l] == '(') return parse(e, l + 1, r - 1)
+
+        return Variable(e.substring(l..r).trim())
+    }
+
+    val ws = Regex("\\s")
     val axioms = listOf(
             "A -> B -> A",
             "(A -> B) -> (A -> B -> C) -> (A -> C)",
@@ -97,58 +101,59 @@ fun solve(`in`: BufferedReader, out: BufferedWriter) {
             "(A -> Q) -> (B -> Q) -> (A | B -> Q)",
             "(A -> B) -> (A -> !B) -> !A",
             "!!A -> A"
-    ).map { it.replace(regex, "") }.map { parse(it, 0, it.length - 1) }
+    ).map { it.replace(ws, "") }.map { parse(it, 0, it.length - 1) }
 
     val title = `in`.readLine().split("|-")
-    val hypotheses: List<Expression> = {
-        if (title[0].length > 0)
-            title[0].split(",").map { it.replace(regex, "") }.map { parse(it, 0, it.length - 1) }
-        else
-            emptyList()
-    }()
-    val expressions = ArrayList<Expression>()
-    val unproven = title[1].replace(regex, "").let { parse(it, 0, it.length - 1) }
+    val hypotheses: List<Expression> =
+            if (title[0].length > 0) title[0].split(",").map { it.replace(ws, "") }.map { parse(it, 0, it.length - 1) }
+            else emptyList()
 
+    val unproven = title[1].replace(ws, "").let { parse(it, 0, it.length - 1) }
+
+    val expressions = ArrayList<Expression?>()
     var counter = 0
-    outer@ for (line in `in`.lines()) {
+
+    `in`.forEachLine { line ->
         counter++
-        val expression = line.replace(regex, "").let { parse(it, 0, it.length - 1) }
-        println(expression.toString())
-        expressions.add(expression)
+
+        val expression = line.replace(ws, "").let { parse(it, 0, it.length - 1) }
 
         out.write("($counter)")
-        out.write(" ${expression.toString()} ")
+        out.write(" $expression ")
 
         for (i in 1..axioms.size) {
-            if (axioms[i - 1].equals(expression)) {
+            if (axioms[i - 1] match expression) {
+                expressions.add(expression)
                 out.write("(Сх. акс. $i)\n")
-                continue@outer
+                return@forEachLine
             }
         }
 
         for (i in 1..hypotheses.size) {
-            if (hypotheses[i - 1].equals(expression)) {
+            if (hypotheses[i - 1] match expression) {
+                expressions.add(expression)
                 out.write("(Предп. $i)\n")
-                continue@outer
+                return@forEachLine
             }
         }
 
-        for (i in expressions.size - 1 downTo 1) {
+        for (i in 1..expressions.size) {
             if (expressions[i - 1] is Implication) {
                 val impl = expressions[i - 1] as Implication
-                if (impl.rhs.equals(expression)) {
-                    for (j in i - 1 downTo 1) {
-                        if (impl.lhs.equals(expressions[j])) {
-                            out.write("(M.P. $j, $i)\n")
-                            continue@outer
+                if (impl.rhs equal expression) {
+                    for (j in 1..expressions.size) {
+                        if (expressions[j - 1]?.equal(impl.lhs) ?: false) {
+                            expressions.add(expression)
+                            out.write("(M. P. $j, $i)\n")
+                            return@forEachLine
                         }
                     }
                 }
             }
         }
 
+        expressions.add(null)
         out.write("(Не доказано)\n")
-        break
     }
 }
 
