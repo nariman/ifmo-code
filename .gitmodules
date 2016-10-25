@@ -40,3 +40,6 @@
 [submodule "android/remotes/practice/practice3"]
 	path = android/remotes/practice/practice3
 	url = https://github.com/IFMO-Android-2016/practice3
+[submodule "android/remotes/lessons/lesson7"]
+	path = android/remotes/lessons/lesson7
+	url = https://github.com/IFMO-Android-2016/lesson7
