@@ -56,7 +56,7 @@ fun solve(`in`: BufferedReader, out: BufferedWriter) {
         }
 
         for (i in 1..hypotheses.list.size) {
-            if (hypotheses.list[i - 1] match expression) {
+            if (hypotheses.list[i - 1] equal expression) {
                 save("Предп. $i", expression)
                 return@forEachLine
             }

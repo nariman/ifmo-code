@@ -11,10 +11,10 @@ import java.util.*
  */
 interface Expression {
     /**
-     * Checks equality of expressions explicitly.
+     * Checks equality of expressions strictly.
      *
      * @param  other expression to check equality with.
-     * @return       true, if expressions are explicitly equals, otherwise false.
+     * @return       true, if expressions are strictly equals, otherwise false.
      */
     infix fun equal(other: Expression): Boolean
 
