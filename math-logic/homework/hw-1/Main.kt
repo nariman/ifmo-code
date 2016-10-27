@@ -11,8 +11,14 @@ import java.util.*
 
 fun solve(`in`: BufferedReader, out: BufferedWriter) {
     val title: List<String> = `in`.readLine().split("|-")
+    out.write("${title[0]}|-${title[1]}\n")
 
-    val unproven = Parser.parse(title[1])
+    val unproven: Expression? =
+            if (title[1].length > 0)
+                Parser.parse(title[1])
+            else
+                null
+
     val hypotheses = object : Chain(
             if (title[0].length > 0)
                 title[0].split(",")
