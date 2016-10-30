@@ -8,8 +8,6 @@
  * Singleton for expression parsing
  */
 object Parser {
-    val whitespace = Regex("\\s")
-
     /**
      * Parses expression from the string
      *
@@ -17,7 +15,7 @@ object Parser {
      * @return           parsed expression
      */
     fun parse(expression: String): Expression =
-            expression.replace(whitespace, "").let {
+            expression.filter { it != ' ' }.let {
                 parse(it, 0, it.length - 1)
             }
 

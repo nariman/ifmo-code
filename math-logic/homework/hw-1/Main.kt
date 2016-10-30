@@ -69,7 +69,7 @@ fun solve(`in`: BufferedReader, out: BufferedWriter) {
             }
         }
 
-        out.write("(Не доказано)\n")
+        save("Не доказано", expression)
     }
 }
 
