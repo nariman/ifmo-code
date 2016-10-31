@@ -11,21 +11,21 @@ object Parser {
     /**
      * Parses expression from the string
      *
-     * @param expression expression to parse
-     * @return           parsed expression
+     * @param  expression expression to parse
+     * @return            parsed expression
      */
     fun parse(expression: String): Expression =
-            expression.filter { it != ' ' }.let {
+            Utils.clean(expression).let {
                 parse(it, 0, it.length - 1)
             }
 
     /**
      * Parses expression from the string
      *
-     * @param expression expression to parse
-     * @param l          left bound of parsing
-     * @param r          right bound of parsing
-     * @return           parsed expression
+     * @param  expression expression to parse
+     * @param  l          left bound of parsing
+     * @param  r          right bound of parsing
+     * @return            parsed expression
      */
     private fun parse(expression: String, l: Int, r: Int): Expression {
         var weight: Int = 0

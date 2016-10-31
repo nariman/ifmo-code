@@ -10,14 +10,7 @@ import java.io.File
 import java.util.*
 
 fun solve(`in`: BufferedReader, out: BufferedWriter) {
-    val title: List<String> = `in`.readLine().split("|-")
-    out.write("${title[0]}|-${title[1]}\n")
-
-    val unproven: Expression? =
-            if (title[1].length > 0)
-                Parser.parse(title[1])
-            else
-                null
+    val title: List<String> = Utils.clean(`in`.readLine()).split("|-")
 
     val hypotheses = object : Chain(
             if (title[0].length > 0)
@@ -25,6 +18,14 @@ fun solve(`in`: BufferedReader, out: BufferedWriter) {
             else
                 emptyList()
     ) {}
+
+    val unproven: Expression? =
+            if (title[1].length > 0)
+                Parser.parse(title[1])
+            else
+                null
+
+    out.write("${hypotheses.list.map { it.toString() }.joinToString(",")}|-$unproven\n")
 
     val expressions = HashMap<Int, Expression>()
     val fulls = HashMap<String, Int>()
