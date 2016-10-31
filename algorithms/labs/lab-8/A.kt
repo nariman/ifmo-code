@@ -187,9 +187,7 @@ private fun judge() {
     }
 }
 
-fun main(args: Array<String>) {
-//    judge()
-
+private fun run() {
     val `in` = Scanner(File(PROBLEM_NAME + ".in"))
     val out = PrintWriter(File(PROBLEM_NAME + ".out"))
 
@@ -197,4 +195,9 @@ fun main(args: Array<String>) {
 
     `in`.close()
     out.close()
+}
+
+fun main(args: Array<String>) {
+//    judge()
+    run()
 }
