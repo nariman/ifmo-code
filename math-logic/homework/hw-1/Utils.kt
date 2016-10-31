@@ -1,6 +1,6 @@
 /**
  * Nariman Safiulin (woofilee)
- * File: Main.kt
+ * File: Utils.kt
  * Created on: 31 Oct, 2016
  */
 
