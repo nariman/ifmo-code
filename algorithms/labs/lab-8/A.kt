@@ -143,6 +143,8 @@ private fun testgen(out: PrintWriter) {
     (2..n).forEach { out.println(definitelyRandom.nextInt(it - 1) + 1) }
     out.println(m)
     (1..m).forEach { out.println("${definitelyRandom.nextInt(n) + 1} ${definitelyRandom.nextInt(n) + 1}") }
+
+    print("N=$n, M=$m")
 }
 
 private fun judge() {
@@ -150,14 +152,30 @@ private fun judge() {
     var out: PrintWriter
     val tests = 150
 
+    var startTime: Long
+    var endTime: Long
+
     (1..tests).forEach { test ->
-        print("Checking test #$test... ")
+        println("Checking test #$test...")
+
+        // Test generation
+
+        print("   - test generation... ")
+        startTime = System.nanoTime()
 
         out = PrintWriter(File(PROBLEM_NAME + ".in"))
 
         testgen(out)
 
         out.close()
+
+        endTime = System.nanoTime()
+        println(" OK, ${endTime - startTime} ns.")
+
+        // Naive solution
+
+        print("   - naive solution running (answer file)... ")
+        startTime = System.nanoTime()
 
         `in` = Scanner(File(PROBLEM_NAME + ".in"))
         out = PrintWriter(File(PROBLEM_NAME + ".ans"))
@@ -167,6 +185,14 @@ private fun judge() {
         `in`.close()
         out.close()
 
+        endTime = System.nanoTime()
+        println("OK, ${endTime - startTime} ns.")
+
+        // Main solution
+
+        print("   - main solution running... ")
+        startTime = System.nanoTime()
+
         `in` = Scanner(File(PROBLEM_NAME + ".in"))
         out = PrintWriter(File(PROBLEM_NAME + ".out"))
 
@@ -174,6 +200,13 @@ private fun judge() {
 
         `in`.close()
         out.close()
+
+        endTime = System.nanoTime()
+        println("OK, ${endTime - startTime} ns.")
+
+        // Checking
+
+        print("   - checking... ")
 
         val outLines = Files.readAllLines(Paths.get(PROBLEM_NAME + ".out"))
         val ansLines = Files.readAllLines(Paths.get(PROBLEM_NAME + ".ans"))
@@ -184,6 +217,8 @@ private fun judge() {
             println("WA")
             return
         }
+
+        println()
     }
 }
 
