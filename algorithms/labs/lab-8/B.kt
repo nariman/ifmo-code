@@ -37,7 +37,6 @@ private fun solve(`in`: Scanner, out: PrintWriter) {
 
     val max = 5 * 100000
     var n = 1
-
     val p = Array(max) { 0 }
     val d = Array(max) { 0 }
     val dp = Array(max) { Array(log(max) + 1) { 0 } }

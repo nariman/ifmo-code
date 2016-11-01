@@ -105,14 +105,13 @@ private fun naive(`in`: Scanner, out: PrintWriter) {
     val n = `in`.nextInt()
     val graph = Array(n) { ArrayList<Int>() }
     val weight = Array(n) { Int.MAX_VALUE }
+    val p = Array(n) { 0 }
+    val d = Array(n) { 0 }
 
     (1..n - 1).forEach {
         graph[`in`.nextInt() - 1].add(it)
         weight[it] = `in`.nextInt()
     }
-
-    val p = Array(n) { 0 }
-    val d = Array(n) { 0 }
 
     fun dfs(v: Int, e: Int) {
         d[v] = e
@@ -121,6 +120,7 @@ private fun naive(`in`: Scanner, out: PrintWriter) {
             dfs(it, e + 1)
         }
     }
+
     dfs(0, 0)
 
     fun minonpath(v: Int, u: Int): Int {

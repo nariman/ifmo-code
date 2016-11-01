@@ -34,17 +34,15 @@ private class Scanner(file: File) {
 }
 
 private fun solve(`in`: Scanner, out: PrintWriter) {
-    fun power(e: Int) = 1 shl e
-    fun log(v: Int): Int = (Math.log(v.toDouble()) / Math.log(2.0)).toInt() + 1
-
     val n = `in`.nextInt()
-
+    val logn = (Math.log(n.toDouble()) / Math.log(2.0)).toInt() + 1
+    val power = Array(logn + 1) { 1 shl it }
     val graph = Array(n) { ArrayList<Int>() }
-    (1..n - 1).forEach { graph[`in`.nextInt() - 1].add(it) }
-
     val p = Array(n) { 0 }
     val d = Array(n) { 0 }
-    val dp = Array(n) { Array(log(n) + 1) { 0 } }
+    val dp = Array(n) { Array(logn + 1) { 0 } }
+
+    (1..n - 1).forEach { graph[`in`.nextInt() - 1].add(it) }
 
     fun dfs(v: Int, e: Int) {
         d[v] = e
@@ -53,11 +51,12 @@ private fun solve(`in`: Scanner, out: PrintWriter) {
             dfs(it, e + 1)
         }
     }
+
     dfs(0, 0)
 
     p.forEachIndexed { i, v -> dp[i][0] = v }
 
-    (1..log(n)).forEach { i ->
+    (1..logn).forEach { i ->
         (1..n - 1).forEach { v ->
             dp[v][i] = dp[dp[v][i - 1]][i - 1]
         }
@@ -69,14 +68,14 @@ private fun solve(`in`: Scanner, out: PrintWriter) {
         var v = v
         var u = u
 
-        (log(n) downTo 0).forEach {
-            if (d[u] - d[v] >= power(it))
+        (logn downTo 0).forEach {
+            if (d[u] - d[v] >= power[it])
                 u = dp[u][it]
         }
 
         if (v == u) return v
 
-        (log(n) downTo 0).forEach {
+        (logn downTo 0).forEach {
             if (dp[v][it] != dp[u][it]) {
                 v = dp[v][it]
                 u = dp[u][it]
@@ -92,10 +91,10 @@ private fun solve(`in`: Scanner, out: PrintWriter) {
 private fun naive(`in`: Scanner, out: PrintWriter) {
     val n = `in`.nextInt()
     val graph = Array(n) { ArrayList<Int>() }
-    (1..n - 1).forEach { graph[`in`.nextInt() - 1].add(it) }
-
     val p = Array(n) { 0 }
     val d = Array(n) { 0 }
+
+    (1..n - 1).forEach { graph[`in`.nextInt() - 1].add(it) }
 
     fun dfs(v: Int, e: Int) {
         d[v] = e
@@ -104,6 +103,7 @@ private fun naive(`in`: Scanner, out: PrintWriter) {
             dfs(it, e + 1)
         }
     }
+
     dfs(0, 0)
 
     fun lca(v: Int, u: Int): Int {
