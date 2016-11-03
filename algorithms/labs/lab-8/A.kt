@@ -48,13 +48,12 @@ private fun solve(`in`: Scanner, out: PrintWriter) {
         d[v] = e
         graph[v].forEach {
             p[it] = v
+            dp[it][0] = v
             dfs(it, e + 1)
         }
     }
 
     dfs(0, 0)
-
-    p.forEachIndexed { i, v -> dp[i][0] = v }
 
     (1..logn).forEach { i ->
         (1..n - 1).forEach { v ->

@@ -49,27 +49,25 @@ private fun solve(`in`: Scanner, out: PrintWriter) {
 
     val p = Array(n) { 0 }
     val d = Array(n) { 0 }
-    val dp = Array(n) { Array(log(n) + 1) { 0 } }
-    val dpWeight = Array(n) { Array(log(n) + 1) { Int.MAX_VALUE } }
+    val dpv = Array(n) { Array(log(n) + 1) { 0 } }             // Vertices
+    val dpw = Array(n) { Array(log(n) + 1) { Int.MAX_VALUE } } // Weights
 
     fun dfs(v: Int, e: Int) {
         d[v] = e
         graph[v].forEach {
             p[it] = v
+            dpv[it][0] = v
+            dpw[it][0] = weight[it]
             dfs(it, e + 1)
         }
     }
-    dfs(0, 0)
 
-    p.forEachIndexed { i, v ->
-        dp[i][0] = v
-        dpWeight[i][0] = weight[i]
-    }
+    dfs(0, 0)
 
     (1..log(n)).forEach { i ->
         (1..n - 1).forEach { v ->
-            dp[v][i] = dp[dp[v][i - 1]][i - 1]
-            dpWeight[v][i] = Math.min(dpWeight[v][i - 1], dpWeight[dp[v][i - 1]][i - 1])
+            dpv[v][i] = dpv[dpv[v][i - 1]][i - 1]
+            dpw[v][i] = Math.min(dpw[v][i - 1], dpw[dpv[v][i - 1]][i - 1])
         }
     }
 
@@ -82,16 +80,16 @@ private fun solve(`in`: Scanner, out: PrintWriter) {
 
         (log(n) downTo 0).forEach {
             if (d[u] - d[v] >= power(it)) {
-                w = Math.min(w, dpWeight[u][it])
-                u = dp[u][it]
+                w = Math.min(w, dpw[u][it])
+                u = dpv[u][it]
             }
         }
 
         (log(n) downTo 0).forEach {
-            if (dp[v][it] != dp[u][it]) {
-                w = Math.min(w, Math.min(dpWeight[v][it], dpWeight[u][it]))
-                v = dp[v][it]
-                u = dp[u][it]
+            if (dpv[v][it] != dpv[u][it]) {
+                w = Math.min(w, Math.min(dpw[v][it], dpw[u][it]))
+                v = dpv[v][it]
+                u = dpv[u][it]
             }
         }
 
