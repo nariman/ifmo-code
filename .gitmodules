@@ -46,3 +46,6 @@
 [submodule "android/remotes/homework/homework3"]
 	path = android/remotes/homework/homework3
 	url = https://github.com/IFMO-Android-2016/homework3
+[submodule "android/remotes/lessons/lesson8"]
+	path = android/remotes/lessons/lesson8
+	url = https://github.com/IFMO-Android-2016/lesson8
