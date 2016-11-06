@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="@dimen/moviesListGap"
+    android:background="@android:color/white"
+    card_view:cardElevation="0dp">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="@dimen/movieMarginPrimary">
+
+        <com.facebook.drawee.view.SimpleDraweeView
+            android:id="@+id/poster"
+            android:layout_width="@dimen/moviePosterWidth"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true" />
+
+        <LinearLayout
+            android:id="@+id/rating_container"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentTop="true"
+            android:background="@color/movieRatingGray"
+            android:paddingBottom="@dimen/movieVoteAverageMarginVertical"
+            android:paddingLeft="@dimen/movieVoteAverageMarginHorizontal"
+            android:paddingRight="@dimen/movieVoteAverageMarginHorizontal"
+            android:paddingTop="@dimen/movieVoteAverageMarginVertical">
+
+            <TextView
+                android:id="@+id/rating"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@android:color/white"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_marginLeft="@dimen/movieMarginPrimary"
+            android:layout_marginRight="@dimen/movieMarginPrimary"
+            android:layout_toLeftOf="@id/rating_container"
+            android:layout_toRightOf="@id/poster"
+            android:textColor="#404040"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/overview"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_below="@id/title"
+            android:layout_marginLeft="@dimen/movieMarginPrimary"
+            android:layout_marginTop="@dimen/movieMarginPrimary"
+            android:layout_toRightOf="@id/poster"
+            android:text="@string/movie_desc_by_lang_not_available" />
+
+    </RelativeLayout>
+</android.support.v7.widget.CardView>
