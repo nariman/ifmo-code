@@ -87,18 +87,16 @@ private fun solve(`in`: Scanner, out: PrintWriter) {
     dp = Array(n) { Array(logn + 1) { 0 } }
     cost = Array(n) { Array(logn + 1) { 0 } }
 
-    val graph = Array(n) { ArrayList<Int>() }
-    val edges = Array(n) { HashSet<Int>() }
+    val graph = Array(n) { HashSet<Int>() }
 
     (0..h - 1).forEach { i ->
         (0..w - 1).forEach { j ->
             if (matrix[i][j]) {
                 val u = horizontal[i][j]
                 val v = vertical[i][j]
-                if (!edges[u].contains(v)) {
+                if (!graph[u].contains(v)) {
                     graph[u].add(v)
                     graph[v].add(u)
-                    edges[u].add(v)
                 }
             }
         }
