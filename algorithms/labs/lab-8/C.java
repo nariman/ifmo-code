@@ -14,7 +14,6 @@ public class C {
     public static final String PROBLEM_NAME = "lca_rmq";
 
     public static void main(String[] args) throws Exception {
-        System.out.print("CCCCC");
         Scanner in = new Scanner(new File(PROBLEM_NAME + ".in"));
         PrintWriter out = new PrintWriter(new File(PROBLEM_NAME + ".out"));
 
