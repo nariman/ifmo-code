@@ -18,7 +18,7 @@
 
 При открытии экрана внизу показывается сегодняшняя дата и начинается загрузка расписания для выбранного маршрута и даты, при этом показывается индикатор прогресса. За загрузку данных отвечает класс `TimetableLoader` -- он выполняет запросы к сервису РЖД и получает расписание для выбранных маршрута и даты. После окончания загрузки показывается список поездов или сообщение об ошибке.
 
-<table border="0px">
+<table border="0">
 <tr>
 <td><img src="https://github.com/IFMO-Android-2016/homework4/blob/master/screenshots/loading_progress.png" width="360px"/></td>
 <td><img src="https://github.com/IFMO-Android-2016/homework4/blob/master/screenshots/timetable.png" width="360px"/></td>
