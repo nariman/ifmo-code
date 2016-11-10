@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_weight="1"
+        android:layout_height="0dp">
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/recycler"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+
+        <ProgressBar
+            android:id="@+id/progress"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:indeterminate="true"
+            android:visibility="gone"
+            />
+
+        <TextView
+            android:id="@+id/error_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:textSize="18sp"
+            android:visibility="gone"/>
+    </FrameLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:orientation="horizontal"
+        android:background="?attr/colorAccent">
+        <ImageView
+            android:id="@+id/btn_previous_day"
+            android:layout_width="?attr/actionBarSize"
+            android:layout_height="match_parent"
+            android:clickable="true"
+            android:focusable="true"
+            android:focusableInTouchMode="false"
+            android:background="@drawable/selector_bg"
+            android:scaleType="center"
+            android:src="@drawable/ic_previous_enabled"/>
+
+        <TextView
+            android:id="@+id/date_text"
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:textSize="18sp"
+            android:textColor="@android:color/white"/>
+
+        <ImageView
+            android:id="@+id/btn_next_day"
+            android:layout_width="?attr/actionBarSize"
+            android:layout_height="match_parent"
+            android:clickable="true"
+            android:focusable="true"
+            android:focusableInTouchMode="false"
+            android:background="@drawable/selector_bg"
+            android:scaleType="center"
+            android:src="@drawable/ic_next_enabled"/>
+    </LinearLayout>
+
+</LinearLayout>
