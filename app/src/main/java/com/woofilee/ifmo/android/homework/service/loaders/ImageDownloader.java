@@ -16,23 +16,9 @@ import java.net.URL;
  * an image by URL.
  */
 public class ImageDownloader {
-    private final String TAG = this.getClass().getSimpleName();
+    private static final String TAG = ImageDownloader.class.getSimpleName();
 
     private static final int BUFFER_LENGTH = 8192;
-
-    /**
-     * Listener with methods to be invoked when image download status changes.
-     */
-    private final OnImageLoaderListener listener;
-
-    /**
-     * Indicates, that loading has started.
-     */
-    private boolean started = false;
-
-    public ImageDownloader(OnImageLoaderListener listener) {
-        this.listener = listener;
-    }
 
     /**
      * Interface with methods to be invoked when image download status changes.
@@ -58,14 +44,11 @@ public class ImageDownloader {
         void onProgressChange(int percent);
     }
 
-    public void download(final String url) {
-        if (started) {
-            Log.w(TAG, "Download already running...");
-            return;
-        }
-
-        started = true;
-
+    /**
+     * @param url      url, where image to download is located
+     * @param listener listener with methods to be invoked when image download status changes
+     */
+    public static void download(final String url, final OnImageLoaderListener listener) {
         new AsyncTask<Void, Integer, Bitmap>() {
             @Override
             protected void onPreExecute() {
@@ -164,5 +147,8 @@ public class ImageDownloader {
 //                System.gc();
             }
         }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+    }
+
+    private ImageDownloader() {
     }
 }

@@ -17,7 +17,7 @@ import java.net.URL;
  * a links from a Reddit's subreddit.
  */
 public class RedditLinksLoader {
-    private final String TAG = this.getClass().getSimpleName();
+    private static final String TAG = RedditLinksLoader.class.getSimpleName();
 
     private static final int BUFFER_LENGTH = 8192;
 
@@ -30,49 +30,6 @@ public class RedditLinksLoader {
 
     public static final Protocol DEFAULT_PROTOCOL = Protocol.HTTPS;
     public static final String DEFAULT_SUBREDDIT = "aww";
-
-    /**
-     * Listener with methods to be invoked when links load status changes.
-     */
-    private final OnLinksLoaderListener listener;
-
-    /**
-     * Protocol, that will be used when download.
-     */
-    private final String protocol;
-
-    /**
-     * Subreddit name, from to load a links.
-     */
-    private final String subreddit;
-
-    /**
-     * Indicates, that loading has started.
-     */
-    private boolean started = false;
-
-    public RedditLinksLoader(OnLinksLoaderListener listener) {
-        this(DEFAULT_PROTOCOL, DEFAULT_SUBREDDIT, listener);
-    }
-
-    public RedditLinksLoader(String subreddit, OnLinksLoaderListener listener) {
-        this(DEFAULT_PROTOCOL, subreddit, listener);
-    }
-
-    public RedditLinksLoader(Protocol protocol, OnLinksLoaderListener listener) {
-        this(protocol, DEFAULT_SUBREDDIT, listener);
-    }
-
-    public RedditLinksLoader(Protocol protocol, String subreddit, OnLinksLoaderListener listener) {
-        this.subreddit = subreddit;
-        this.listener = listener;
-
-        if (protocol == Protocol.HTTP)
-            this.protocol = "http";
-        else {
-            this.protocol = "https";
-        }
-    }
 
     /**
      * Interface with methods to be invoked when links load status changes.
@@ -91,14 +48,35 @@ public class RedditLinksLoader {
         void onError();
     }
 
-    public void load() {
-        if (started) {
-            Log.w(TAG, "Load already running...");
-            return;
-        }
+    /**
+     * @param listener listener with methods to be invoked when links load status changes
+     */
+    public static void load(OnLinksLoaderListener listener) {
+        load(DEFAULT_PROTOCOL, DEFAULT_SUBREDDIT, listener);
+    }
 
-        started = true;
+    /**
+     * @param subreddit subreddit name, from to load a links
+     * @param listener  listener with methods to be invoked when links load status changes
+     */
+    public static void load(String subreddit, OnLinksLoaderListener listener) {
+        load(DEFAULT_PROTOCOL, subreddit, listener);
+    }
 
+    /**
+     * @param protocol protocol, that will be used when download
+     * @param listener listener with methods to be invoked when links load status changes
+     */
+    public static void load(Protocol protocol, OnLinksLoaderListener listener) {
+        load(protocol, DEFAULT_SUBREDDIT, listener);
+    }
+
+    /**
+     * @param protocol  protocol, that will be used when download
+     * @param subreddit subreddit name, from to load a links
+     * @param listener  listener with methods to be invoked when links load status changes
+     */
+    public static void load(final Protocol protocol, final String subreddit, final OnLinksLoaderListener listener) {
         new AsyncTask<Void, Integer, JsonReader>() {
             @Override
             protected void onPreExecute() {
@@ -120,21 +98,22 @@ public class RedditLinksLoader {
 
                 try {
                     connection = (HttpURLConnection) new URL(
-                            protocol + "://" + REDDIT_URL + "/r/" + subreddit + ".json"
+                            (protocol == Protocol.HTTP) ? "http" : "https"
+                                    + "://"
+                                    + REDDIT_URL
+                                    + "/r/"
+                                    + subreddit
+                                    + ".json"
                     ).openConnection();
+
+                    Log.d(TAG, "URL: " + connection.getURL().toString());
 
                     connection.connect();
 
                     final int responseCode = connection.getResponseCode();
-                    final int length = connection.getContentLength();
-
                     if (responseCode != HttpURLConnection.HTTP_OK) {
                         throw new FileNotFoundException("Unexpected HTTP response: " + responseCode
                                 + ", " + connection.getResponseMessage());
-                    }
-
-                    if (length <= 0) {
-                        throw new FileNotFoundException("Invalid content length: " + length);
                     }
 
                     is = new BufferedInputStream(connection.getInputStream(), BUFFER_LENGTH);
@@ -149,15 +128,14 @@ public class RedditLinksLoader {
                         out.write(bytes, 0, count);
                     }
 
-                    if (length != read) {
-                        Log.w(TAG, "Received " + read + " bytes, but expected " + length);
-                    } else {
-                        Log.d(TAG, "Received " + read + " bytes");
-                        reader = new JsonReader(
-                                new InputStreamReader(new ByteArrayInputStream(out.toByteArray()))
-                        );
-                    }
+                    Log.d(TAG, "Received " + read + " bytes");
+
+                    reader = new JsonReader(
+                            new InputStreamReader(new ByteArrayInputStream(out.toByteArray()))
+                    );
                 } catch (Throwable e) {
+                    Log.e(TAG, e.getMessage());
+
                     if (!this.isCancelled()) {
                         this.cancel(true);
                     }
@@ -195,5 +173,8 @@ public class RedditLinksLoader {
 //                System.gc();
             }
         }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+    }
+
+    private RedditLinksLoader() {
     }
 }
