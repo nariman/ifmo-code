@@ -12,10 +12,9 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 
 /**
- * Class provides a methods for downloading
- * an image by URL.
+ * Class provides a methods for downloading an image by URL.
  */
-public class ImageDownloader {
+public final class ImageDownloader {
     private static final String TAG = ImageDownloader.class.getSimpleName();
 
     private static final int BUFFER_LENGTH = 8192;
@@ -45,6 +44,8 @@ public class ImageDownloader {
     }
 
     /**
+     * Loads an image by URL.
+     *
      * @param url      url, where image to download is located
      * @param listener listener with methods to be invoked when image download status changes
      */
@@ -69,29 +70,29 @@ public class ImageDownloader {
             protected Bitmap doInBackground(Void... params) {
                 Bitmap bitmap = null;
 
-                HttpURLConnection connection = null;
+                HttpURLConnection conn = null;
                 BufferedInputStream is = null;
-                ByteArrayOutputStream out = null;
+                ByteArrayOutputStream os = null;
 
                 try {
-                    connection = (HttpURLConnection) new URL(url).openConnection();
+                    conn = (HttpURLConnection) new URL(url).openConnection();
 
-                    connection.connect();
+                    conn.connect();
 
-                    final int responseCode = connection.getResponseCode();
-                    final int length = connection.getContentLength();
+                    final int responseCode = conn.getResponseCode();
+                    final int length = conn.getContentLength();
 
                     if (responseCode != HttpURLConnection.HTTP_OK) {
                         throw new FileNotFoundException("Unexpected HTTP response: " + responseCode
-                                + ", " + connection.getResponseMessage());
+                                + ", " + conn.getResponseMessage());
                     }
 
                     if (length <= 0) {
                         throw new FileNotFoundException("Invalid content length: " + length);
                     }
 
-                    is = new BufferedInputStream(connection.getInputStream(), BUFFER_LENGTH);
-                    out = new ByteArrayOutputStream();
+                    is = new BufferedInputStream(conn.getInputStream(), BUFFER_LENGTH);
+                    os = new ByteArrayOutputStream();
 
                     byte bytes[] = new byte[BUFFER_LENGTH];
                     int count;
@@ -99,7 +100,7 @@ public class ImageDownloader {
 
                     while ((count = is.read(bytes)) != -1) {
                         read += count;
-                        out.write(bytes, 0, count);
+                        os.write(bytes, 0, count);
                         publishProgress((int) ((read * 100) / length));
                     }
 
@@ -107,7 +108,7 @@ public class ImageDownloader {
                         Log.w(TAG, "Received " + read + " bytes, but expected " + length);
                     } else {
                         Log.d(TAG, "Received " + read + " bytes");
-                        bitmap = BitmapFactory.decodeByteArray(out.toByteArray(), 0, out.size());
+                        bitmap = BitmapFactory.decodeByteArray(os.toByteArray(), 0, os.size());
                     }
                 } catch (Throwable e) {
                     if (!this.isCancelled()) {
@@ -115,17 +116,17 @@ public class ImageDownloader {
                     }
                 } finally {
                     try {
-                        if (connection != null) {
-                            connection.disconnect();
+                        if (conn != null) {
+                            conn.disconnect();
                         }
 
                         if (is != null) {
                             is.close();
                         }
 
-                        if (out != null) {
-                            out.flush();
-                            out.close();
+                        if (os != null) {
+                            os.flush();
+                            os.close();
                         }
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -144,7 +145,7 @@ public class ImageDownloader {
                     listener.onComplete(result);
                 }
 
-//                System.gc();
+                System.gc();  // Collect it all! :)
             }
         }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }

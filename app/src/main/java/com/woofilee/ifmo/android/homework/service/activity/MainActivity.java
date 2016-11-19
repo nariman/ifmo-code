@@ -12,7 +12,9 @@ import android.widget.ProgressBar;
 import com.woofilee.ifmo.android.homework.service.R;
 import com.woofilee.ifmo.android.homework.service.loaders.ImageDownloader;
 import com.woofilee.ifmo.android.homework.service.loaders.RedditLinksLoader;
+import com.woofilee.ifmo.android.homework.service.utils.ImageUtils;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 
 public class MainActivity extends AppCompatActivity {
@@ -56,7 +58,13 @@ public class MainActivity extends AppCompatActivity {
                 new ImageDownloader.OnImageLoaderListener() {
                     @Override
                     public void onComplete(Bitmap result) {
-                        imageView.setImageBitmap(result);
+                        try {
+                            ImageUtils.saveImage(result, "hell", "png", getApplicationContext());
+                            Bitmap bitmap = ImageUtils.loadImage("hell", "png", getApplicationContext());
+                            imageView.setImageBitmap(bitmap);
+                        } catch (FileNotFoundException e) {
+                            e.printStackTrace();
+                        }
                     }
 
                     @Override

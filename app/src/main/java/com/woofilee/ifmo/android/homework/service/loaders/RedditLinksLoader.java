@@ -13,10 +13,9 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 
 /**
- * Class provides a methods for loading
- * a links from a Reddit's subreddit.
+ * Class provides a methods for loading a links from a Reddit's subreddit.
  */
-public class RedditLinksLoader {
+public final class RedditLinksLoader {
     private static final String TAG = RedditLinksLoader.class.getSimpleName();
 
     private static final int BUFFER_LENGTH = 8192;
@@ -49,6 +48,8 @@ public class RedditLinksLoader {
     }
 
     /**
+     * Loads a links from a Reddit's subreddit.
+     *
      * @param listener listener with methods to be invoked when links load status changes
      */
     public static void load(OnLinksLoaderListener listener) {
@@ -56,6 +57,8 @@ public class RedditLinksLoader {
     }
 
     /**
+     * Loads a links from a Reddit's subreddit.
+     *
      * @param subreddit subreddit name, from to load a links
      * @param listener  listener with methods to be invoked when links load status changes
      */
@@ -64,6 +67,8 @@ public class RedditLinksLoader {
     }
 
     /**
+     * Loads a links from a Reddit's subreddit.
+     *
      * @param protocol protocol, that will be used when download
      * @param listener listener with methods to be invoked when links load status changes
      */
@@ -72,6 +77,8 @@ public class RedditLinksLoader {
     }
 
     /**
+     * Loads a links from a Reddit's subreddit.
+     *
      * @param protocol  protocol, that will be used when download
      * @param subreddit subreddit name, from to load a links
      * @param listener  listener with methods to be invoked when links load status changes
@@ -92,12 +99,12 @@ public class RedditLinksLoader {
             protected JsonReader doInBackground(Void... params) {
                 JsonReader reader = null;
 
-                HttpURLConnection connection = null;
+                HttpURLConnection conn = null;
                 BufferedInputStream is = null;
-                ByteArrayOutputStream out = null;
+                ByteArrayOutputStream os = null;
 
                 try {
-                    connection = (HttpURLConnection) new URL(
+                    conn = (HttpURLConnection) new URL(
                             (protocol == Protocol.HTTP) ? "http" : "https"
                                     + "://"
                                     + REDDIT_URL
@@ -106,18 +113,18 @@ public class RedditLinksLoader {
                                     + ".json"
                     ).openConnection();
 
-                    Log.d(TAG, "URL: " + connection.getURL().toString());
+                    Log.d(TAG, "URL: " + conn.getURL().toString());
 
-                    connection.connect();
+                    conn.connect();
 
-                    final int responseCode = connection.getResponseCode();
+                    final int responseCode = conn.getResponseCode();
                     if (responseCode != HttpURLConnection.HTTP_OK) {
                         throw new FileNotFoundException("Unexpected HTTP response: " + responseCode
-                                + ", " + connection.getResponseMessage());
+                                + ", " + conn.getResponseMessage());
                     }
 
-                    is = new BufferedInputStream(connection.getInputStream(), BUFFER_LENGTH);
-                    out = new ByteArrayOutputStream();
+                    is = new BufferedInputStream(conn.getInputStream(), BUFFER_LENGTH);
+                    os = new ByteArrayOutputStream();
 
                     byte bytes[] = new byte[BUFFER_LENGTH];
                     int count;
@@ -125,13 +132,13 @@ public class RedditLinksLoader {
 
                     while ((count = is.read(bytes)) != -1) {
                         read += count;
-                        out.write(bytes, 0, count);
+                        os.write(bytes, 0, count);
                     }
 
                     Log.d(TAG, "Received " + read + " bytes");
 
                     reader = new JsonReader(
-                            new InputStreamReader(new ByteArrayInputStream(out.toByteArray()))
+                            new InputStreamReader(new ByteArrayInputStream(os.toByteArray()))
                     );
                 } catch (Throwable e) {
                     Log.e(TAG, e.getMessage());
@@ -141,17 +148,17 @@ public class RedditLinksLoader {
                     }
                 } finally {
                     try {
-                        if (connection != null) {
-                            connection.disconnect();
+                        if (conn != null) {
+                            conn.disconnect();
                         }
 
                         if (is != null) {
                             is.close();
                         }
 
-                        if (out != null) {
-                            out.flush();
-                            out.close();
+                        if (os != null) {
+                            os.flush();
+                            os.close();
                         }
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -170,7 +177,7 @@ public class RedditLinksLoader {
                     listener.onComplete(result);
                 }
 
-//                System.gc();
+                System.gc(); // Collect it all! :)
             }
         }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
