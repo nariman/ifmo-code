@@ -14,7 +14,6 @@ import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -22,10 +21,11 @@ import android.widget.ImageView;
 import com.woofilee.ifmo.android.homework.service.R;
 import com.woofilee.ifmo.android.homework.service.receivers.ImageServiceReceiver;
 import com.woofilee.ifmo.android.homework.service.services.ImageService;
-import com.woofilee.ifmo.android.homework.service.utils.ImageUtils;
+import com.woofilee.ifmo.android.homework.service.utils.FileUtils;
 import com.woofilee.ifmo.android.homework.service.utils.ServiceUtils;
 
-import java.io.FileNotFoundException;
+import java.io.FileInputStream;
+import java.io.IOException;
 
 /**
  * Main screen
@@ -33,8 +33,9 @@ import java.io.FileNotFoundException;
 public class MainActivity extends AppCompatActivity {
     private final String TAG = this.getClass().getSimpleName();
 
-    private static final float BLUR_IMAGE_SCALE = 0.1f;
-    private static final float BLUR_IMAGE_RADIUS = 10f;
+    private static final int IMAGE_SAMPLE_SIZE = 1024;
+    private static final float BLUR_IMAGE_SCALE = 0.25f;
+    private static final float BLUR_IMAGE_RADIUS = 7.5f;
 
     private Intent serviceIntent;
     private ImageServiceReceiver receiver;
@@ -105,22 +106,36 @@ public class MainActivity extends AppCompatActivity {
                 Bitmap bitmap;
 
                 try {
-                    bitmap = ImageUtils.loadImage(
-                            ImageService.IMAGE_FILENAME,
-                            ImageService.IMAGE_EXTENSION,
-                            getApplicationContext()
-                    );
-                } catch (FileNotFoundException e) {
+                    FileInputStream fis = FileUtils.getInputFile(ImageService.IMAGE_FILENAME,
+                            ImageService.IMAGE_EXTENSION, getApplicationContext());
+
+                    final BitmapFactory.Options options = new BitmapFactory.Options();
+                    options.inJustDecodeBounds = true;
+
+                    BitmapFactory.decodeStream(fis, null, options);
+
+                    options.inSampleSize = calculateSampleSize(
+                            options, IMAGE_SAMPLE_SIZE, IMAGE_SAMPLE_SIZE);
+                    options.inJustDecodeBounds = false;
+
+                    fis = FileUtils.getInputFile(ImageService.IMAGE_FILENAME,
+                            ImageService.IMAGE_EXTENSION, getApplicationContext());
+
+                    bitmap = BitmapFactory.decodeStream(fis, null, options);
+
+                    try {
+                        fis.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                } catch (IOException e) {
                     bitmap = BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher);
 
                     handler.post(new Runnable() {
                         @Override
                         public void run() {
-                            Snackbar.make(
-                                    coordinatorLayout,
-                                    R.string.no_available_image,
-                                    Snackbar.LENGTH_INDEFINITE
-                            ).show();
+                            Snackbar.make(coordinatorLayout, R.string.no_available_image,
+                                    Snackbar.LENGTH_INDEFINITE).show();
                         }
                     });
                 }
@@ -157,6 +172,26 @@ public class MainActivity extends AppCompatActivity {
                 });
 
                 return null;
+            }
+
+            private int calculateSampleSize(BitmapFactory.Options options,
+                                            int reqWidth,
+                                            int reqHeight) {
+                final int height = options.outHeight;
+                final int width = options.outWidth;
+                int sampleSize = 1;
+
+                if (height > reqHeight || width > reqWidth) {
+                    final int halfHeight = height / 2;
+                    final int halfWidth = width / 2;
+
+                    while ((halfHeight / sampleSize) >= reqHeight
+                            && (halfWidth / sampleSize) >= reqWidth) {
+                        sampleSize *= 2;
+                    }
+                }
+
+                return sampleSize;
             }
 
             @Override

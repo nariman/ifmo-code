@@ -20,6 +20,9 @@ public final class RedditLinksLoader {
 
     private static final int BUFFER_LENGTH = 8192;
 
+    private static final int CONNECT_TIMEOUT = 60;
+    private static final int READ_TIMEOUT = 60;
+
     public static enum Protocol {
         HTTPS,
         HTTP
@@ -93,6 +96,7 @@ public final class RedditLinksLoader {
             @Override
             protected void onCancelled() {
                 Log.d(TAG, "Cancel load");
+                listener.onError();
             }
 
             @Override
@@ -114,6 +118,8 @@ public final class RedditLinksLoader {
                     ).openConnection();
 
                     Log.d(TAG, "URL: " + conn.getURL().toString());
+                    conn.setConnectTimeout(CONNECT_TIMEOUT * 1000);
+                    conn.setReadTimeout(READ_TIMEOUT * 1000);
 
                     conn.connect();
 

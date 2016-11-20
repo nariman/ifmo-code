@@ -19,6 +19,9 @@ public final class ImageDownloader {
 
     private static final int BUFFER_LENGTH = 8192;
 
+    private static final int CONNECT_TIMEOUT = 60;
+    private static final int READ_TIMEOUT = 60;
+
     /**
      * Interface with methods to be invoked when image download status changes.
      */
@@ -59,6 +62,7 @@ public final class ImageDownloader {
             @Override
             protected void onCancelled() {
                 Log.d(TAG, "Cancel download");
+                listener.onError();
             }
 
             @Override
@@ -76,6 +80,10 @@ public final class ImageDownloader {
 
                 try {
                     conn = (HttpURLConnection) new URL(url).openConnection();
+
+                    Log.d(TAG, "URL: " + conn.getURL().toString());
+                    conn.setConnectTimeout(CONNECT_TIMEOUT * 1000);
+                    conn.setReadTimeout(READ_TIMEOUT * 1000);
 
                     conn.connect();
 
@@ -110,7 +118,7 @@ public final class ImageDownloader {
                         Log.d(TAG, "Received " + read + " bytes");
                         bitmap = BitmapFactory.decodeByteArray(os.toByteArray(), 0, os.size());
                     }
-                } catch (Throwable e) {
+                } catch (Exception e) {
                     if (!this.isCancelled()) {
                         this.cancel(true);
                     }

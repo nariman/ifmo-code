@@ -7,6 +7,7 @@
     <string name="stop_service">Stop service</string>
 
     <string name="reloaded">Image updated</string>
+    <string name="no_available_image">No available image</string>
 
     <string name="image_download">Image Download</string>
     <string name="preparing_to_download">Preparing to download…</string>
@@ -14,5 +15,4 @@
     <string name="download_complete">Download complete</string>
     <string name="download_error">Download error</string>
     <string name="saving">Saving…</string>
-    <string name="no_available_image">No available image</string>
 </resources>
