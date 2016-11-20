@@ -6,13 +6,13 @@ import android.content.Intent;
 import android.util.Log;
 
 /**
- * Receiver class for the RedditService broadcasts.
+ * Receiver class for the Image Service broadcasts.
  */
-public abstract class RedditServiceReceiver extends BroadcastReceiver {
-    public static final String TAG = RedditServiceReceiver.class.getSimpleName();
+public abstract class ImageServiceReceiver extends BroadcastReceiver {
+    public static final String TAG = ImageServiceReceiver.class.getSimpleName();
 
     public static final String BROADCAST_ACTION =
-            "com.woofilee.ifmo.android.homework.service.reddit";
+            "com.woofilee.ifmo.android.homework.service.image";
 
     public static final String ACTION_TYPE_PARAM = "type";
 

@@ -14,4 +14,5 @@
     <string name="download_complete">Download complete</string>
     <string name="download_error">Download error</string>
     <string name="saving">Saving…</string>
+    <string name="no_available_image">No available image</string>
 </resources>

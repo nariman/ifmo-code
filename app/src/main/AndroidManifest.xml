@@ -21,7 +21,7 @@
         </activity>
 
         <service
-            android:name=".services.RedditService"
+            android:name=".services.ImageService"
             android:enabled="true"
             android:exported="false"></service>
     </application>
