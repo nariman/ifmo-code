@@ -9,6 +9,5 @@ public class ServiceApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-        // TODO
     }
 }

@@ -5,6 +5,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 
+/**
+ * Receiver class for the RedditService broadcasts.
+ */
 public abstract class RedditServiceReceiver extends BroadcastReceiver {
     public static final String TAG = RedditServiceReceiver.class.getSimpleName();
 
@@ -29,5 +32,8 @@ public abstract class RedditServiceReceiver extends BroadcastReceiver {
         }
     }
 
+    /**
+     * Invokes, when image download complete.
+     */
     public abstract void onFinishLoading();
 }

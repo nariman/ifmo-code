@@ -3,25 +3,27 @@ package com.woofilee.ifmo.android.homework.service.services;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.Service;
-import android.bluetooth.BluetoothAdapter;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Bitmap;
+import android.os.AsyncTask;
 import android.os.IBinder;
 import android.util.Log;
 
 import com.woofilee.ifmo.android.homework.service.R;
+import com.woofilee.ifmo.android.homework.service.constants.ImagesURLConstants;
 import com.woofilee.ifmo.android.homework.service.loaders.ImageDownloader;
 import com.woofilee.ifmo.android.homework.service.receivers.RedditServiceReceiver;
 import com.woofilee.ifmo.android.homework.service.utils.ImageUtils;
 
 import java.io.FileNotFoundException;
 
-import static android.R.attr.id;
-
-public class RedditService extends Service {
+/**
+ * Service class, that downloads images by the battery state change system event.
+ */
+public final class RedditService extends Service {
     private static final String TAG = RedditService.class.getSimpleName();
 
     public static final String IMAGE_FILENAME = "reddit";
@@ -30,17 +32,20 @@ public class RedditService extends Service {
     NotificationManager notificationManager;
     BroadcastReceiver receiver;
 
+    int notificationCounter;
     boolean isLoading;
 
     public RedditService() {
+        notificationCounter = 0;
         isLoading = false;
-
     }
 
     @Override
     public void onCreate() {
         Log.d(TAG, "Starting service");
         super.onCreate();
+
+        notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
         receiver = new BroadcastReceiver() {
             @Override
@@ -52,65 +57,80 @@ public class RedditService extends Service {
                     return;
                 }
 
+                notificationCounter++;
                 isLoading = true;
 
-                notificationManager = (NotificationManager)
-                        getSystemService(Context.NOTIFICATION_SERVICE);
-
-                final Notification.Builder builder = new Notification.Builder(getApplicationContext());
-                builder.setContentTitle("Picture Download")
-                        .setContentText("Preparing to download...")
+                final Notification.Builder builder =
+                        new Notification.Builder(getApplicationContext());
+                builder.setContentTitle(getString(R.string.image_download))
+                        .setContentText(getString(R.string.preparing_to_download))
                         .setSmallIcon(R.mipmap.ic_launcher)
                         .setProgress(100, 0, true);
 
-                notificationManager.notify(0, builder.build());
+                notificationManager.notify(notificationCounter, builder.build());
 
-                builder.setContentText("Download in progress...");
-                notificationManager.notify(0, builder.build());
+                // TODO: Reddit links download
+
+                builder.setContentText(getString(R.string.download_in_progress));
+                notificationManager.notify(notificationCounter, builder.build());
 
                 ImageDownloader.download(
-                        "https://i.reddituploads.com/ede98e2d860b43d885732abcf8f74036?fit=max&h=1536&w=1536&s=0dc5faee8bb8042f764e52d4815222dd",
+                        ImagesURLConstants.getRandomImageURL(),
                         new ImageDownloader.OnImageLoaderListener() {
                             @Override
-                            public void onComplete(Bitmap result) {
-                                try {
-                                    ImageUtils.saveImage(
-                                            result,
-                                            IMAGE_FILENAME,
-                                            IMAGE_EXTENSION,
-                                            getApplicationContext()
-                                    );
+                            public void onComplete(final Bitmap result) {
+                                builder.setContentText(getString(R.string.saving));
+                                builder.setProgress(100, 0, true);
+                                notificationManager.notify(notificationCounter, builder.build());
 
-                                    Intent intent = new Intent(RedditServiceReceiver.BROADCAST_ACTION);
-                                    intent.putExtra(
-                                            RedditServiceReceiver.ACTION_TYPE_PARAM,
-                                            RedditServiceReceiver.ACTION_TYPE_FINISH_LOADING
-                                    );
+                                new AsyncTask<Void, Void, Void>() { // Async image saving to file
+                                    @Override
+                                    protected Void doInBackground(Void... voids) {
+                                        try {
+                                            ImageUtils.saveImage(
+                                                    result,
+                                                    IMAGE_FILENAME,
+                                                    IMAGE_EXTENSION,
+                                                    getApplicationContext()
+                                            );
 
-                                    sendBroadcast(intent);
-                                    builder.setContentText("Download complete");
-                                } catch (FileNotFoundException e) {
-                                    e.printStackTrace();
-                                    builder.setContentText("Error downloading image");
-                                }
+                                            Intent intent = new Intent(
+                                                    RedditServiceReceiver.BROADCAST_ACTION);
+                                            intent.putExtra(
+                                                    RedditServiceReceiver.ACTION_TYPE_PARAM,
+                                                    RedditServiceReceiver.ACTION_TYPE_FINISH_LOADING
+                                            );
 
-                                builder.setProgress(0, 0, false);
-                                notificationManager.notify(id, builder.build());
-                                isLoading = false;
+                                            sendBroadcast(intent);
+                                            builder.setContentText(getString(
+                                                    R.string.download_complete));
+                                        } catch (FileNotFoundException e) {
+                                            e.printStackTrace();
+                                            builder.setContentText(getString(
+                                                    R.string.download_error));
+                                        }
+
+                                        builder.setProgress(0, 0, false);
+                                        notificationManager.notify(notificationCounter, builder.build());
+                                        isLoading = false;
+
+                                        return null;
+                                    }
+                                }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
                             }
 
                             @Override
                             public void onError() {
                                 isLoading = false;
-                                builder.setContentText("Error downloading image");
+                                builder.setContentText(getString(R.string.download_error));
                                 builder.setProgress(0, 0, false);
-                                notificationManager.notify(id, builder.build());
+                                notificationManager.notify(notificationCounter, builder.build());
                             }
 
                             @Override
                             public void onProgressChange(int percent) {
                                 builder.setProgress(100, percent, false);
-                                notificationManager.notify(id, builder.build());
+                                notificationManager.notify(notificationCounter, builder.build());
                             }
                         }
                 );
