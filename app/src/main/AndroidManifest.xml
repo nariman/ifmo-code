@@ -19,6 +19,11 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <service
+            android:name=".services.RedditService"
+            android:enabled="true"
+            android:exported="false"></service>
     </application>
 
 </manifest>

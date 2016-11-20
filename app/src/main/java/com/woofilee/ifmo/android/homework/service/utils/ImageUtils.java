@@ -19,14 +19,13 @@ public final class ImageUtils {
      * @param bitmap    image to save
      * @param filename  name of file
      * @param extension extension of file
-     * @param context   context of file
-     *
+     * @param context   application context
      * @throws FileNotFoundException if path to the file not created, and file cannot be available
      */
     public static void saveImage(Bitmap bitmap,
-                                    String filename,
-                                    String extension,
-                                    Context context) throws FileNotFoundException {
+                                 String filename,
+                                 String extension,
+                                 Context context) throws FileNotFoundException {
         FileOutputStream fos = FileUtils.getOutputFile(filename, extension, context);
         bitmap.compress(Bitmap.CompressFormat.PNG, 100, fos);
 
@@ -42,8 +41,8 @@ public final class ImageUtils {
      *
      * @param filename  name of file
      * @param extension extension of file
-     * @param context   context of file
-
+     * @param context   application context
+     * @return          loaded image
      * @throws FileNotFoundException if path to the file not created, and file cannot be available
      */
     public static Bitmap loadImage(String filename,

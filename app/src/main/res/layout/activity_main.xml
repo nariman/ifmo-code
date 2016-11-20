@@ -39,7 +39,7 @@
             android:id="@+id/button_start"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:clickable="false"
+            android:enabled="false"
             android:text="@string/start_service"
             style="@style/Widget.AppCompat.Button" />
 
@@ -47,7 +47,7 @@
             android:id="@+id/button_stop"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:clickable="false"
+            android:enabled="false"
             android:text="@string/stop_service" />
 
     </LinearLayout>

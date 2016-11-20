@@ -1,7 +1,6 @@
 package com.woofilee.ifmo.android.homework.service.utils;
 
 import android.content.Context;
-import android.util.Log;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -17,13 +16,13 @@ public final class FileUtils {
      *
      * @param filename  name of file
      * @param extension extension of file
-     * @param context   context of file
-     *
+     * @param context   application context
+     * @return          file instance to read
      * @throws FileNotFoundException if path to the file not created, and file cannot be available
      */
     public static FileInputStream getInputFile(String filename,
-                                         String extension,
-                                         Context context) throws FileNotFoundException {
+                                               String extension,
+                                               Context context) throws FileNotFoundException {
         File f = getFile(filename, extension, context);
 
         if (f == null) {
@@ -38,13 +37,13 @@ public final class FileUtils {
      *
      * @param filename  name of file
      * @param extension extension of file
-     * @param context   context of file
-     *
+     * @param context   application context
+     * @return          file instance to write
      * @throws FileNotFoundException if path to the file not created, and file cannot be available
      */
     public static FileOutputStream getOutputFile(String filename,
-                                           String extension,
-                                           Context context) throws FileNotFoundException {
+                                                 String extension,
+                                                 Context context) throws FileNotFoundException {
         File f = getFile(filename, extension, context);
 
         if (f == null) {
@@ -59,7 +58,8 @@ public final class FileUtils {
      *
      * @param filename  name of file
      * @param extension extension of file
-     * @param context   context of file
+     * @param context   application context
+     * @return          file instance
      */
     private static File getFile(String filename, String extension, Context context) {
         File f = context.getFilesDir();
