@@ -1,4 +1,4 @@
-package com.woofilee.ifmo.android.homework.service.services;
+package com.woofilee.ifmo.android.homework.service.service;
 
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -13,14 +13,21 @@ import android.os.AsyncTask;
 import android.os.IBinder;
 import android.util.Log;
 
-import com.woofilee.ifmo.android.homework.service.R;
 import com.woofilee.ifmo.android.homework.service.activity.MainActivity;
-import com.woofilee.ifmo.android.homework.service.constants.ImagesURLConstants;
-import com.woofilee.ifmo.android.homework.service.loaders.ImageDownloader;
-import com.woofilee.ifmo.android.homework.service.receivers.ImageServiceReceiver;
-import com.woofilee.ifmo.android.homework.service.utils.ImageUtils;
+import com.woofilee.ifmo.android.homework.service.constant.ImagesURLConstants;
+import com.woofilee.ifmo.android.homework.service.loader.ImageDownloader;
+import com.woofilee.ifmo.android.homework.service.receiver.ImageReceiver;
+import com.woofilee.ifmo.android.homework.service.util.ImageUtils;
 
-import java.io.FileNotFoundException;
+import static com.woofilee.ifmo.android.homework.service.R.mipmap.ic_launcher;
+
+import static com.woofilee.ifmo.android.homework.service.R.string.image_download;
+import static com.woofilee.ifmo.android.homework.service.R.string.preparing_to_download;
+import static com.woofilee.ifmo.android.homework.service.R.string.download_in_progress;
+import static com.woofilee.ifmo.android.homework.service.R.string.saving;
+import static com.woofilee.ifmo.android.homework.service.R.string.saving_error;
+import static com.woofilee.ifmo.android.homework.service.R.string.download_complete;
+import static com.woofilee.ifmo.android.homework.service.R.string.download_error;
 
 /**
  * Service class, that downloads images by the battery state change system event.
@@ -28,8 +35,10 @@ import java.io.FileNotFoundException;
 public final class ImageService extends Service {
     private static final String TAG = ImageService.class.getSimpleName();
 
-    public static final String IMAGE_FILENAME = "reddit";
-    public static final String IMAGE_EXTENSION = "png";
+    public static final String IMAGE_FILEPATH = "reddit.png";
+
+    public static final String ACTION_DOWNLOAD =
+            "com.woofilee.ifmo.android.homework.service.download";
 
     NotificationManager notificationManager;
     BroadcastReceiver receiver;
@@ -48,20 +57,47 @@ public final class ImageService extends Service {
         super.onCreate();
 
         notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-
         receiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
-                Log.d(TAG, "Broadcast battery state changed received");
-
-                if (isLoading) {
-                    Log.d(TAG, "Something loading already, skipping broadcast");
-                    return;
+                if (intent != null &&
+                        intent.getAction() != null &&
+                        intent.getAction().equals(android.content.Intent.ACTION_BATTERY_CHANGED)) {
+                    onDownload();
                 }
+            }
+        };
 
-                notificationCounter++;
-                isLoading = true;
+        registerReceiver(receiver, new IntentFilter(android.content.Intent.ACTION_BATTERY_CHANGED));
+        sendBroadcast(new Intent(ImageReceiver.BROADCAST_ACTION).putExtra(
+                ImageReceiver.ACTION_TYPE_PARAM,
+                ImageReceiver.ACTION_TYPE_SERVICE_STARTED
+        ));
+    }
 
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        if (intent != null &&
+                intent.getAction() != null &&
+                intent.getAction().equals(ACTION_DOWNLOAD)) {
+            onDownload();
+        }
+
+        return START_STICKY; // We want to live, we want to listen all changes of battery status, not only static
+    }
+
+    public void onDownload() {
+        if (isLoading) {
+            Log.d(TAG, "Something is downloading already, skipping");
+            return;
+        }
+
+        notificationCounter++;
+        isLoading = true;
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
                 final Notification.Builder notificationBuilder =
                         new Notification.Builder(getApplicationContext());
                 final PendingIntent notificationIntent = PendingIntent.getActivity(
@@ -71,17 +107,17 @@ public final class ImageService extends Service {
                         0
                 );
 
-                notificationBuilder.setContentTitle(getString(R.string.image_download))
+                notificationBuilder.setContentTitle(getString(image_download))
                         .setContentIntent(notificationIntent)
-                        .setContentText(getString(R.string.preparing_to_download))
-                        .setSmallIcon(R.mipmap.ic_launcher)
+                        .setContentText(getString(preparing_to_download))
+                        .setSmallIcon(ic_launcher)
                         .setProgress(100, 0, true);
 
                 notificationManager.notify(notificationCounter, notificationBuilder.build());
 
-                // TODO: Reddit links download
+                // TODO: IDEA: Reddit links load
 
-                notificationBuilder.setContentText(getString(R.string.download_in_progress));
+                notificationBuilder.setContentText(getString(download_in_progress));
                 notificationManager.notify(notificationCounter, notificationBuilder.build());
 
                 ImageDownloader.download(
@@ -89,32 +125,35 @@ public final class ImageService extends Service {
                         new ImageDownloader.OnImageLoaderListener() {
                             @Override
                             public void onComplete(final Bitmap result) {
-                                notificationBuilder.setContentText(getString(R.string.saving));
+                                notificationBuilder.setContentText(getString(saving));
                                 notificationBuilder.setProgress(100, 0, true);
                                 notificationManager.notify(notificationCounter,
                                         notificationBuilder.build());
 
-                                new AsyncTask<Void, Void, Void>() { // Async image saving to file
+                                new AsyncTask<Void, Void, Void>() { // Async image saving to the file
                                     @Override
                                     protected Void doInBackground(Void... voids) {
                                         try {
-                                            ImageUtils.saveImage(result, IMAGE_FILENAME,
-                                                    IMAGE_EXTENSION, getApplicationContext());
+                                            if (!ImageUtils.writeImage(
+                                                    result,
+                                                    IMAGE_FILEPATH,
+                                                    getApplicationContext()
+                                            )) {
+                                                throw new IllegalStateException(
+                                                        "Image saving error!");
+                                            }
 
-                                            Intent intent = new Intent(
-                                                    ImageServiceReceiver.BROADCAST_ACTION);
-                                            intent.putExtra(
-                                                    ImageServiceReceiver.ACTION_TYPE_PARAM,
-                                                    ImageServiceReceiver.ACTION_TYPE_FINISH_LOADING
-                                            );
-
-                                            sendBroadcast(intent);
+                                            sendBroadcast(new Intent(
+                                                    ImageReceiver.BROADCAST_ACTION).putExtra(
+                                                    ImageReceiver.ACTION_TYPE_PARAM,
+                                                    ImageReceiver.ACTION_TYPE_DOWNLOADING_FINISHED
+                                            ));
                                             notificationBuilder.setContentText(getString(
-                                                    R.string.download_complete));
-                                        } catch (FileNotFoundException e) {
+                                                    download_complete));
+                                        } catch (Exception e) {
                                             e.printStackTrace();
                                             notificationBuilder.setContentText(getString(
-                                                    R.string.download_error));
+                                                    saving_error));
                                         }
 
                                         notificationBuilder.setProgress(0, 0, false);
@@ -134,11 +173,11 @@ public final class ImageService extends Service {
 
                             @Override
                             public void onError() {
-                                isLoading = false;
-                                notificationBuilder.setContentText(getString(R.string.download_error));
+                                notificationBuilder.setContentText(getString(download_error));
                                 notificationBuilder.setProgress(0, 0, false);
                                 notificationManager.notify(notificationCounter,
                                         notificationBuilder.build());
+                                isLoading = false;
                             }
 
                             @Override
@@ -150,9 +189,7 @@ public final class ImageService extends Service {
                         }
                 );
             }
-        };
-
-        registerReceiver(receiver, new IntentFilter(android.content.Intent.ACTION_BATTERY_CHANGED));
+        }).run();
     }
 
     @Override
@@ -161,6 +198,10 @@ public final class ImageService extends Service {
         super.onDestroy();
 
         unregisterReceiver(receiver);
+        sendBroadcast(new Intent(ImageReceiver.BROADCAST_ACTION).putExtra(
+                ImageReceiver.ACTION_TYPE_PARAM,
+                ImageReceiver.ACTION_TYPE_SERVICE_STOPPED
+        ));
     }
 
     @Override

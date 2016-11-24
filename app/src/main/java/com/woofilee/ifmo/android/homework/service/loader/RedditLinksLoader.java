@@ -1,4 +1,4 @@
-package com.woofilee.ifmo.android.homework.service.loaders;
+package com.woofilee.ifmo.android.homework.service.loader;
 
 import android.os.AsyncTask;
 import android.util.JsonReader;
@@ -23,7 +23,7 @@ public final class RedditLinksLoader {
     private static final int CONNECT_TIMEOUT = 60;
     private static final int READ_TIMEOUT = 60;
 
-    public static enum Protocol {
+    public enum Protocol {
         HTTPS,
         HTTP
     }
@@ -38,14 +38,14 @@ public final class RedditLinksLoader {
      */
     public interface OnLinksLoaderListener {
         /**
-         * Invoked after the links has been successfully loaded.
+         * Invokes after the links has been successfully loaded.
          *
          * @param result the downloaded image
          */
         void onComplete(JsonReader result);
 
         /**
-         * Invoked if an error has occurred and the load did not complete.
+         * Invokes if an error has occurred and the load did not complete.
          */
         void onError();
     }
@@ -72,7 +72,7 @@ public final class RedditLinksLoader {
     /**
      * Loads a links from a Reddit's subreddit.
      *
-     * @param protocol protocol, that will be used when download
+     * @param protocol protocol, that will be used when load
      * @param listener listener with methods to be invoked when links load status changes
      */
     public static void load(Protocol protocol, OnLinksLoaderListener listener) {
@@ -82,11 +82,13 @@ public final class RedditLinksLoader {
     /**
      * Loads a links from a Reddit's subreddit.
      *
-     * @param protocol  protocol, that will be used when download
+     * @param protocol  protocol, that will be used when load
      * @param subreddit subreddit name, from to load a links
      * @param listener  listener with methods to be invoked when links load status changes
      */
-    public static void load(final Protocol protocol, final String subreddit, final OnLinksLoaderListener listener) {
+    public static void load(final Protocol protocol,
+                            final String subreddit,
+                            final OnLinksLoaderListener listener) {
         new AsyncTask<Void, Integer, JsonReader>() {
             @Override
             protected void onPreExecute() {
@@ -118,9 +120,9 @@ public final class RedditLinksLoader {
                     ).openConnection();
 
                     Log.d(TAG, "URL: " + conn.getURL().toString());
+
                     conn.setConnectTimeout(CONNECT_TIMEOUT * 1000);
                     conn.setReadTimeout(READ_TIMEOUT * 1000);
-
                     conn.connect();
 
                     final int responseCode = conn.getResponseCode();

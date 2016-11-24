@@ -1,4 +1,4 @@
-package com.woofilee.ifmo.android.homework.service.loaders;
+package com.woofilee.ifmo.android.homework.service.loader;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -56,12 +56,12 @@ public final class ImageDownloader {
         new AsyncTask<Void, Integer, Bitmap>() {
             @Override
             protected void onPreExecute() {
-                Log.d(TAG, "Starting download");
+                Log.d(TAG, "Starting download image");
             }
 
             @Override
             protected void onCancelled() {
-                Log.d(TAG, "Cancel download");
+                Log.d(TAG, "Cancel download image");
                 listener.onError();
             }
 
@@ -112,11 +112,11 @@ public final class ImageDownloader {
                         publishProgress((int) ((read * 100) / length));
                     }
 
-                    if (length != read) {
-                        Log.w(TAG, "Received " + read + " bytes, but expected " + length);
-                    } else {
+                    if (length == read) {
                         Log.d(TAG, "Received " + read + " bytes");
                         bitmap = BitmapFactory.decodeByteArray(os.toByteArray(), 0, os.size());
+                    } else {
+                        Log.w(TAG, "Received " + read + " bytes, but expected " + length);
                     }
                 } catch (Exception e) {
                     if (!this.isCancelled()) {
@@ -147,7 +147,7 @@ public final class ImageDownloader {
             @Override
             protected void onPostExecute(Bitmap result) {
                 if (result == null) {
-                    Log.e(TAG, "Error while downloading an image");
+                    Log.e(TAG, "Error while download an image");
                     listener.onError();
                 } else {
                     listener.onComplete(result);

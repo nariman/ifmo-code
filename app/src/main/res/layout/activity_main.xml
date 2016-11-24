@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/activity_main"
+    android:id="@+id/coordinator"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.woofilee.ifmo.android.homework.service.activity.MainActivity">
@@ -14,41 +14,60 @@
             android:id="@+id/blur_image_view"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:layout_centerVertical="true"
             android:adjustViewBounds="true"
             android:background="@android:color/background_dark"
             android:contentDescription="@string/image_description"
-            android:layout_centerVertical="true"
             android:scaleType="centerCrop" />
 
         <ImageView
             android:id="@+id/image_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:contentDescription="@string/image_description"
             android:layout_centerVertical="true"
+            android:contentDescription="@string/image_description"
             android:scaleType="centerInside" />
 
-        <Button
-            android:id="@+id/button_start"
-            style="@style/Widget.AppCompat.Button.Colored"
+        <ProgressBar
+            android:id="@+id/progress"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
             android:layout_centerHorizontal="true"
-            android:layout_marginBottom="64dp"
-            android:text="@string/start_service"
+            android:layout_centerVertical="true"
+            android:indeterminate="true"
             android:visibility="gone" />
 
-        <Button
-            android:id="@+id/button_stop"
-            style="@style/Widget.AppCompat.Button.Colored"
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
             android:layout_centerHorizontal="true"
-            android:layout_marginBottom="64dp"
-            android:text="@string/stop_service"
-            android:visibility="gone" />
+            android:layout_marginBottom="64dp">
+
+            <Button
+                android:id="@+id/button_refresh"
+                style="@style/Widget.AppCompat.Button.Small"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/refresh_image"
+                android:visibility="gone" />
+
+            <Button
+                android:id="@+id/button_start"
+                style="@style/Widget.AppCompat.Button.Colored"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/start_service"
+                android:visibility="gone" />
+
+            <Button
+                android:id="@+id/button_stop"
+                style="@style/Widget.AppCompat.Button.Colored"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/stop_service"
+                android:visibility="gone" />
+        </LinearLayout>
 
     </RelativeLayout>
 

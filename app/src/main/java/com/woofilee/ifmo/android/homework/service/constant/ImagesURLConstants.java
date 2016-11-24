@@ -1,9 +1,9 @@
-package com.woofilee.ifmo.android.homework.service.constants;
+package com.woofilee.ifmo.android.homework.service.constant;
 
 import java.util.Random;
 
 /**
- * Class with list of available for download images.
+ * Class with list of available images for download.
  */
 public final class ImagesURLConstants {
     private static final Random random = new Random();

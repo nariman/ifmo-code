@@ -17,12 +17,29 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 
-import com.woofilee.ifmo.android.homework.service.R;
-import com.woofilee.ifmo.android.homework.service.receivers.ImageServiceReceiver;
-import com.woofilee.ifmo.android.homework.service.services.ImageService;
-import com.woofilee.ifmo.android.homework.service.utils.FileUtils;
-import com.woofilee.ifmo.android.homework.service.utils.ServiceUtils;
+import com.woofilee.ifmo.android.homework.service.receiver.ImageReceiver;
+import com.woofilee.ifmo.android.homework.service.service.ImageService;
+import com.woofilee.ifmo.android.homework.service.util.FileUtils;
+import com.woofilee.ifmo.android.homework.service.util.ServiceUtils;
+
+import static com.woofilee.ifmo.android.homework.service.R.layout.activity_main;
+
+import static com.woofilee.ifmo.android.homework.service.R.mipmap.ic_launcher;
+
+import static com.woofilee.ifmo.android.homework.service.R.id.coordinator;
+import static com.woofilee.ifmo.android.homework.service.R.id.blur_image_view;
+import static com.woofilee.ifmo.android.homework.service.R.id.image_view;
+import static com.woofilee.ifmo.android.homework.service.R.id.progress;
+import static com.woofilee.ifmo.android.homework.service.R.id.button_refresh;
+import static com.woofilee.ifmo.android.homework.service.R.id.button_start;
+import static com.woofilee.ifmo.android.homework.service.R.id.button_stop;
+
+import static com.woofilee.ifmo.android.homework.service.R.string.service_started;
+import static com.woofilee.ifmo.android.homework.service.R.string.image_updated;
+import static com.woofilee.ifmo.android.homework.service.R.string.service_stopped;
+import static com.woofilee.ifmo.android.homework.service.R.string.no_available_image;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -34,66 +51,97 @@ public class MainActivity extends AppCompatActivity {
     private final String TAG = this.getClass().getSimpleName();
 
     private static final int IMAGE_SAMPLE_SIZE = 1024;
-    private static final float BLUR_IMAGE_SCALE = 0.25f;
-    private static final float BLUR_IMAGE_RADIUS = 7.5f;
+    private static final float BLUR_IMAGE_SCALE_FACTOR = 0.25f;
+    private static final float BLUR_IMAGE_RADIUS_FACTOR = 7.5f;
 
-    private Intent serviceIntent;
-    private ImageServiceReceiver receiver;
+    private ImageReceiver receiver;
 
     private CoordinatorLayout coordinatorLayout;
 
     private ImageView imageView;
     private ImageView blurImageView;
+    private ProgressBar progressBar;
+    private Button buttonRefresh;
     private Button buttonStart;
     private Button buttonStop;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(activity_main);
 
-        serviceIntent = new Intent(getApplicationContext(), ImageService.class);
-
-        coordinatorLayout = (CoordinatorLayout) findViewById(R.id.activity_main);
-
-        imageView = (ImageView) findViewById(R.id.image_view);
-        blurImageView = (ImageView) findViewById(R.id.blur_image_view);
-        buttonStart = (Button) findViewById(R.id.button_start);
-        buttonStop = (Button) findViewById(R.id.button_stop);
+        coordinatorLayout = (CoordinatorLayout) findViewById(coordinator);
+        imageView = (ImageView) findViewById(image_view);
+        blurImageView = (ImageView) findViewById(blur_image_view);
+        progressBar = (ProgressBar) findViewById(progress);
+        buttonRefresh = (Button) findViewById(button_refresh);
+        buttonStart = (Button) findViewById(button_start);
+        buttonStop = (Button) findViewById(button_stop);
 
         if (ServiceUtils.isServiceRunning(ImageService.class, getApplicationContext())) {
+            buttonRefresh.setVisibility(View.VISIBLE);
             buttonStop.setVisibility(View.VISIBLE);
         } else {
             buttonStart.setVisibility(View.VISIBLE);
         }
 
+        buttonRefresh.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                view.setEnabled(false);
+                startService(new Intent(getApplicationContext(), ImageService.class).setAction(
+                        ImageService.ACTION_DOWNLOAD));
+            }
+        });
+
         buttonStart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                buttonStart.setVisibility(View.GONE);
-                startService(serviceIntent);
-                buttonStop.setVisibility(View.VISIBLE);
+                view.setEnabled(false);
+                startService(new Intent(getApplicationContext(), ImageService.class));
             }
         });
 
         buttonStop.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                buttonStop.setVisibility(View.GONE);
-                stopService(serviceIntent);
-                buttonStart.setVisibility(View.VISIBLE);
+                view.setEnabled(false);
+                stopService(new Intent(getApplicationContext(), ImageService.class));
             }
         });
 
-        receiver = new ImageServiceReceiver() {
+        receiver = new ImageReceiver() {
+            @Override
+            public void onServiceStarted() {
+                buttonStart.setVisibility(View.GONE);
+
+                buttonRefresh.setVisibility(View.VISIBLE);
+                buttonStop.setVisibility(View.VISIBLE);
+                buttonStop.setEnabled(true);
+
+                Snackbar.make(coordinatorLayout, service_started, Snackbar.LENGTH_LONG).show();
+            }
+
             @Override
             public void onFinishLoading() {
                 updateImage();
-                Snackbar.make(coordinatorLayout, R.string.reloaded, Snackbar.LENGTH_LONG).show();
+                buttonRefresh.setEnabled(true);
+                Snackbar.make(coordinatorLayout, image_updated, Snackbar.LENGTH_LONG).show();
+            }
+
+            @Override
+            public void onServiceStopped() {
+                buttonRefresh.setVisibility(View.GONE);
+                buttonStop.setVisibility(View.GONE);
+
+                buttonStart.setVisibility(View.VISIBLE);
+                buttonStart.setEnabled(true);
+
+                Snackbar.make(coordinatorLayout, service_stopped, Snackbar.LENGTH_LONG).show();
             }
         };
 
-        registerReceiver(receiver, new IntentFilter(ImageServiceReceiver.BROADCAST_ACTION));
+        registerReceiver(receiver, new IntentFilter(ImageReceiver.BROADCAST_ACTION));
         updateImage();
     }
 
@@ -106,35 +154,41 @@ public class MainActivity extends AppCompatActivity {
                 Bitmap bitmap;
 
                 try {
-                    FileInputStream fis = FileUtils.getInputFile(ImageService.IMAGE_FILENAME,
-                            ImageService.IMAGE_EXTENSION, getApplicationContext());
+                    FileInputStream bis = FileUtils.getInputFile(
+                            ImageService.IMAGE_FILEPATH,
+                            getApplicationContext()
+                    );
 
                     final BitmapFactory.Options options = new BitmapFactory.Options();
                     options.inJustDecodeBounds = true;
 
-                    BitmapFactory.decodeStream(fis, null, options);
+                    BitmapFactory.decodeStream(bis, null, options);
 
                     options.inSampleSize = calculateSampleSize(
                             options, IMAGE_SAMPLE_SIZE, IMAGE_SAMPLE_SIZE);
                     options.inJustDecodeBounds = false;
 
-                    fis = FileUtils.getInputFile(ImageService.IMAGE_FILENAME,
-                            ImageService.IMAGE_EXTENSION, getApplicationContext());
+                    bis = FileUtils.getInputFile(
+                            ImageService.IMAGE_FILEPATH,
+                            getApplicationContext()
+                    );
 
-                    bitmap = BitmapFactory.decodeStream(fis, null, options);
+                    bitmap = BitmapFactory.decodeStream(bis, null, options);
 
                     try {
-                        fis.close();
+                        bis.close();
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
                 } catch (IOException e) {
-                    bitmap = BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher);
+                    e.printStackTrace();
+
+                    bitmap = BitmapFactory.decodeResource(getResources(), ic_launcher);
 
                     handler.post(new Runnable() {
                         @Override
                         public void run() {
-                            Snackbar.make(coordinatorLayout, R.string.no_available_image,
+                            Snackbar.make(coordinatorLayout, no_available_image,
                                     Snackbar.LENGTH_INDEFINITE).show();
                         }
                     });
@@ -144,8 +198,8 @@ public class MainActivity extends AppCompatActivity {
 
                 final Bitmap blurBitmap = Bitmap.createScaledBitmap(
                         bitmap,
-                        Math.round(bitmap.getWidth() * BLUR_IMAGE_SCALE),
-                        Math.round(bitmap.getHeight() * BLUR_IMAGE_SCALE),
+                        Math.round(bitmap.getWidth() * BLUR_IMAGE_SCALE_FACTOR),
+                        Math.round(bitmap.getHeight() * BLUR_IMAGE_SCALE_FACTOR),
                         false
                 );
 
@@ -157,7 +211,7 @@ public class MainActivity extends AppCompatActivity {
                         Element.U8_4(rs)
                 );
 
-                script.setRadius(BLUR_IMAGE_RADIUS);
+                script.setRadius(BLUR_IMAGE_RADIUS_FACTOR);
                 script.setInput(input);
                 script.forEach(output);
                 output.copyTo(blurBitmap);
@@ -168,6 +222,7 @@ public class MainActivity extends AppCompatActivity {
                     public void run() {
                         imageView.setImageBitmap(finalBitmap);
                         blurImageView.setImageBitmap(blurBitmap);
+                        progressBar.setVisibility(View.GONE);
                     }
                 });
 
