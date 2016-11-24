@@ -12,15 +12,17 @@
     <string name="stopping_service">Stopping service…</string>
 
     <string name="service_started">Service started</string>
+    <string name="image_updating">Image updating…</string>
     <string name="image_updated">Image updated</string>
     <string name="service_stopped">Service stopped</string>
     <string name="no_available_image">No available image</string>
 
-    <string name="image_download">Image Download</string>
+    <string name="image_downloader_service">Image Downloader Service</string>
     <string name="preparing_to_download">Preparing to download…</string>
     <string name="download_in_progress">Download in progress…</string>
     <string name="saving">Saving…</string>
     <string name="saving_error">Saving error</string>
     <string name="download_complete">Download complete</string>
     <string name="download_error">Download error</string>
+    <string name="download_canceled">Download canceled</string>
 </resources>

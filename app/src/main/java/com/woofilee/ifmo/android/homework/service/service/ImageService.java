@@ -21,7 +21,7 @@ import com.woofilee.ifmo.android.homework.service.util.ImageUtils;
 
 import static com.woofilee.ifmo.android.homework.service.R.mipmap.ic_launcher;
 
-import static com.woofilee.ifmo.android.homework.service.R.string.image_download;
+import static com.woofilee.ifmo.android.homework.service.R.string.image_downloader_service;
 import static com.woofilee.ifmo.android.homework.service.R.string.preparing_to_download;
 import static com.woofilee.ifmo.android.homework.service.R.string.download_in_progress;
 import static com.woofilee.ifmo.android.homework.service.R.string.saving;
@@ -40,8 +40,8 @@ public final class ImageService extends Service {
     public static final String ACTION_DOWNLOAD =
             "com.woofilee.ifmo.android.homework.service.download";
 
-    NotificationManager notificationManager;
-    BroadcastReceiver receiver;
+    private NotificationManager notificationManager;
+    private BroadcastReceiver receiver;
 
     int notificationCounter;
     boolean isLoading;
@@ -57,18 +57,15 @@ public final class ImageService extends Service {
         super.onCreate();
 
         notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+
         receiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
-                if (intent != null &&
-                        intent.getAction() != null &&
-                        intent.getAction().equals(android.content.Intent.ACTION_BATTERY_CHANGED)) {
-                    onDownload();
-                }
+                onDownload();
             }
         };
 
-        registerReceiver(receiver, new IntentFilter(android.content.Intent.ACTION_BATTERY_CHANGED));
+        registerReceiver(receiver, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
         sendBroadcast(new Intent(ImageReceiver.BROADCAST_ACTION).putExtra(
                 ImageReceiver.ACTION_TYPE_PARAM,
                 ImageReceiver.ACTION_TYPE_SERVICE_STARTED
@@ -92,45 +89,66 @@ public final class ImageService extends Service {
             return;
         }
 
-        notificationCounter++;
         isLoading = true;
+        notificationCounter++;
 
-        new Thread(new Runnable() {
+        new AsyncTask<Void, Void, Void>() {
             @Override
-            public void run() {
+            protected Void doInBackground(Void... voids) {
                 final Notification.Builder notificationBuilder =
-                        new Notification.Builder(getApplicationContext());
-                final PendingIntent notificationIntent = PendingIntent.getActivity(
-                        getApplicationContext(),
-                        0,
-                        new Intent(getApplicationContext(), MainActivity.class),
-                        0
+                        new Notification.Builder(getApplicationContext())
+                                .setContentTitle(getString(image_downloader_service))
+                                .setSmallIcon(ic_launcher)
+                                .setContentIntent(
+                                        PendingIntent.getActivity(
+                                                getApplicationContext(),
+                                                0,
+                                                new Intent(
+                                                        getApplicationContext(),
+                                                        MainActivity.class
+                                                ).setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP),
+                                                0
+                                        )
+                                );
+
+                sendBroadcast(new Intent(
+                        ImageReceiver.BROADCAST_ACTION).putExtra(
+                        ImageReceiver.ACTION_TYPE_PARAM,
+                        ImageReceiver.ACTION_TYPE_DOWNLOAD_STARTED
+                ));
+
+                notificationManager.notify(
+                        notificationCounter,
+                        notificationBuilder
+                                .setContentText(getString(preparing_to_download))
+                                .setProgress(100, 0, true)
+                                .build()
                 );
-
-                notificationBuilder.setContentTitle(getString(image_download))
-                        .setContentIntent(notificationIntent)
-                        .setContentText(getString(preparing_to_download))
-                        .setSmallIcon(ic_launcher)
-                        .setProgress(100, 0, true);
-
-                notificationManager.notify(notificationCounter, notificationBuilder.build());
 
                 // TODO: IDEA: Reddit links load
 
-                notificationBuilder.setContentText(getString(download_in_progress));
-                notificationManager.notify(notificationCounter, notificationBuilder.build());
+                notificationManager.notify(
+                        notificationCounter,
+                        notificationBuilder
+                                .setContentText(getString(download_in_progress))
+                                .build()
+                );
 
                 ImageDownloader.download(
                         ImagesURLConstants.getRandomImageURL(),
                         new ImageDownloader.OnImageLoaderListener() {
                             @Override
                             public void onComplete(final Bitmap result) {
-                                notificationBuilder.setContentText(getString(saving));
-                                notificationBuilder.setProgress(100, 0, true);
-                                notificationManager.notify(notificationCounter,
-                                        notificationBuilder.build());
+                                notificationManager.notify(
+                                        notificationCounter,
+                                        notificationBuilder
+                                                .setContentText(getString(saving))
+                                                .setProgress(100, 0, true)
+                                                .build()
+                                );
 
-                                new AsyncTask<Void, Void, Void>() { // Async image saving to the file
+                                // Async image saving to the file
+                                new AsyncTask<Void, Void, Void>() {
                                     @Override
                                     protected Void doInBackground(Void... voids) {
                                         try {
@@ -146,50 +164,58 @@ public final class ImageService extends Service {
                                             sendBroadcast(new Intent(
                                                     ImageReceiver.BROADCAST_ACTION).putExtra(
                                                     ImageReceiver.ACTION_TYPE_PARAM,
-                                                    ImageReceiver.ACTION_TYPE_DOWNLOADING_FINISHED
+                                                    ImageReceiver.ACTION_TYPE_DOWNLOAD_COMPLETE
                                             ));
-                                            notificationBuilder.setContentText(getString(
-                                                    download_complete));
+
+                                            notificationBuilder.setContentText(
+                                                    getString(download_complete));
                                         } catch (Exception e) {
                                             e.printStackTrace();
-                                            notificationBuilder.setContentText(getString(
-                                                    saving_error));
+                                            notificationBuilder.setContentText(
+                                                    getString(saving_error));
                                         }
 
-                                        notificationBuilder.setProgress(0, 0, false);
-                                        notificationManager.notify(notificationCounter,
-                                                notificationBuilder.build());
+                                        notificationManager.notify(
+                                                notificationCounter,
+                                                notificationBuilder
+                                                        .setProgress(0, 0, false)
+                                                        .build()
+                                        );
+
                                         isLoading = false;
-
                                         return null;
-                                    }
-
-                                    @Override
-                                    protected void onPostExecute(Void aVoid) {
-                                        System.gc();
                                     }
                                 }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
                             }
 
                             @Override
-                            public void onError() {
-                                notificationBuilder.setContentText(getString(download_error));
-                                notificationBuilder.setProgress(0, 0, false);
-                                notificationManager.notify(notificationCounter,
-                                        notificationBuilder.build());
-                                isLoading = false;
+                            public void onProgressChange(int percent) {
+                                notificationManager.notify(
+                                        notificationCounter,
+                                        notificationBuilder
+                                                .setProgress(100, percent, false)
+                                                .build()
+                                );
                             }
 
                             @Override
-                            public void onProgressChange(int percent) {
-                                notificationBuilder.setProgress(100, percent, false);
-                                notificationManager.notify(notificationCounter,
-                                        notificationBuilder.build());
+                            public void onError() {
+                                notificationManager.notify(
+                                        notificationCounter,
+                                        notificationBuilder
+                                                .setContentText(getString(download_error))
+                                                .setProgress(0, 0, false)
+                                                .build()
+                                );
+
+                                isLoading = false;
                             }
                         }
                 );
+
+                return null;
             }
-        }).run();
+        }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
 
     @Override

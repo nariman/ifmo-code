@@ -17,8 +17,9 @@ public abstract class ImageReceiver extends BroadcastReceiver {
     public static final String ACTION_TYPE_PARAM = "type";
 
     public static final int ACTION_TYPE_SERVICE_STARTED = 1;
-    public static final int ACTION_TYPE_DOWNLOADING_FINISHED = 2;
-    public static final int ACTION_TYPE_SERVICE_STOPPED = 3;
+    public static final int ACTION_TYPE_DOWNLOAD_STARTED = 2;
+    public static final int ACTION_TYPE_DOWNLOAD_COMPLETE = 3;
+    public static final int ACTION_TYPE_SERVICE_STOPPED = 4;
 
     @Override
     public void onReceive(Context context, Intent intent) {
@@ -29,9 +30,13 @@ public abstract class ImageReceiver extends BroadcastReceiver {
                 Log.d(TAG, "Broadcast \"Service Started\" received");
                 onServiceStarted();
                 break;
-            case ACTION_TYPE_DOWNLOADING_FINISHED:
-                Log.d(TAG, "Broadcast \"Finish Loading\" received");
-                onFinishLoading();
+            case ACTION_TYPE_DOWNLOAD_STARTED:
+                Log.d(TAG, "Broadcast \"Download Started\" received");
+                onDownloadStarted();
+                break;
+            case ACTION_TYPE_DOWNLOAD_COMPLETE:
+                Log.d(TAG, "Broadcast \"Download Complete\" received");
+                onDownloadComplete();
                 break;
             case ACTION_TYPE_SERVICE_STOPPED:
                 Log.d(TAG, "Broadcast \"Service Stopped\" received");
@@ -48,9 +53,14 @@ public abstract class ImageReceiver extends BroadcastReceiver {
     public abstract void onServiceStarted();
 
     /**
+     * Invokes, when image download started.
+     */
+    public abstract void onDownloadStarted();
+
+    /**
      * Invokes, when image download complete.
      */
-    public abstract void onFinishLoading();
+    public abstract void onDownloadComplete();
 
     /**
      * Invokes, when service stopped.

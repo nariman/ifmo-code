@@ -34,16 +34,16 @@ public final class ImageDownloader {
         void onComplete(Bitmap result);
 
         /**
-         * Invoked if an error has occurred and the download did not complete.
-         */
-        void onError();
-
-        /**
          * Invoked every time the progress of the download changes.
          *
          * @param percent new status in %
          */
         void onProgressChange(int percent);
+
+        /**
+         * Invoked if an error has occurred and the download did not complete.
+         */
+        void onError();
     }
 
     /**
@@ -152,8 +152,6 @@ public final class ImageDownloader {
                 } else {
                     listener.onComplete(result);
                 }
-
-                System.gc();  // Collect it all! :)
             }
         }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }

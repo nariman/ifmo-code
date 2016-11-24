@@ -184,8 +184,6 @@ public final class RedditLinksLoader {
                 } else {
                     listener.onComplete(result);
                 }
-
-                System.gc(); // Collect it all! :)
             }
         }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }

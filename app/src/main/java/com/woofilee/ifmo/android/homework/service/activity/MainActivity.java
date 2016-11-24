@@ -17,7 +17,6 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.ProgressBar;
 
 import com.woofilee.ifmo.android.homework.service.receiver.ImageReceiver;
 import com.woofilee.ifmo.android.homework.service.service.ImageService;
@@ -31,12 +30,12 @@ import static com.woofilee.ifmo.android.homework.service.R.mipmap.ic_launcher;
 import static com.woofilee.ifmo.android.homework.service.R.id.coordinator;
 import static com.woofilee.ifmo.android.homework.service.R.id.blur_image_view;
 import static com.woofilee.ifmo.android.homework.service.R.id.image_view;
-import static com.woofilee.ifmo.android.homework.service.R.id.progress;
 import static com.woofilee.ifmo.android.homework.service.R.id.button_refresh;
 import static com.woofilee.ifmo.android.homework.service.R.id.button_start;
 import static com.woofilee.ifmo.android.homework.service.R.id.button_stop;
 
 import static com.woofilee.ifmo.android.homework.service.R.string.service_started;
+import static com.woofilee.ifmo.android.homework.service.R.string.image_updating;
 import static com.woofilee.ifmo.android.homework.service.R.string.image_updated;
 import static com.woofilee.ifmo.android.homework.service.R.string.service_stopped;
 import static com.woofilee.ifmo.android.homework.service.R.string.no_available_image;
@@ -60,7 +59,6 @@ public class MainActivity extends AppCompatActivity {
 
     private ImageView imageView;
     private ImageView blurImageView;
-    private ProgressBar progressBar;
     private Button buttonRefresh;
     private Button buttonStart;
     private Button buttonStop;
@@ -73,7 +71,6 @@ public class MainActivity extends AppCompatActivity {
         coordinatorLayout = (CoordinatorLayout) findViewById(coordinator);
         imageView = (ImageView) findViewById(image_view);
         blurImageView = (ImageView) findViewById(blur_image_view);
-        progressBar = (ProgressBar) findViewById(progress);
         buttonRefresh = (Button) findViewById(button_refresh);
         buttonStart = (Button) findViewById(button_start);
         buttonStop = (Button) findViewById(button_stop);
@@ -116,6 +113,7 @@ public class MainActivity extends AppCompatActivity {
                 buttonStart.setVisibility(View.GONE);
 
                 buttonRefresh.setVisibility(View.VISIBLE);
+                buttonRefresh.setEnabled(true);
                 buttonStop.setVisibility(View.VISIBLE);
                 buttonStop.setEnabled(true);
 
@@ -123,7 +121,13 @@ public class MainActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onFinishLoading() {
+            public void onDownloadStarted() {
+                buttonRefresh.setEnabled(false);
+                Snackbar.make(coordinatorLayout, image_updating, Snackbar.LENGTH_LONG).show();
+            }
+
+            @Override
+            public void onDownloadComplete() {
                 updateImage();
                 buttonRefresh.setEnabled(true);
                 Snackbar.make(coordinatorLayout, image_updated, Snackbar.LENGTH_LONG).show();
@@ -222,7 +226,6 @@ public class MainActivity extends AppCompatActivity {
                     public void run() {
                         imageView.setImageBitmap(finalBitmap);
                         blurImageView.setImageBitmap(blurBitmap);
-                        progressBar.setVisibility(View.GONE);
                     }
                 });
 
@@ -247,11 +250,6 @@ public class MainActivity extends AppCompatActivity {
                 }
 
                 return sampleSize;
-            }
-
-            @Override
-            protected void onPostExecute(Void aVoid) {
-                System.gc();
             }
         }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
