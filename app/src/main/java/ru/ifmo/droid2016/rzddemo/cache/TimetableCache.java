@@ -116,7 +116,11 @@ public class TimetableCache {
                 TimetableContract.Columns.DATE + "=? AND "
                         + TimetableContract.Columns.DEPARTURE_STATION_ID + "=? AND "
                         + TimetableContract.Columns.ARRIVAL_STATION_ID + "=?",
-                new String[]{schemaDate.format(dateMsk.getTime()), fromStationId, toStationId},
+                new String[]{
+                        schemaDate.format(dateMsk.getTime()),
+                        fromStationId,
+                        toStationId
+                },
                 null, // group
                 null, // having
                 null, // order
@@ -146,8 +150,8 @@ public class TimetableCache {
                                 cursor.getString(cnt)
                         );
                     } catch (ParseException e) {
-                        e.printStackTrace(); // skip
-                        continue;
+                        e.printStackTrace();
+                        continue; // skip entry
                     }
 
                     timetable.add(entry);
@@ -196,34 +200,38 @@ public class TimetableCache {
 
         db.beginTransaction();
 
-        for (TimetableEntry entry : timetable) {
-            int key = 1;
+        try {
+            for (TimetableEntry entry : timetable) {
+                int key = 1;
 
-            prepared.bindString(key++, schemaDate.format(dateMsk.getTime()));
-            prepared.bindString(key++, entry.departureStationId);
-            prepared.bindString(key++, entry.departureStationName);
-            prepared.bindString(key++, schemaDateTime.format(entry.departureTime.getTime()));
-            prepared.bindString(key++, entry.arrivalStationId);
-            prepared.bindString(key++, entry.arrivalStationName);
-            prepared.bindString(key++, schemaDateTime.format(entry.arrivalTime.getTime()));
-            prepared.bindString(key++, entry.trainRouteId);
+                prepared.bindString(key++, schemaDate.format(dateMsk.getTime()));
+                prepared.bindString(key++, entry.departureStationId);
+                prepared.bindString(key++, entry.departureStationName);
+                prepared.bindString(key++, schemaDateTime.format(entry.departureTime.getTime()));
+                prepared.bindString(key++, entry.arrivalStationId);
+                prepared.bindString(key++, entry.arrivalStationName);
+                prepared.bindString(key++, schemaDateTime.format(entry.arrivalTime.getTime()));
+                prepared.bindString(key++, entry.trainRouteId);
 
-            if (version == DataSchemeVersion.V2) {
-                if (entry.trainName == null) {
-                    prepared.bindNull(key++);
-                } else {
-                    prepared.bindString(key++, entry.trainName);
+                if (version == DataSchemeVersion.V2) {
+                    if (entry.trainName == null) {
+                        prepared.bindNull(key++);
+                    } else {
+                        prepared.bindString(key++, entry.trainName);
+                    }
                 }
+
+                prepared.bindString(key++, entry.routeStartStationName);
+                prepared.bindString(key, entry.routeEndStationName);
+
+                prepared.executeInsert();
             }
 
-            prepared.bindString(key++, entry.routeStartStationName);
-            prepared.bindString(key, entry.routeEndStationName);
-
-            prepared.executeInsert();
+            db.setTransactionSuccessful();
+        } finally {
+            db.endTransaction();
         }
 
-        db.setTransactionSuccessful();
-        db.endTransaction();
         db.close();
     }
 
