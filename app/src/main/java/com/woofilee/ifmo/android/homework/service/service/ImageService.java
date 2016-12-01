@@ -8,16 +8,18 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.os.IBinder;
 import android.util.Log;
 
 import com.woofilee.ifmo.android.homework.service.activity.MainActivity;
 import com.woofilee.ifmo.android.homework.service.constant.ImagesURLConstants;
-import com.woofilee.ifmo.android.homework.service.loader.ImageDownloader;
+import com.woofilee.ifmo.android.homework.service.loader.AsyncLoader;
 import com.woofilee.ifmo.android.homework.service.receiver.ImageReceiver;
-import com.woofilee.ifmo.android.homework.service.util.ImageUtils;
+import com.woofilee.ifmo.android.homework.service.util.FileUtils;
+
+import java.io.ByteArrayOutputStream;
+import java.io.FileOutputStream;
 
 import static com.woofilee.ifmo.android.homework.service.R.mipmap.ic_launcher;
 
@@ -56,20 +58,19 @@ public final class ImageService extends Service {
         Log.d(TAG, "Starting service");
         super.onCreate();
 
-        notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        sendBroadcast(new Intent(ImageReceiver.BROADCAST_ACTION).putExtra(
+                ImageReceiver.ACTION_TYPE_PARAM,
+                ImageReceiver.ACTION_TYPE_SERVICE_STARTED
+        ));
 
+        notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         receiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
                 onDownload();
             }
         };
-
         registerReceiver(receiver, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
-        sendBroadcast(new Intent(ImageReceiver.BROADCAST_ACTION).putExtra(
-                ImageReceiver.ACTION_TYPE_PARAM,
-                ImageReceiver.ACTION_TYPE_SERVICE_STARTED
-        ));
     }
 
     @Override
@@ -80,7 +81,7 @@ public final class ImageService extends Service {
             onDownload();
         }
 
-        return START_STICKY; // We want to live, we want to listen all changes of battery status, not only static
+        return START_STICKY; // We want to live, to listen all changes of battery status, not only static
     }
 
     public void onDownload() {
@@ -134,11 +135,11 @@ public final class ImageService extends Service {
                                 .build()
                 );
 
-                ImageDownloader.download(
+                AsyncLoader.load(
                         ImagesURLConstants.getRandomImageURL(),
-                        new ImageDownloader.OnImageLoaderListener() {
+                        new AsyncLoader.OnAsyncLoaderListener() {
                             @Override
-                            public void onComplete(final Bitmap result) {
+                            public void onComplete(final ByteArrayOutputStream result) {
                                 notificationManager.notify(
                                         notificationCounter,
                                         notificationBuilder
@@ -152,14 +153,13 @@ public final class ImageService extends Service {
                                     @Override
                                     protected Void doInBackground(Void... voids) {
                                         try {
-                                            if (!ImageUtils.writeImage(
-                                                    result,
+                                            FileOutputStream file = FileUtils.getOutputFile(
                                                     IMAGE_FILEPATH,
                                                     getApplicationContext()
-                                            )) {
-                                                throw new IllegalStateException(
-                                                        "Image saving error!");
-                                            }
+                                            );
+
+                                            result.writeTo(file);
+                                            result.close();
 
                                             sendBroadcast(new Intent(
                                                     ImageReceiver.BROADCAST_ACTION).putExtra(

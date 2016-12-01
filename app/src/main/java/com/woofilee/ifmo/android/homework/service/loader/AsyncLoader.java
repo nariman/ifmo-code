@@ -1,7 +1,5 @@
 package com.woofilee.ifmo.android.homework.service.loader;
 
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.util.Log;
 
@@ -12,10 +10,10 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 
 /**
- * Class provides a methods for downloading an image by URL.
+ * Class provides a methods for async loading resources by URL.
  */
-public final class ImageDownloader {
-    private static final String TAG = ImageDownloader.class.getSimpleName();
+public class AsyncLoader {
+    private static final String TAG = AsyncLoader.class.getSimpleName();
 
     private static final int BUFFER_LENGTH = 8192;
 
@@ -23,45 +21,62 @@ public final class ImageDownloader {
     private static final int READ_TIMEOUT = 60;
 
     /**
-     * Interface with methods to be invoked when image download status changes.
+     * Interface with methods to be invoked when loading status changes.
      */
-    public interface OnImageLoaderListener {
+    public interface OnAsyncLoaderListener {
         /**
-         * Invoked after the image has been successfully downloaded.
+         * Invoked after the loading has been successfully downloaded.
          *
-         * @param result the downloaded image
+         * @param result the downloaded resource in bytes
          */
-        void onComplete(Bitmap result);
+        void onComplete(ByteArrayOutputStream result);
 
         /**
-         * Invoked every time the progress of the download changes.
+         * Invoked every time the progress of the loading changes.
          *
          * @param percent new status in %
          */
         void onProgressChange(int percent);
 
         /**
-         * Invoked if an error has occurred and the download did not complete.
+         * Invoked if an error has occurred and the loading did not complete.
          */
         void onError();
     }
 
     /**
-     * Loads an image by URL.
+     * Loads a resource by URL.
      *
-     * @param url      url, where image to download is located
-     * @param listener listener with methods to be invoked when image download status changes
+     * @param url            url, where resource to load is located
+     * @param listener       listener with methods to be invoked when loading status changes
      */
-    public static void download(final String url, final OnImageLoaderListener listener) {
-        new AsyncTask<Void, Integer, Bitmap>() {
+    public static void load(final String url, final OnAsyncLoaderListener listener) {
+        load(url, listener, BUFFER_LENGTH, CONNECT_TIMEOUT, READ_TIMEOUT);
+    }
+
+    /**
+     * Loads a resource by URL.
+     *
+     * @param url            url, where resource to load is located
+     * @param listener       listener with methods to be invoked when loading status changes
+     * @param bufferLength   size of the buffer while fetching resource data
+     * @param connectTimeout connection timeout
+     * @param readTimeout    reading timeout
+     */
+    public static void load(final String url,
+                            final OnAsyncLoaderListener listener,
+                            final int bufferLength,
+                            final int connectTimeout,
+                            final int readTimeout) {
+        new AsyncTask<Void, Integer, ByteArrayOutputStream>() {
             @Override
             protected void onPreExecute() {
-                Log.d(TAG, "Starting download image");
+                Log.d(TAG, "Start loading");
             }
 
             @Override
             protected void onCancelled() {
-                Log.d(TAG, "Cancel download image");
+                Log.d(TAG, "Cancel loading");
                 listener.onError();
             }
 
@@ -71,9 +86,7 @@ public final class ImageDownloader {
             }
 
             @Override
-            protected Bitmap doInBackground(Void... params) {
-                Bitmap bitmap = null;
-
+            protected ByteArrayOutputStream doInBackground(Void... params) {
                 HttpURLConnection conn = null;
                 BufferedInputStream is = null;
                 ByteArrayOutputStream os = null;
@@ -82,8 +95,8 @@ public final class ImageDownloader {
                     conn = (HttpURLConnection) new URL(url).openConnection();
 
                     Log.d(TAG, "URL: " + conn.getURL().toString());
-                    conn.setConnectTimeout(CONNECT_TIMEOUT * 1000);
-                    conn.setReadTimeout(READ_TIMEOUT * 1000);
+                    conn.setConnectTimeout(connectTimeout * 1000);
+                    conn.setReadTimeout(readTimeout * 1000);
 
                     conn.connect();
 
@@ -99,10 +112,10 @@ public final class ImageDownloader {
                         throw new FileNotFoundException("Invalid content length: " + length);
                     }
 
-                    is = new BufferedInputStream(conn.getInputStream(), BUFFER_LENGTH);
+                    is = new BufferedInputStream(conn.getInputStream(), bufferLength);
                     os = new ByteArrayOutputStream();
 
-                    byte bytes[] = new byte[BUFFER_LENGTH];
+                    byte bytes[] = new byte[bufferLength];
                     int count;
                     long read = 0;
 
@@ -114,7 +127,6 @@ public final class ImageDownloader {
 
                     if (length == read) {
                         Log.d(TAG, "Received " + read + " bytes");
-                        bitmap = BitmapFactory.decodeByteArray(os.toByteArray(), 0, os.size());
                     } else {
                         Log.w(TAG, "Received " + read + " bytes, but expected " + length);
                     }
@@ -141,21 +153,18 @@ public final class ImageDownloader {
                     }
                 }
 
-                return bitmap;
+                return os;
             }
 
             @Override
-            protected void onPostExecute(Bitmap result) {
+            protected void onPostExecute(ByteArrayOutputStream result) {
                 if (result == null) {
-                    Log.e(TAG, "Error while download an image");
+                    Log.e(TAG, "Error while loading a resource");
                     listener.onError();
                 } else {
                     listener.onComplete(result);
                 }
             }
         }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-    }
-
-    private ImageDownloader() {
     }
 }
