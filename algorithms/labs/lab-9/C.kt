@@ -10,13 +10,13 @@ import java.util.*
 private val PROBLEM_NAME = "cut"
 
 
-data class Pair(val v: Int, val capacity: Int, var reverse: Pair? = null, var flow: Int = 0)
+data class Edge(val v: Int, val capacity: Int, var reverse: Edge? = null, var flow: Int = 0)
 
 private fun solve(`in`: Scanner, out: BufferedWriter) {
     val n = `in`.int()
     val m = `in`.int()
 
-    val g = Array(n) { ArrayList<Pair>() }
+    val g = Array(n) { ArrayList<Edge>() }
     val used = Array(n) { false }
     var min = Array(n) { 0 }
     var ptr =  Array(n) { 0 }
@@ -26,8 +26,8 @@ private fun solve(`in`: Scanner, out: BufferedWriter) {
         val v = `in`.int() - 1
         val c = `in`.int()
 
-        val a = Pair(v, c)
-        val b = Pair(u, c)
+        val a = Edge(v, c)
+        val b = Edge(u, c)
 
         a.reverse = b
         b.reverse = a
@@ -45,9 +45,9 @@ private fun solve(`in`: Scanner, out: BufferedWriter) {
 
         while (!queue.isEmpty()) {
             val u = queue.pop()
-            val pairs = g[u]
+            val edges = g[u]
 
-            for ((v, capacity, reverse, flow) in pairs) {
+            for ((v, capacity, reverse, flow) in edges) {
                 if (min[v] == -1 && capacity - flow >= lim) {
                     min[v] = min[u] + 1
                     queue.add(v)
@@ -62,10 +62,10 @@ private fun solve(`in`: Scanner, out: BufferedWriter) {
         if (v == n - 1) return true
         if (f == 0) return false
 
-        val pairs = g[v]
+        val edges = g[v]
 
-        while (ptr[v] < pairs.size) {
-            val e = pairs[ptr[v]]
+        while (ptr[v] < edges.size) {
+            val e = edges[ptr[v]]
 
             if (min[e.v] == min[v] + 1 && e.capacity - e.flow >= f) {
                 if (dfs(e.v, f)) {
