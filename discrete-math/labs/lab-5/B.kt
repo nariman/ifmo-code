@@ -74,8 +74,8 @@ private fun solve(`in`: Scanner, out: BufferedWriter) {
 
 private fun testgen(out: BufferedWriter) {
     val definitelyRandom = Random()
-    val n = definitelyRandom.nextInt(50000) + 2
-    val m = definitelyRandom.nextInt(100000) + 1
+    val n = definitelyRandom.nextInt(1000) + 2   // B/c this random doesn't generate connected graphs,
+    val m = definitelyRandom.nextInt(100000) + 1 // and this constant is near to true tests
     val s = definitelyRandom.nextInt(1000000000) // 1e18 in statement
 
     out.write("$n $m $s\n")
@@ -130,7 +130,7 @@ private fun judge() {
         startTime = System.nanoTime()
 
         `in` = Scanner(File(PROBLEM_NAME + ".in"))
-        out = File(PROBLEM_NAME + ".out").bufferedWriter()
+        out = File(PROBLEM_NAME + ".out.kt").bufferedWriter()
 
         solve(`in`, out)
 
@@ -145,7 +145,7 @@ private fun judge() {
         print("   - checking... ")
 
         val outLines = Files.readAllLines(Paths.get(PROBLEM_NAME + ".out"))
-        val ansLines = Files.readAllLines(Paths.get(PROBLEM_NAME + ".ans"))
+        val ansLines = Files.readAllLines(Paths.get(PROBLEM_NAME + ".out.kt"))
 
         if (outLines[0] == ansLines[0]) {
             println("OK")
