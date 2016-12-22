@@ -1,0 +1,19 @@
+<resources>
+    <string name="app_name">РЖД Демо</string>
+    <string name="station_departure">Станция отправления</string>
+    <string name="station_arrival">Станция прибытия</string>
+    <string name="error">Ошибка</string>
+    <string name="no_inernet">Остутствует соединение</string>
+    <string name="no_trains">Поезда не найдены</string>
+
+    <string name="train_id_format">№ %1$s</string>
+    <string name="train_id_name_format">№ %1$s &#171;%2$s&#187;</string>
+    <string name="route_descr_format">%1$s - %2$s</string>
+    <string name="departure_format">%1$s: отправление в %2$s</string>
+    <string name="arrival_format">%1$s: прибытие в %2$s</string>
+
+    <string name="btn_timetable_1">Расписание V1</string>
+    <string name="btn_timetable_2">Расписание V2</string>
+
+    <string name="version_warn">Для выбора другой версии нужно перезапустить приложение</string>
+</resources>
