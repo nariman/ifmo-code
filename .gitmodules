@@ -58,3 +58,6 @@
 [submodule "android/remotes/lessons/lesson10"]
 	path = android/remotes/lessons/lesson10
 	url = https://github.com/IFMO-Android-2016/lesson10
+[submodule "android/remotes/lessons/lesson11"]
+	path = android/remotes/lessons/lesson11
+	url = https://github.com/IFMO-Android-2016/lesson11
