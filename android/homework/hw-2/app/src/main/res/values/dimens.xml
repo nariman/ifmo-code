@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="moviesListGap">12dp</dimen>
+    <dimen name="movieMarginPrimary">16dp</dimen>
+
+    <dimen name="movieVoteAverageMarginVertical">6dp</dimen>
+    <dimen name="movieVoteAverageMarginHorizontal">10dp</dimen>
+    <dimen name="moviePosterWidth">100dp</dimen>
+</resources>
