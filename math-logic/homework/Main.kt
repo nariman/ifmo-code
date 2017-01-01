@@ -10,8 +10,15 @@ import java.io.IOException
 
 fun main(args: Array<String>) {
     if (args.isEmpty()) {
-        println("Please, provide the name of the problem (first, second or third) and, if " +
-                "needed, filenames for input and output files (test.in, test.out by default)")
+        println("Please, provide the name of the problem (first, second or third)")
+        println("If needed, input and output filenames can be provided " +
+                "(test.in/test.out by default)")
+        println("First argument for input filename, second for output filename")
+        println("Just input filename can be provided too " +
+                "(output filename will be default)")
+        println()
+        println("For example:")
+        println(">> java -jar woofilee.jar first tests/some.input tests/some.output")
         return
     }
 
@@ -26,7 +33,7 @@ fun main(args: Array<String>) {
         `in` = File(input).bufferedReader()
         out = File(output).bufferedWriter()
     } catch (e: IOException) {
-        println("Please, provide correct filenames for input and output files")
+        println("Please, provide correct input/output filenames")
         return
     }
 
@@ -37,7 +44,7 @@ fun main(args: Array<String>) {
         "second" -> Second.solve(`in`, out)
         "third" -> Third.solve(`in`, out)
         else -> {
-            println("Please, provide correct problem name (first, second or third)")
+            println("Please, provide correct problem name")
             return
         }
     }
