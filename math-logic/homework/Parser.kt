@@ -1,7 +1,6 @@
-/**
+/*
  * Nariman Safiulin (woofilee)
  * File: Parser.kt
- * Created on: 24 Oct, 2016
  */
 
 /**

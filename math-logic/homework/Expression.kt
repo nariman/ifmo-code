@@ -1,7 +1,6 @@
-/**
+/*
  * Nariman Safiulin (woofilee)
  * File: Expression.kt
- * Created on: 24 Oct, 2016
  */
 
 import java.util.*
