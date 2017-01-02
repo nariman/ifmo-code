@@ -16,4 +16,6 @@ object Utils {
      * @return        cleaned string
      */
     fun clean(string: String) = string.replace(whitespace, "")
+
+    fun isDigit(char: Char) = '0' <= char && char <= '9'
 }

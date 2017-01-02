@@ -64,7 +64,7 @@ object First : Solver {
             if (expression[l] == '(')
                 return parse(expression, l + 1, r - 1)
 
-            // Variable
+            // Variable // Anyway
             return Variable(expression.substring(l..r))
         }
     }
@@ -80,7 +80,7 @@ object First : Solver {
             "(A -> Q) -> (B -> Q) -> (A | B -> Q)",
             "(A -> B) -> (A -> !B) -> !A",
             "!!A -> A"
-    ).map { P.parse(it) }
+    ).map { P.single(it) }
 
     override fun solve(`in`: BufferedReader, out: BufferedWriter) {
         val title: List<String> = Utils.clean(`in`.readLine()).split("|-")
@@ -90,11 +90,11 @@ object First : Solver {
                     title[0].split(",")
                 else
                     emptyList()
-                ).map { P.parse(it) }
+                ).map { P.single(it) }
 
         val unproven: Expression? =
                 if (title[1].isNotEmpty())
-                    P.parse(title[1])
+                    P.single(title[1])
                 else
                     null
 
@@ -117,7 +117,7 @@ object First : Solver {
 
         `in`.forEachLine { line ->
             counter++
-            val expression = P.parse(line)
+            val expression = P.single(line)
 
             out.write("($counter)")
             out.write(" $expression ")
@@ -130,7 +130,7 @@ object First : Solver {
             }
 
             for (i in 1..hypotheses.size) {
-                if (hypotheses[i - 1] equal expression) {
+                if (hypotheses[i - 1] exact expression) {
                     save("Предп. $i", expression)
                     return@forEachLine
                 }
