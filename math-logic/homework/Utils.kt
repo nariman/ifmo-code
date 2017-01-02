@@ -17,5 +17,11 @@ object Utils {
      */
     fun clean(string: String) = string.replace(whitespace, "")
 
+    /**
+     * Checks, is given character is digit
+     *
+     * @param char character to check
+     * @return     true, if character is digit, otherwise false
+     */
     fun isDigit(char: Char) = '0' <= char && char <= '9'
 }

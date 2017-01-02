@@ -10,10 +10,6 @@ import java.io.BufferedWriter
  * Solver for the second problem in a homework
  */
 object Second : Solver {
-    /**
-     * Singleton for expression parsing
-     */
-
     override fun solve(`in`: BufferedReader, out: BufferedWriter) {
         val title: List<String> = Utils.clean(`in`.readLine()).split("|-")
 

@@ -141,18 +141,18 @@ abstract class Binary(operator: String, val lhs: Expression,
 }
 
 /**
- * Function
+ * Expression function
  *
  * @param name      function name
  * @param arguments function arguments
  */
 open class Function(val name: String, vararg val arguments: Expression) : Expression {
     override fun exact(other: Expression) =
-            other is Predicate && name == other.name &&
+            other is Predicate && name == other.name && arguments.size == other.arguments.size &&
                     arguments.zip(other.arguments).all { it.first exact it.second }
 
     override fun match(other: Expression, map: MutableMap<String, Expression>) =
-            other is Predicate && name == other.name &&
+            other is Predicate && name == other.name && arguments.size == other.arguments.size &&
                     arguments.zip(other.arguments).all { it.first.match(it.second, map) }
 
     override fun toString() =
@@ -161,7 +161,7 @@ open class Function(val name: String, vararg val arguments: Expression) : Expres
 }
 
 /**
- * Expression predicate
+ * Predicate function
  *
  * @param name      predicate name
  * @param arguments predicate arguments
