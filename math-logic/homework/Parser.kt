@@ -124,7 +124,7 @@ open class Parser {
         if (expression[l] == '!')
             return !parse(expression, l + 1, r)
 
-        // Universal or Existential quantifier
+        // Universal or Existential quantifier check
         if (expression[l] == '@' || expression[l] == '?') {
             var m = l + 2
             while (Utils.isDigit(expression[m])) m++
@@ -173,19 +173,18 @@ open class Parser {
             balance(pos)
         }
 
-        // Function
+        // Function check
         if ('a' <= expression[l] && expression[l] <= 'z') {
             var m = l + 1
             while (m <= r && Utils.isDigit(expression[m])) m++
 
-            if (m < r)
+            // Function
+            if (m <= r && expression[m] == '(')
                 return Function(expression.substring(l..m - 1), *(expression
                         .substring(m + 1..r - 1)
                         .split(",")
                         .map { single(it) }
                         .toTypedArray()))
-            else
-                return Function(expression.substring(l..m - 1))
         }
 
         // Constant
