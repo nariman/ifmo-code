@@ -102,27 +102,30 @@ open class Parser {
         // Implication
         for (pos in l..r) {
             if (weight == 0 && expression[pos] == '>')
-                return parse(expression, l, pos - 2) impl parse(expression, pos + 1, r)
+                return parse(expression, l, pos - 2) as Logic impl
+                        parse(expression, pos + 1, r) as Logic
             balance(pos)
         }
 
         // Disjunction
         for (pos in r downTo l) {
             if (weight == 0 && expression[pos] == '|')
-                return parse(expression, l, pos - 1) disj parse(expression, pos + 1, r)
+                return parse(expression, l, pos - 1) as Logic disj
+                        parse(expression, pos + 1, r) as Logic
             balance(pos)
         }
 
         // Conjunction
         for (pos in r downTo l) {
             if (weight == 0 && expression[pos] == '&')
-                return parse(expression, l, pos - 1) conj parse(expression, pos + 1, r)
+                return parse(expression, l, pos - 1) as Logic conj
+                        parse(expression, pos + 1, r) as Logic
             balance(pos)
         }
 
         // Negation
         if (expression[l] == '!')
-            return !parse(expression, l + 1, r)
+            return !(parse(expression, l + 1, r) as Logic)
 
         // Universal or Existential quantifier check
         if (expression[l] == '@' || expression[l] == '?') {
@@ -138,7 +141,7 @@ open class Parser {
         }
 
         // Predicate
-        if ('A' <= expression[l] && expression[l] <= 'Z') {
+        if (Utils.isUpperCase(expression[l])) {
             var m = l + 1
             while (m <= r && Utils.isDigit(expression[m])) m++
 
@@ -146,7 +149,7 @@ open class Parser {
                 return Predicate(expression.substring(l..m - 1), *(expression
                         .substring(m + 1..r - 1)
                         .split(",")
-                        .map { single(it) }
+                        .map { single(it) as Math }
                         .toTypedArray()))
             else
                 return Predicate(expression.substring(l..m - 1))
@@ -155,26 +158,29 @@ open class Parser {
         // Equals predicate
         for (pos in r downTo l) {
             if (weight == 0 && expression[pos] == '=')
-                return parse(expression, l, pos - 1) equals parse(expression, pos + 1, r)
+                return parse(expression, l, pos - 1) as Math equals
+                        parse(expression, pos + 1, r) as Math
             balance(pos)
         }
 
         // Addition binary operator
         for (pos in r downTo l) {
             if (weight == 0 && expression[pos] == '+')
-                return parse(expression, l, pos - 1) + parse(expression, pos + 1, r)
+                return parse(expression, l, pos - 1) as Math +
+                        parse(expression, pos + 1, r) as Math
             balance(pos)
         }
 
         // Multiplication binary operator
         for (pos in r downTo l) {
             if (weight == 0 && expression[pos] == '*')
-                return parse(expression, l, pos - 1) * parse(expression, pos + 1, r)
+                return parse(expression, l, pos - 1) as Math *
+                        parse(expression, pos + 1, r) as Math
             balance(pos)
         }
 
         // Function check
-        if ('a' <= expression[l] && expression[l] <= 'z') {
+        if (Utils.isLowerCase(expression[l])) {
             var m = l + 1
             while (m <= r && Utils.isDigit(expression[m])) m++
 
@@ -183,13 +189,13 @@ open class Parser {
                 return Function(expression.substring(l..m - 1), *(expression
                         .substring(m + 1..r - 1)
                         .split(",")
-                        .map { single(it) }
+                        .map { single(it) as Math }
                         .toTypedArray()))
         }
 
         // Constant
         if (expression[r] == '\'')
-            return parse(expression, l, r - 1) + Constant(1)
+            return Increment(parse(expression, l, r - 1) as Math)
 
         // Bracket expression
         if (expression[l] == '(')

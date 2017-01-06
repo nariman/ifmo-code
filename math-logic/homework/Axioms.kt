@@ -27,6 +27,6 @@ val axioms = listOf(
         "a * b' = a * b + a"
 ).map { Parser.single(it) }
 
+val universal_axiom_scheme = Parser.single("@xF(x)->F(0)")
+val existence_axiom_scheme = Parser.single("F(0)->?xF(x)")
 val induction_axiom_scheme = Parser.single("F(0)&@x(F(x)->F(x'))->F(x)")
-val universal_axiom_scheme = Parser.single("@xF(x)->F(o)")
-val existence_axiom_scheme = Parser.single("F(o)->?xF(x)")

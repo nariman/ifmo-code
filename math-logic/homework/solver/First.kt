@@ -38,27 +38,30 @@ object First : Solver {
             // Implication
             (l..r).forEach { pos ->
                 if (weight == 0 && expression[pos] == '>')
-                    return parse(expression, l, pos - 2) impl parse(expression, pos + 1, r)
+                    return parse(expression, l, pos - 2) as Logic impl
+                            parse(expression, pos + 1, r) as Logic
                 balance(pos)
             }
 
             // Disjunction
             (r downTo l).forEach { pos ->
                 if (weight == 0 && expression[pos] == '|')
-                    return parse(expression, l, pos - 1) disj parse(expression, pos + 1, r)
+                    return parse(expression, l, pos - 1) as Logic disj
+                            parse(expression, pos + 1, r) as Logic
                 balance(pos)
             }
 
             // Conjunction
             (r downTo l).forEach { pos ->
                 if (weight == 0 && expression[pos] == '&')
-                    return parse(expression, l, pos - 1) conj parse(expression, pos + 1, r)
+                    return parse(expression, l, pos - 1) as Logic conj
+                            parse(expression, pos + 1, r) as Logic
                 balance(pos)
             }
 
             // Negation
             if (expression[l] == '!')
-                return !parse(expression, l + 1, r)
+                return !(parse(expression, l + 1, r) as Logic)
 
             // Bracket expression
             if (expression[l] == '(')
@@ -101,8 +104,10 @@ object First : Solver {
         out.write("${hypotheses.map { it.toString() }.joinToString(",")}|-$unproven\n")
 
         val expressions = HashMap<Int, Expression>()
+
         val fulls = HashMap<String, Int>()
         val rights = HashMap<String, ArrayList<Int>>()
+
         var counter = 0
 
         fun save(message: String, expression: Expression) {

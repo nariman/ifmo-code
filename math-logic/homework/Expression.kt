@@ -24,7 +24,7 @@ interface Expression {
      * @param  other expression for pattern matching.
      * @param  map   map, that is needed for matching variables from pattern to variables and
      *               expressions from given expression.
-     * @return       true, if given expression matches the pattern.
+     * @return       true, if given expression matches the pattern, otherwise false.
      */
     fun match(other: Expression, map: MutableMap<String, Expression>): Boolean
 
@@ -37,21 +37,34 @@ interface Expression {
      * Checks equality of expressions with pattern matching.
      * Uses this expression as a pattern, and given expression for pattern matching.
      * Default pattern matching implementation with `HashMap`.
+     *
+     * @param  other expression for pattern matching.
+     * @return       true, if given expression matches the pattern, otherwise false.
      */
-    infix fun match(other: Expression): Boolean = match(other, HashMap<String, Expression>())
+    infix fun match(other: Expression) = match(other, HashMap<String, Expression>())
 
     /**
      * Returns a string representation of the expression.
      */
-    fun stringify(): String = "($this)"
+    fun stringify() = "($this)"
 }
+
+/**
+ * Interface for logic expressions
+ */
+interface Logic : Expression
+
+/**
+ * Interface for math expressions
+ */
+interface Math : Expression
 
 /**
  * Expression variable
  *
  * @param name variable name
  */
-class Variable(val name: String) : Expression {
+class Variable(val name: String) : Math {
     override infix fun exact(other: Expression) = other is Variable && name == other.name
 
     override fun match(other: Expression, map: MutableMap<String, Expression>) =
@@ -69,7 +82,7 @@ class Variable(val name: String) : Expression {
  *
  * @param value constant value
  */
-class Constant(val value: Int) : Expression {
+class Constant(val value: Int) : Math {
     override infix fun exact(other: Expression) = other is Constant && value == other.value
 
     override fun match(other: Expression, map: MutableMap<String, Expression>) = exact(other)
@@ -82,14 +95,25 @@ class Constant(val value: Int) : Expression {
  * Expression operators abstract class
  *
  * @param operator a string representation of the operator
+ * @param arguments operands
  */
-abstract class Operator(val operator: String) : Expression
+abstract class Operator(val operator: String, vararg val arguments: Expression) : Expression {
+    override fun exact(other: Expression) =
+            other is Operator && this.javaClass == other.javaClass &&
+                    operator == other.operator && arguments.size == other.arguments.size &&
+                    arguments.zip(other.arguments).all { it.first exact it.second }
+
+    override fun match(other: Expression, map: MutableMap<String, Expression>) =
+            other is Operator && this.javaClass == other.javaClass &&
+                    operator == other.operator && arguments.size == other.arguments.size &&
+                    arguments.zip(other.arguments).all { it.first.match(it.second, map) }
+}
 
 /**
  * Expression quantifiers abstract class
  */
 abstract class Quantifier(val quantifier: String, val variable: Variable,
-                          val statement: Expression) : Expression {
+                          val statement: Expression) : Logic {
     override fun exact(other: Expression) =
             other is Quantifier && this.javaClass == other.javaClass &&
                     variable exact other.variable && statement exact other.statement
@@ -107,15 +131,7 @@ abstract class Quantifier(val quantifier: String, val variable: Variable,
  *  @param operator a string representation of the operator
  *  @param value    unary operand
  */
-abstract class Unary(operator: String, val value: Expression) : Operator(operator) {
-    override infix fun exact(other: Expression) =
-            other is Unary && this.javaClass == other.javaClass &&
-                    value exact other.value
-
-    override fun match(other: Expression, map: MutableMap<String, Expression>) =
-            other is Unary && this.javaClass == other.javaClass &&
-                    value.match(other.value, map)
-
+abstract class Unary(operator: String, val value: Expression) : Operator(operator, value) {
     override fun toString() = operator + value.stringify()
     override fun stringify() = toString()
 }
@@ -128,31 +144,25 @@ abstract class Unary(operator: String, val value: Expression) : Operator(operato
  *  @param rhs      right-hand side operand
  */
 abstract class Binary(operator: String, val lhs: Expression,
-                      val rhs: Expression) : Operator(operator) {
-    override infix fun exact(other: Expression) =
-            other is Binary && this.javaClass == other.javaClass &&
-                    lhs exact other.lhs && rhs exact other.rhs
-
-    override fun match(other: Expression, map: MutableMap<String, Expression>) =
-            other is Binary && this.javaClass == other.javaClass &&
-                    lhs.match(other.lhs, map) && rhs.match(other.rhs, map)
-
+                      val rhs: Expression) : Operator(operator, lhs, rhs) {
     override fun toString(): String = lhs.stringify() + operator + rhs.stringify()
 }
 
 /**
- * Expression function
+ * Expression predicate
  *
- * @param name      function name
- * @param arguments function arguments
+ * @param name      predicate name
+ * @param arguments predicate arguments
  */
-open class Function(val name: String, vararg val arguments: Expression) : Expression {
+open class Predicate(val name: String, vararg val arguments: Expression) : Logic {
     override fun exact(other: Expression) =
-            other is Predicate && name == other.name && arguments.size == other.arguments.size &&
+            other is Predicate && this.javaClass == other.javaClass &&
+                    name == other.name && arguments.size == other.arguments.size &&
                     arguments.zip(other.arguments).all { it.first exact it.second }
 
     override fun match(other: Expression, map: MutableMap<String, Expression>) =
-            other is Predicate && name == other.name && arguments.size == other.arguments.size &&
+            other is Predicate && this.javaClass == other.javaClass &&
+                    name == other.name && arguments.size == other.arguments.size &&
                     arguments.zip(other.arguments).all { it.first.match(it.second, map) }
 
     override fun toString() =
@@ -161,12 +171,26 @@ open class Function(val name: String, vararg val arguments: Expression) : Expres
 }
 
 /**
- * Predicate function
+ * Expression function
  *
- * @param name      predicate name
- * @param arguments predicate arguments
+ * @param name      function name
+ * @param arguments function arguments
  */
-open class Predicate(name: String, vararg arguments: Expression) : Function(name, *arguments)
+open class Function(val name: String, vararg val arguments: Math) : Math {
+    override fun exact(other: Expression) =
+            other is Function && this.javaClass == other.javaClass &&
+                    name == other.name && arguments.size == other.arguments.size &&
+                    arguments.zip(other.arguments).all { it.first exact it.second }
+
+    override fun match(other: Expression, map: MutableMap<String, Expression>) =
+            other is Function && this.javaClass == other.javaClass &&
+                    name == other.name && arguments.size == other.arguments.size &&
+                    arguments.zip(other.arguments).all { it.first.match(it.second, map) }
+
+    override fun toString() =
+            name + if (arguments.isEmpty()) "" else "(" + arguments.joinToString(",") + ")"
+    override fun stringify() = toString()
+}
 
 /**
  * Universal quantifier
@@ -185,48 +209,60 @@ infix fun Variable.exists(statement: Expression) = Existential(this, statement)
 /**
  * Equals predicate
  */
-class Equals(lhs: Expression, rhs: Expression) : Predicate("=", lhs, rhs)
+class Equals(val lhs: Math, val rhs: Math) : Predicate("=", lhs, rhs) {
+    override fun toString() = lhs.stringify() + "=" + rhs.stringify()
+    override fun stringify() = "($this)"
+}
 
-infix fun Expression.equals(rhs: Expression) = Equals(this, rhs)
+infix fun Math.equals(rhs: Math) = Equals(this, rhs)
 
 /**
  * Negation unary operator
  */
-class Negation(value: Expression) : Unary("!", value)
+class Negation(value: Logic) : Unary("!", value), Logic
 
-operator fun Expression.not() = Negation(this)
+operator fun Logic.not() = Negation(this)
+
+/**
+ * Increment unary operator
+ */
+class Increment(value: Math) : Unary("'", value), Math {
+    override fun toString() = value.stringify() + operator
+}
+
+operator fun Math.inc() = Increment(this)
 
 /**
  * Conjunction binary operator
  */
-class Conjunction(lhs: Expression, rhs: Expression) : Binary("&", lhs, rhs)
+class Conjunction(lhs: Logic, rhs: Logic) : Binary("&", lhs, rhs), Logic
 
-infix fun Expression.conj(rhs: Expression) = Conjunction(this, rhs)
+infix fun Logic.conj(rhs: Logic) = Conjunction(this, rhs)
 
 /**
  * Disjunction binary operator
  */
-class Disjunction(lhs: Expression, rhs: Expression) : Binary("|", lhs, rhs)
+class Disjunction(lhs: Logic, rhs: Logic) : Binary("|", lhs, rhs), Logic
 
-infix fun Expression.disj(rhs: Expression) = Disjunction(this, rhs)
+infix fun Logic.disj(rhs: Logic) = Disjunction(this, rhs)
 
 /**
  * Implication binary operator
  */
-class Implication(lhs: Expression, rhs: Expression) : Binary("->", lhs, rhs)
+class Implication(lhs: Logic, rhs: Logic) : Binary("->", lhs, rhs), Logic
 
-infix fun Expression.impl(rhs: Expression) = Implication(this, rhs)
+infix fun Logic.impl(rhs: Logic) = Implication(this, rhs)
 
 /**
  * Addition binary operator
  */
-class Addition(lhs: Expression, rhs: Expression) : Binary("+", lhs, rhs)
+class Addition(lhs: Math, rhs: Math) : Binary("+", lhs, rhs), Math
 
-operator fun Expression.plus(rhs: Expression) = Addition(this, rhs)
+operator fun Math.plus(rhs: Math) = Addition(this, rhs)
 
 /**
  * Multiplication binary operator
  */
-class Multiplication(lhs: Expression, rhs: Expression) : Binary("*", lhs, rhs)
+class Multiplication(lhs: Math, rhs: Math) : Binary("*", lhs, rhs), Math
 
-operator fun Expression.times(rhs: Expression) = Multiplication(this, rhs)
+operator fun Math.times(rhs: Math) = Multiplication(this, rhs)

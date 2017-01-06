@@ -24,4 +24,20 @@ object Utils {
      * @return     true, if character is digit, otherwise false
      */
     fun isDigit(char: Char) = '0' <= char && char <= '9'
+
+    /**
+     * Checks, is given character is upper case
+     *
+     * @param char character to check
+     * @return     true, if character is upper case, otherwise false
+     */
+    fun isUpperCase(char: Char) = 'A' <= char && char <= 'Z'
+
+    /**
+     * Checks, is given character is lower case
+     *
+     * @param char character to check
+     * @return     true, if character is lower case, otherwise false
+     */
+    fun isLowerCase(char: Char) = 'a' <= char && char <= 'z'
 }
