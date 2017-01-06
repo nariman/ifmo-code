@@ -134,10 +134,12 @@ open class Parser {
 
             // Universal quantifier
             if (expression[l] == '@')
-                return Variable(expression.substring(l + 1..m - 1)) all parse(expression, m, r)
+                return Variable(expression.substring(l + 1..m - 1)) all
+                        parse(expression, m, r) as Logic
 
             // Existential quantifier
-            return Variable(expression.substring(l + 1..m - 1)) exists parse(expression, m, r)
+            return Variable(expression.substring(l + 1..m - 1)) exists
+                    parse(expression, m, r) as Logic
         }
 
         // Predicate

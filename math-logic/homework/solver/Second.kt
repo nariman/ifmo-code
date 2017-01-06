@@ -14,30 +14,24 @@ object Second : Solver {
     override fun solve(`in`: BufferedReader, out: BufferedWriter) {
         val title: List<String> = Utils.clean(`in`.readLine()).split("|-")
 
-        val assumptions: List<Expression>
-        val alpha: Expression?
+        val assumptions: List<Logic>
+        val alpha: Logic?
 
-        val part =
+        val _part: List<Logic> =
                 if (title[0].isNotEmpty())
-                    Parser.many(title[0])
+                    Parser.many(title[0]).map { it as Logic }
                 else
-                    emptyList()
+                    emptyList<Logic>()
 
-        if (part.isNotEmpty()) {
-            alpha = part.last()
-            assumptions = part.dropLast(1)
+        if (_part.isNotEmpty()) {
+            alpha = _part.last()
+            assumptions = _part.dropLast(1)
         } else {
             alpha = null
-            assumptions = part
+            assumptions = _part
         }
 
-        val unproven: Expression? =
-                if (title[1].isNotEmpty())
-                    Parser.single(title[1])
-                else
-                    null
-
-        out.write("${(assumptions + alpha).map { it.toString() }.joinToString(",")}|-$unproven\n")
+        val unproven = Parser.single(title[1]) as Logic
 
         val expressions = HashMap<Int, Expression>()
         val annotations = HashMap<Int, Annotation>()
@@ -45,6 +39,8 @@ object Second : Solver {
 
         val fulls = HashMap<String, Int>()
         val rights = HashMap<String, ArrayList<Int>>()
+
+        val deduction = ArrayList<String>()
 
         var counter = 0
 
@@ -58,199 +54,176 @@ object Second : Solver {
             messages.put(counter, message)
         }
 
-        fun error(message: String? = null) {
-            out.write("Вывод некорректен начиная с формулы номер $counter")
-            if (message != null) out.write(": $message")
-            out.close()
-            System.exit(0)
+        fun deduct_axiom(expression: Expression) {
+            deduction.add("$expression")
+            deduction.add("$expression->$alpha->$expression")
+            deduction.add("$alpha->$expression")
+        }
+        fun deduct_axiom_proof() {
+            deduction.add("$alpha->$alpha->$alpha")
+            deduction.add("($alpha->$alpha->$alpha)->($alpha->($alpha->$alpha)->$alpha)->$alpha->$alpha")
+            deduction.add("($alpha->($alpha->$alpha)->$alpha)->$alpha->$alpha")
+            deduction.add("($alpha->($alpha->$alpha)->$alpha)")
+            deduction.add("$alpha->$alpha")
+        }
+        fun deduct_mp(expression: Expression) {
+            expression as Implication
+            deduction.add("($alpha->${expression.lhs})->($alpha->$expression)->$alpha->${expression.rhs}")
+            deduction.add("($alpha->$expression)->$alpha->${expression.rhs}")
+            deduction.add("$alpha->${expression.rhs}")
         }
 
-        `in`.forEachLine { line ->
+        fun mismatch(e1: Expression, e2: Expression, x: Variable): Expression? {
+            if (e1 is Parameterized && e1.javaClass == e2.javaClass) {
+                e2 as Parameterized
+                var m: Expression? = null
+
+                for ((index, argument) in e1.arguments.withIndex()) {
+                    if (m != null) break
+                    m = mismatch(argument, e2.arguments[index], x)
+                }
+
+                return m
+            } else if (e1 is Quantifier && e1.javaClass == e2.javaClass) {
+                return mismatch(e1.statement, (e2 as Quantifier).statement, x)
+            } else if (e1 is Variable && e1 == x) {
+                return e2
+            }
+
+            return null
+        }
+
+        loop@ for (line in `in`.lines()) {
             counter++
             val expression = Parser.single(line)
-            out.write("$expression\n")
+
+            for (i in 0..axioms.size - 1) {
+                if (axioms[i] exact expression) {
+                    save(expression, Annotation.Axiom(axioms[i]), "Акс. ${i + 1}")
+                    if (alpha != null) deduct_axiom(expression)
+                    continue@loop
+                }
+            }
+
+            for (i in 0..axiom_schemes.size - 1) {
+                if (axiom_schemes[i] match expression) {
+                    save(expression, Annotation.Axiom(axiom_schemes[i]), "Сх. акс. ${i + 1}")
+                    if (alpha != null) deduct_axiom(expression)
+                    continue@loop
+                }
+            }
+
+            for (i in 0..assumptions.size - 1) {
+                if (assumptions[i] exact expression) {
+                    save(expression, Annotation.Assumption(assumptions[i]), "Предп. ${i + 1}")
+                    if (alpha != null) deduct_axiom(expression)
+                    continue@loop
+                }
+            }
+
+            for (j in rights[expression.toString()] ?: emptyList<ArrayList<Int>>())
+                if (fulls[(expressions[j] as Implication).lhs.toString()] != null) {
+                    save(
+                            expression,
+                            Annotation.ModusPonens(
+                                    expressions[fulls[(expressions[j] as Implication).lhs.toString()]]!!,
+                                    expressions[j]!!
+                            ),
+                            "M.P. ${fulls[(expressions[j] as Implication).lhs.toString()]}, $j"
+                    )
+                    deduct_mp(expressions[j]!!)
+                    continue@loop
+                }
+
+            if (induction_axiom_scheme match expression) {
+                expression as Implication
+                expression.lhs as Conjunction
+                expression.lhs.rhs as Universal
+                expression.lhs.rhs.statement as Implication
+
+                val phi = expression.rhs
+                val x = expression.lhs.rhs.variable
+
+                try {
+                    if (phi.replace(x, Constant(0)) exact expression.lhs.lhs &&
+                            phi.replace(x, Increment(x)) exact expression.lhs.rhs.statement.rhs) {
+                        save(expression, Annotation.Axiom(induction_axiom_scheme), "Сх. акс.")
+                        if (alpha != null) deduct_axiom(expression)
+                        continue@loop
+                    }
+                } catch (e: IllegalArgumentException) {} // Possible next variants
+            }
+
+            if (alpha != null && alpha exact expression) {
+                save(expression, Annotation.Assumption(alpha), "Предп.")
+                deduct_axiom_proof()
+                continue@loop
+            }
+
+            if (universal_axiom_scheme match expression) {
+                expression as Implication
+                expression.lhs as Universal
+
+                val phi = expression.lhs.statement
+                val x = expression.lhs.variable
+                val term = mismatch(phi, expression.rhs, x)!! as Math
+
+                try {
+                    if (phi.replace(x, term) exact expression.rhs) {
+                        save(expression, Annotation.Axiom(universal_axiom_scheme), "Сх акс. 11")
+                        if (alpha != null) deduct_axiom(expression)
+                        continue@loop
+                    }
+                } catch (e: IllegalArgumentException) {
+                    save(
+                            expression,
+                            Annotation.Mistake(),
+                            "Терм $term не свободен для подстановки в формулу $phi вместо $x"
+                    )
+                    break@loop
+                }
+            }
+
+            if (existence_axiom_scheme match expression) {
+                expression as Implication
+                expression.rhs as Existential
+
+                val phi = expression.rhs.statement
+                val x = expression.rhs.variable
+                val term = mismatch(phi, expression.lhs, x)!! as Math
+
+                try {
+                    if (phi.replace(x, term) exact expression.lhs) {
+                        save(expression, Annotation.Axiom(existence_axiom_scheme), "Сх акс. 12")
+                        if (alpha != null) deduct_axiom(expression)
+                        continue@loop
+                    }
+                } catch (e: IllegalArgumentException) {
+                    save(
+                            expression,
+                            Annotation.Mistake(),
+                            "Терм $term не свободен для подстановки в формулу $phi вместо $x"
+                    )
+                    break@loop
+                }
+            }
+
+            save(expression, Annotation.Mistake(), "Не доказано")
+            break@loop
         }
 
-//        if (alpha == null) {
-//            `in`.forEachLine { line ->
-//                counter++
-//                val expression = Parser.single(line)
-//
-//                for (i in 0..axioms.size - 1) {
-//                    if (axioms[i] exact expression) {
-//                        save(expression, Annotation.Axiom(axioms[i]), "Акс. ${i + 1}")
-//                        return@forEachLine
-//                    }
-//                }
-//
-//                for (i in 0..axiom_schemes.size - 1) {
-//                    if (axiom_schemes[i] match expression) {
-//                        save(expression, Annotation.Axiom(axiom_schemes[i]), "Сх. акс. ${i + 1}")
-//                        return@forEachLine
-//                    }
-//                }
-//
-//                // We don't have any assumptions
-//                /*
-//                for (i in 0..assumptions.size - 1) {
-//                    if (assumptions[i] exact expression) {
-//                        save(expression, Annotation.Assumption(assumptions[i]), "Предп. ${i + 1}")
-//                        return@forEachLine
-//                    }
-//                }
-//                */
-//
-//                if (expression is Implication && expression.lhs is Conjunction) {
-//                    val and = expression.lhs
-//
-//                    if (and.rhs is Quantifier) {
-//                        val q = and.rhs
-//                        if (q is Universal && q.statement is Implication) {
-//                            val right = expression.rhs
-//
-//                            if (q.statement.lhs exact right) {
-//                                try {
-//                                    val zero = right.replace(q.variable, and.lhs)
-//                                    if (zero.equals(Variable("0")) && right.replace(q.variable, q.statement.rhs).equals(Increment(q.variable))) {
-//                                        save(expression, Annotation.Axiom(induction_axiom_scheme), "Сх. акс.")
-//                                        return@forEachLine
-//                                    }
-//                                } catch (e: IllegalArgumentException) {}
-//
-//                            }
-//                        }
-//                    }
-//                }
-//
-//                rights[expression.toString()]?.forEach { j ->
-//                    fulls[(expressions[j] as Implication).lhs.toString()]?.let { i ->
-//                        save(expression, Annotation.ModusPonens(expressions[i]!!, expressions[j]!!),
-//                                "M.P. $i, $j")
-//                        return@forEachLine
-//                    }
-//                }
-//
-//                if (universal_axiom_scheme match expression) {
-//                    save(expression, Annotation.Axiom(universal_axiom_scheme), "Сх акс. 11")
-//                    return@forEachLine
-//                }
-//
-//                if (existence_axiom_scheme match expression) {
-//                    save(expression, Annotation.Axiom(existence_axiom_scheme), "Сх акс. 12")
-//                    return@forEachLine
-//                }
-//
-//                save(expression, Annotation.Mistake(), "Не доказано")
-//                error()
-//            }
-//
-//            out.write("|-$unproven\n")
-//            for ((c, expression) in expressions) {
-//                out.write("$expression\n")
-//            }
-//        } else {
-//            val sb = StringBuilder()
-//
-//            `in`.forEachLine { line ->
-//                counter++
-//                val expression = Parser.single(line)
-//
-//                for (i in 0..axioms.size - 1) {
-//                    if (axioms[i] exact expression) {
-//                        save(expression, Annotation.Axiom(axioms[i]), "Акс. ${i + 1}")
-//                        out.write("$expression\n")
-//                        out.write("$expression->$alpha->$expression\n")
-//                        out.write("$alpha->$expression\n")
-//                        return@forEachLine
-//                    }
-//                }
-//
-//                for (i in 0..axiom_schemes.size - 1) {
-//                    if (axiom_schemes[i] match expression) {
-//                        save(expression, Annotation.Axiom(axiom_schemes[i]), "Сх. акс. ${i + 1}")
-//                        out.write("$expression\n")
-//                        out.write("$expression->$alpha->$expression\n")
-//                        out.write("$alpha->$expression\n")
-//                        return@forEachLine
-//                    }
-//                }
-//
-//                for (i in 0..assumptions.size - 1) {
-//                    if (assumptions[i] exact expression) {
-//                        save(expression, Annotation.Assumption(assumptions[i]), "Предп. ${i + 1}")
-//                        out.write("$expression\n")
-//                        out.write("$expression->$alpha->$expression\n")
-//                        out.write("$alpha->$expression\n")
-//                        return@forEachLine
-//                    }
-//                }
-//
-//                if (alpha exact expression) {
-//                    save(expression, Annotation.Assumption(alpha), "Предп.")
-//                    out.write("$alpha->$alpha->$alpha\n")
-//                    out.write("($alpha->$alpha->$alpha)->($alpha->($alpha->$alpha)->$alpha)->$alpha->$alpha\n")
-//                    out.write("($alpha->($alpha->$alpha)->$alpha)->$alpha->$alpha\n")
-//                    out.write("($alpha->($alpha->$alpha)->$alpha)\n")
-//                    out.write("$alpha->$alpha\n")
-//                    return@forEachLine
-//                }
-//
-//                if (expression is Implication && expression.lhs is Conjunction) {
-//                    val and = expression.lhs
-//
-//                    if (and.rhs is Quantifier) {
-//                        val q = and.rhs
-//                        if (q is Universal && q.statement is Implication) {
-//                            val right = expression.rhs
-//
-//                            if (q.statement.lhs exact right) {
-//                                try {
-//                                    val zero = right.replace(q.variable, and.lhs)
-//                                    if (zero.equals(Constant(0)) && right.replace(q.variable, q.statement.rhs).equals(Increment(q.variable))) {
-//                                        save(expression, Annotation.Axiom(induction_axiom_scheme), "Сх. акс.")
-//                                        out.write("$expression\n")
-//                                        out.write("$expression->$alpha->$expression\n")
-//                                        out.write("$alpha->$expression\n")
-//                                        return@forEachLine
-//                                    }
-//                                } catch (e: IllegalArgumentException) {}
-//
-//                            }
-//                        }
-//                    }
-//                }
-//
-//                rights[expression.toString()]?.forEach { j ->
-//                    fulls[(expressions[j] as Implication).lhs.toString()]?.let { i ->
-//                        save(expression, Annotation.ModusPonens(expressions[i]!!, expressions[j]!!),
-//                                "M.P. $i, $j")
-//                        val f = expressions[j] as Implication
-//
-//                        out.write("($alpha->${f.lhs})->($alpha->$f)->$alpha->${f.rhs}\n")
-//                        out.write("($alpha->$f)->$alpha->${f.rhs}\n")
-//                        out.write("$alpha->${f.rhs}\n")
-//                        return@forEachLine
-//                    }
-//                }
-//
-//                if (universal_axiom_scheme match expression) {
-//                    save(expression, Annotation.Axiom(universal_axiom_scheme), "Сх акс. 11")
-//                    return@forEachLine
-//                }
-//
-//                if (existence_axiom_scheme match expression) {
-//                    save(expression, Annotation.Axiom(existence_axiom_scheme), "Сх акс. 12")
-//                    return@forEachLine
-//                }
-//
-//                save(expression, Annotation.Mistake(), "Не доказано")
-//                error()
-//            }
-//
-//            out.write("|-$unproven\n")
-//            for ((counter, expression) in expressions) {
-//                out.write("($counter) $expression (${messages[counter]})\n")
-//            }
-//        }
+        if (annotations[counter] is Annotation.Mistake) {
+            out.write("Вывод неверен начиная с формулы номер $counter: ")
+            out.write(messages[counter])
+        } else {
+            if (alpha != null) {
+                out.write("${assumptions.joinToString(",")}|-${Implication(alpha, unproven)}\n")
+                for (expression in deduction) out.write("$expression\n")
+            }
+            else {
+                out.write("|-$unproven\n") // If alpha is null, then assumptions list is empty
+                for ((c, expression) in expressions) out.write("$expression\n")
+            }
+        }
     }
 }

@@ -9,6 +9,8 @@ import java.util.*
  * Interface for expression objects
  */
 interface Expression {
+    val variables: HashSet<String>
+
     /**
      * Checks equality of expressions strictly.
      *
@@ -29,6 +31,18 @@ interface Expression {
     fun match(other: Expression, map: MutableMap<String, Expression>): Boolean
 
     /**
+     * Replaces given variable with other expression.
+     *
+     * @param  variable                 variable to replace.
+     * @param  replacement              replacement expression.
+     * @param  set                      set, that is needed for checking for bound variables while
+     *                                  replacing.
+     * @return                          expression with replaced variable.
+     * @throws IllegalArgumentException if variable cannot be replaced
+     */
+    fun replace(variable: Variable, replacement: Math, set: MultiSet<String>): Expression
+
+    /**
      * Returns a string representation of the expression.
      */
     override fun toString(): String
@@ -44,6 +58,17 @@ interface Expression {
     infix fun match(other: Expression) = match(other, HashMap<String, Expression>())
 
     /**
+     * Replaces given variable with other expression.
+     *
+     * @param  variable                 variable to replace.
+     * @param  replacement              replacement expression.
+     * @return                          expression with replaced variable.
+     * @throws IllegalArgumentException if variable cannot be replaced
+     */
+    fun replace(variable: Variable, replacement: Math) =
+            replace(variable, replacement, MultiSet<String>())
+
+    /**
      * Returns a string representation of the expression.
      */
     fun stringify() = "($this)"
@@ -52,12 +77,17 @@ interface Expression {
 /**
  * Interface for logic expressions
  */
-interface Logic : Expression
+interface Logic : Expression {
+    override fun replace(variable: Variable, replacement: Math, set: MultiSet<String>): Logic
+}
 
 /**
  * Interface for math expressions
  */
-interface Math : Expression
+interface Math : Expression {
+    override fun match(other: Expression, map: MutableMap<String, Expression>) = false
+    override fun replace(variable: Variable, replacement: Math, set: MultiSet<String>): Math
+}
 
 /**
  * Expression variable
@@ -65,13 +95,21 @@ interface Math : Expression
  * @param name variable name
  */
 class Variable(val name: String) : Math {
+    override val variables = HashSet<String>()
+
+    init {
+        variables.add(name)
+    }
+
     override infix fun exact(other: Expression) = other is Variable && name == other.name
 
-    override fun match(other: Expression, map: MutableMap<String, Expression>) =
-            map[name]?.exact(other) ?: {
-                map.put(name, other)
-                true
-            }()
+    override fun replace(variable: Variable, replacement: Math,
+                         set: MultiSet<String>): Math {
+        if (name in set || replacement.variables.any { it in set })
+            throw IllegalArgumentException()
+
+        return replacement
+    }
 
     override fun toString() = name
     override fun stringify() = toString()
@@ -83,12 +121,37 @@ class Variable(val name: String) : Math {
  * @param value constant value
  */
 class Constant(val value: Int) : Math {
+    override val variables = HashSet<String>()
+
     override infix fun exact(other: Expression) = other is Constant && value == other.value
 
-    override fun match(other: Expression, map: MutableMap<String, Expression>) = exact(other)
+    override fun replace(variable: Variable, replacement: Math, set: MultiSet<String>) = this
 
     override fun toString() = value.toString()
     override fun stringify() = toString()
+}
+
+/**
+ * Abstract class for parameterized expressions
+ *
+ * @param arguments operands
+ */
+abstract class Parameterized(vararg val arguments: Expression) : Expression {
+    final override val variables = HashSet<String>()
+
+    init {
+        arguments.forEach { variables.addAll(it.variables) }
+    }
+
+    override fun exact(other: Expression) =
+            other is Parameterized && this.javaClass == other.javaClass &&
+                    arguments.size == other.arguments.size &&
+                    arguments.zip(other.arguments).all { it.first exact it.second }
+
+    override fun match(other: Expression, map: MutableMap<String, Expression>) =
+            other is Parameterized && this.javaClass == other.javaClass &&
+//                    arguments.size == other.arguments.size &&
+                    arguments.zip(other.arguments).all { it.first.match(it.second, map) }
 }
 
 /**
@@ -97,23 +160,26 @@ class Constant(val value: Int) : Math {
  * @param operator a string representation of the operator
  * @param arguments operands
  */
-abstract class Operator(val operator: String, vararg val arguments: Expression) : Expression {
+abstract class Operator(val operator: String,
+                        vararg arguments: Expression) : Parameterized(*arguments) {
     override fun exact(other: Expression) =
-            other is Operator && this.javaClass == other.javaClass &&
-                    operator == other.operator && arguments.size == other.arguments.size &&
-                    arguments.zip(other.arguments).all { it.first exact it.second }
+            other is Operator && operator == other.operator && super.exact(other)
 
     override fun match(other: Expression, map: MutableMap<String, Expression>) =
-            other is Operator && this.javaClass == other.javaClass &&
-                    operator == other.operator && arguments.size == other.arguments.size &&
-                    arguments.zip(other.arguments).all { it.first.match(it.second, map) }
+            other is Operator && operator == other.operator && super.match(other, map)
 }
 
 /**
  * Expression quantifiers abstract class
  */
 abstract class Quantifier(val quantifier: String, val variable: Variable,
-                          val statement: Expression) : Logic {
+                          val statement: Logic) : Logic {
+    final override val variables = HashSet<String>()
+
+    init {
+        variables.addAll(statement.variables)
+    }
+
     override fun exact(other: Expression) =
             other is Quantifier && this.javaClass == other.javaClass &&
                     variable exact other.variable && statement exact other.statement
@@ -131,7 +197,7 @@ abstract class Quantifier(val quantifier: String, val variable: Variable,
  *  @param operator a string representation of the operator
  *  @param value    unary operand
  */
-abstract class Unary(operator: String, val value: Expression) : Operator(operator, value) {
+abstract class Unary(operator: String, open val value: Expression) : Operator(operator, value) {
     override fun toString() = operator + value.stringify()
     override fun stringify() = toString()
 }
@@ -143,8 +209,8 @@ abstract class Unary(operator: String, val value: Expression) : Operator(operato
  *  @param lhs      left-hand side operand
  *  @param rhs      right-hand side operand
  */
-abstract class Binary(operator: String, val lhs: Expression,
-                      val rhs: Expression) : Operator(operator, lhs, rhs) {
+abstract class Binary(operator: String, open val lhs: Expression,
+                      open val rhs: Expression) : Operator(operator, lhs, rhs) {
     override fun toString(): String = lhs.stringify() + operator + rhs.stringify()
 }
 
@@ -154,16 +220,21 @@ abstract class Binary(operator: String, val lhs: Expression,
  * @param name      predicate name
  * @param arguments predicate arguments
  */
-open class Predicate(val name: String, vararg val arguments: Expression) : Logic {
+open class Predicate(val name: String,
+                     vararg arguments: Expression) : Parameterized(*arguments), Logic {
     override fun exact(other: Expression) =
-            other is Predicate && this.javaClass == other.javaClass &&
-                    name == other.name && arguments.size == other.arguments.size &&
-                    arguments.zip(other.arguments).all { it.first exact it.second }
+            other is Predicate && name == other.name && super.exact(other)
 
     override fun match(other: Expression, map: MutableMap<String, Expression>) =
-            other is Predicate && this.javaClass == other.javaClass &&
-                    name == other.name && arguments.size == other.arguments.size &&
-                    arguments.zip(other.arguments).all { it.first.match(it.second, map) }
+            map[name]?.exact(other) ?: {
+                map.put(name, other)
+                true
+            }()
+
+    override fun replace(variable: Variable, replacement: Math, set: MultiSet<String>) =
+            Predicate(name, *(arguments.map {
+                it.replace(variable, replacement, set)
+            }.toTypedArray()))
 
     override fun toString() =
             name + if (arguments.isEmpty()) "" else "(" + arguments.joinToString(",") + ")"
@@ -176,16 +247,18 @@ open class Predicate(val name: String, vararg val arguments: Expression) : Logic
  * @param name      function name
  * @param arguments function arguments
  */
-open class Function(val name: String, vararg val arguments: Math) : Math {
+open class Function(val name: String,
+                    vararg arguments: Math) : Parameterized(*arguments), Math {
     override fun exact(other: Expression) =
-            other is Function && this.javaClass == other.javaClass &&
-                    name == other.name && arguments.size == other.arguments.size &&
-                    arguments.zip(other.arguments).all { it.first exact it.second }
+            other is Function && name == other.name && super.exact(other)
 
     override fun match(other: Expression, map: MutableMap<String, Expression>) =
-            other is Function && this.javaClass == other.javaClass &&
-                    name == other.name && arguments.size == other.arguments.size &&
-                    arguments.zip(other.arguments).all { it.first.match(it.second, map) }
+            other is Function && name == other.name && super<Parameterized>.match(other, map)
+
+    override fun replace(variable: Variable, replacement: Math, set: MultiSet<String>) =
+            Function(name, *(arguments.map {
+                (it as Math).replace(variable, replacement, set)
+            }.toTypedArray()))
 
     override fun toString() =
             name + if (arguments.isEmpty()) "" else "(" + arguments.joinToString(",") + ")"
@@ -195,21 +268,42 @@ open class Function(val name: String, vararg val arguments: Math) : Math {
 /**
  * Universal quantifier
  */
-class Universal(variable: Variable, statement: Expression) : Quantifier("@", variable, statement)
+class Universal(variable: Variable, statement: Logic) : Quantifier("@", variable, statement) {
+    override fun replace(variable: Variable, replacement: Math,
+                         set: MultiSet<String>): Universal {
+        set.add(variable.name)
+        val q = Universal(variable, statement.replace(variable, replacement, set))
+        set.remove(variable.name)
+        return q
+    }
+}
 
-infix fun Variable.all(statement: Expression) = Universal(this, statement)
+infix fun Variable.all(statement: Logic) = Universal(this, statement)
 
 /**
  * Existential quantifier
  */
-class Existential(variable: Variable, statement: Expression) : Quantifier("?", variable, statement)
+class Existential(variable: Variable,
+                  statement: Logic) : Quantifier("?", variable, statement) {
+    override fun replace(variable: Variable, replacement: Math,
+                         set: MultiSet<String>): Existential {
+        set.add(variable.name)
+        val q = Existential(variable, statement.replace(variable, replacement, set))
+        set.remove(variable.name)
+        return q
+    }
+}
 
-infix fun Variable.exists(statement: Expression) = Existential(this, statement)
+infix fun Variable.exists(statement: Logic) = Existential(this, statement)
 
 /**
  * Equals predicate
  */
 class Equals(val lhs: Math, val rhs: Math) : Predicate("=", lhs, rhs) {
+    override fun replace(variable: Variable, replacement: Math, set: MultiSet<String>) =
+            Equals(lhs.replace(variable, replacement, set),
+                    rhs.replace(variable, replacement, set))
+
     override fun toString() = lhs.stringify() + "=" + rhs.stringify()
     override fun stringify() = "($this)"
 }
@@ -219,50 +313,92 @@ infix fun Math.equals(rhs: Math) = Equals(this, rhs)
 /**
  * Negation unary operator
  */
-class Negation(value: Logic) : Unary("!", value), Logic
+class Negation(override val value: Logic) : Unary("!", value), Logic {
+    override fun replace(variable: Variable, replacement: Math, set: MultiSet<String>) =
+            Negation(value.replace(variable, replacement, set))
+}
 
 operator fun Logic.not() = Negation(this)
 
 /**
  * Increment unary operator
  */
-class Increment(value: Math) : Unary("'", value), Math {
+class Increment(override val value: Math) : Unary("'", value), Math {
+    override fun match(other: Expression, map: MutableMap<String, Expression>): Boolean {
+        return super<Math>.match(other, map)
+    }
+
+    override fun replace(variable: Variable, replacement: Math, set: MultiSet<String>) =
+            Increment(value.replace(variable, replacement, set))
+
     override fun toString() = value.stringify() + operator
 }
 
-operator fun Math.inc() = Increment(this)
+fun Math.inc() = Increment(this)
 
 /**
  * Conjunction binary operator
  */
-class Conjunction(lhs: Logic, rhs: Logic) : Binary("&", lhs, rhs), Logic
+class Conjunction(override val lhs: Logic,
+                  override val rhs: Logic) : Binary("&", lhs, rhs), Logic {
+    override fun replace(variable: Variable, replacement: Math, set: MultiSet<String>) =
+            Conjunction(lhs.replace(variable, replacement, set),
+                    rhs.replace(variable, replacement, set))
+}
 
 infix fun Logic.conj(rhs: Logic) = Conjunction(this, rhs)
 
 /**
  * Disjunction binary operator
  */
-class Disjunction(lhs: Logic, rhs: Logic) : Binary("|", lhs, rhs), Logic
+class Disjunction(override val lhs: Logic,
+                  override val rhs: Logic) : Binary("|", lhs, rhs), Logic {
+    override fun replace(variable: Variable, replacement: Math, set: MultiSet<String>) =
+            Disjunction(lhs.replace(variable, replacement, set),
+                    rhs.replace(variable, replacement, set))
+}
 
 infix fun Logic.disj(rhs: Logic) = Disjunction(this, rhs)
 
 /**
  * Implication binary operator
  */
-class Implication(lhs: Logic, rhs: Logic) : Binary("->", lhs, rhs), Logic
+class Implication(override val lhs: Logic,
+                  override val rhs: Logic) : Binary("->", lhs, rhs), Logic {
+    override fun replace(variable: Variable, replacement: Math, set: MultiSet<String>) =
+            Implication(lhs.replace(variable, replacement, set),
+                    rhs.replace(variable, replacement, set))
+}
 
 infix fun Logic.impl(rhs: Logic) = Implication(this, rhs)
 
 /**
  * Addition binary operator
  */
-class Addition(lhs: Math, rhs: Math) : Binary("+", lhs, rhs), Math
+class Addition(override val lhs: Math, override val rhs: Math) : Binary("+", lhs, rhs), Math {
+    override fun match(other: Expression, map: MutableMap<String, Expression>): Boolean {
+        return super<Math>.match(other, map)
+    }
+
+    override fun replace(variable: Variable, replacement: Math, set: MultiSet<String>) =
+            Addition(lhs.replace(variable, replacement, set),
+                    rhs.replace(variable, replacement, set))
+}
 
 operator fun Math.plus(rhs: Math) = Addition(this, rhs)
 
 /**
  * Multiplication binary operator
  */
-class Multiplication(lhs: Math, rhs: Math) : Binary("*", lhs, rhs), Math
+class Multiplication(override val lhs: Math,
+                     override val rhs: Math) : Binary("*", lhs, rhs), Math {
+    override fun match(other: Expression, map: MutableMap<String, Expression>): Boolean {
+        return super<Math>.match(other, map)
+    }
+
+    override fun replace(variable: Variable, replacement: Math, set: MultiSet<String>) =
+            Multiplication(lhs.replace(variable, replacement, set),
+                    rhs.replace(variable, replacement, set))
+}
 
 operator fun Math.times(rhs: Math) = Multiplication(this, rhs)
