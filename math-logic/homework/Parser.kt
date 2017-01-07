@@ -150,8 +150,8 @@ open class Parser {
             if (m < r)
                 return Predicate(expression.substring(l..m - 1), *(expression
                         .substring(m + 1..r - 1)
-                        .split(",")
-                        .map { single(it) as Math }
+                        .let { many(it) }
+                        .map { it as Math }
                         .toTypedArray()))
             else
                 return Predicate(expression.substring(l..m - 1))
@@ -190,8 +190,8 @@ open class Parser {
             if (m <= r && expression[m] == '(')
                 return Function(expression.substring(l..m - 1), *(expression
                         .substring(m + 1..r - 1)
-                        .split(",")
-                        .map { single(it) as Math }
+                        .let { many(it) }
+                        .map { it as Math }
                         .toTypedArray()))
         }
 

@@ -384,7 +384,69 @@ object Second : Solver {
     }
 
     override fun check(ans: BufferedReader, out: BufferedReader) {
-        throw UnsupportedOperationException("Not implemented")
+        try {
+            val titleAns = Utils.clean(ans.readLine()).split("|-")
+            val titleOut = Utils.clean(out.readLine()).split("|-")
+
+            val assumptionsAns =
+                    if (titleAns[0].isNotEmpty())
+                        Parser.many(titleAns[0]).map { it as Logic }
+                    else
+                        emptyList<Logic>()
+            val assumptionsOut =
+                    if (titleAns[0].isNotEmpty())
+                        Parser.many(titleOut[0]).map { it as Logic }
+                    else
+                        emptyList<Logic>()
+
+            if (titleAns[1].isEmpty() || titleOut[1].isEmpty()) {
+                println("[ERROR] Unproven expression (in answer or output file) is missed")
+                return
+            }
+
+            val unprovenAns = Parser.single(titleAns[1]) as Logic
+            val unprovenOut = Parser.single(titleOut[1]) as Logic
+
+            if (!(unprovenAns exact unprovenOut)) {
+                println("[MISTAKE] Unproven expressions are not equals")
+                return
+            }
+
+            // Diff in assumptions is permitted
+
+            var counter = 1
+
+            while(true) {
+                counter++
+
+                val lineAns = ans.readLine()
+                val lineOut = out.readLine()
+
+                if ((lineAns == null || lineOut == null)) {
+                    if (lineAns != lineOut) {
+                        println("[MISTAKE] Lines counts are not equals, at line $counter got diff")
+                        return
+                    }
+
+                    break
+                }
+
+                val expressionAns = Parser.single(lineAns)
+                val expressionOut = Parser.single(lineOut)
+
+                if (!(expressionAns exact expressionOut)) {
+                    println("[MISTAKE] Expressions at line $counter are not equals")
+                    return
+                }
+            }
+
+            println("[OK] All correct :)")
+        } catch (e: Exception) {
+            println("[ERROR] Error during checking; Possibly, output is incorrect")
+            println("[INFO] There is error:")
+            println()
+            e.printStackTrace()
+        }
     }
 
     val AXIOM_EXPRESSIONS = listOf(

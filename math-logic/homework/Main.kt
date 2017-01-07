@@ -22,7 +22,7 @@ fun main(args: Array<String>) {
         println()
         println("Extra")
         println("You can check the correctness of the output")
-        println("Provide the name of the problem with `'checker'` via dash")
+        println("Provide the name of the problem with \"checker\" via dash")
         println("If needed, answer and output filenames can be provided " +
                 "(test.ans/test.out by default)")
         println("First argument for answer filename, second for output filename")
