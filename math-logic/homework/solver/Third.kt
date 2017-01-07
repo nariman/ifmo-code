@@ -13,4 +13,8 @@ object Third : Solver {
     override fun solve(`in`: BufferedReader, out: BufferedWriter) {
         throw UnsupportedOperationException("Not implemented")
     }
+
+    override fun check(ans: BufferedReader, out: BufferedReader) {
+        throw UnsupportedOperationException("Not implemented")
+    }
 }

@@ -28,5 +28,5 @@ val axioms = listOf(
 ).map { Parser.single(it) }
 
 val universal_axiom_scheme = Parser.single("@xF(x)->F(0)")
-val existence_axiom_scheme = Parser.single("F(0)->?xF(x)")
+val existential_axiom_scheme = Parser.single("F(0)->?xF(x)")
 val induction_axiom_scheme = Parser.single("F(0)&@x(F(x)->F(x'))->F(x)")

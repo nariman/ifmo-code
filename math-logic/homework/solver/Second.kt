@@ -11,6 +11,8 @@ import java.util.*
  * Solver for the second problem in a homework
  */
 object Second : Solver {
+    const val NOT_PROVED = "Не доказано"
+
     override fun solve(`in`: BufferedReader, out: BufferedWriter) {
         val title: List<String> = Utils.clean(`in`.readLine()).split("|-")
 
@@ -55,22 +57,73 @@ object Second : Solver {
         }
 
         fun deduct_axiom(expression: Expression) {
-            deduction.add("$expression")
-            deduction.add("$expression->$alpha->$expression")
-            deduction.add("$alpha->$expression")
+            if (alpha != null) {
+                val map = mapOf<Expression, Expression>(
+                        Predicate("A") to expression,
+                        Predicate("B") to alpha
+                )
+
+                AXIOM_EXPRESSIONS.forEach {
+                    deduction.add(it.replace(map).toString())
+                }
+            }
         }
+        
         fun deduct_axiom_proof() {
-            deduction.add("$alpha->$alpha->$alpha")
-            deduction.add("($alpha->$alpha->$alpha)->($alpha->($alpha->$alpha)->$alpha)->$alpha->$alpha")
-            deduction.add("($alpha->($alpha->$alpha)->$alpha)->$alpha->$alpha")
-            deduction.add("($alpha->($alpha->$alpha)->$alpha)")
-            deduction.add("$alpha->$alpha")
+            if (alpha != null) {
+                val map = mapOf<Expression, Expression>(
+                        Predicate("A") to alpha
+                )
+
+                AXIOM_PROOF_EXPRESSIONS.forEach {
+                    deduction.add(it.replace(map).toString())
+                }
+            }
         }
-        fun deduct_mp(expression: Expression) {
-            expression as Implication
-            deduction.add("($alpha->${expression.lhs})->($alpha->$expression)->$alpha->${expression.rhs}")
-            deduction.add("($alpha->$expression)->$alpha->${expression.rhs}")
-            deduction.add("$alpha->${expression.rhs}")
+        
+        fun deduct_mp(expression: Implication) {
+            if (alpha != null) {
+                val map = mapOf<Expression, Expression>(
+                        Predicate("A") to alpha,
+                        Predicate("B") to expression,
+                        Predicate("C") to expression.lhs,
+                        Predicate("D") to expression.rhs
+                )
+
+                MP_EXPRESSIONS.forEach {
+                    deduction.add(it.replace(map).toString())
+                }
+            }
+        }
+
+        fun deduct_universal(b: Expression, c: Expression, x: Expression) {
+            if (alpha != null) {
+                val map = mapOf(
+                        Predicate("A") to alpha,
+                        Predicate("B") to b,
+                        Predicate("C") to c,
+                        Variable("x") to x
+                )
+
+                UNIVERSAL_RULE.forEach {
+                    deduction.add(it.replace(map).toString())
+                }
+            }
+        }
+
+        fun deduct_existential(b: Expression, c: Expression, x: Expression) {
+            if (alpha != null) {
+                val map = mapOf(
+                        Predicate("A") to alpha,
+                        Predicate("B") to b,
+                        Predicate("C") to c,
+                        Variable("x") to x
+                )
+
+                EXISTENTIAL_RULE.forEach {
+                    deduction.add(it.replace(map).toString())
+                }
+            }
         }
 
         fun mismatch(e1: Expression, e2: Expression, x: Variable): Expression? {
@@ -86,7 +139,7 @@ object Second : Solver {
                 return m
             } else if (e1 is Quantifier && e1.javaClass == e2.javaClass) {
                 return mismatch(e1.statement, (e2 as Quantifier).statement, x)
-            } else if (e1 is Variable && e1 == x) {
+            } else if (e1 is Variable && e1 exact x) {
                 return e2
             }
 
@@ -100,7 +153,8 @@ object Second : Solver {
             for (i in 0..axioms.size - 1) {
                 if (axioms[i] exact expression) {
                     save(expression, Annotation.Axiom(axioms[i]), "Акс. ${i + 1}")
-                    if (alpha != null) deduct_axiom(expression)
+                    deduct_axiom(expression)
+
                     continue@loop
                 }
             }
@@ -108,7 +162,8 @@ object Second : Solver {
             for (i in 0..axiom_schemes.size - 1) {
                 if (axiom_schemes[i] match expression) {
                     save(expression, Annotation.Axiom(axiom_schemes[i]), "Сх. акс. ${i + 1}")
-                    if (alpha != null) deduct_axiom(expression)
+                    deduct_axiom(expression)
+
                     continue@loop
                 }
             }
@@ -116,9 +171,17 @@ object Second : Solver {
             for (i in 0..assumptions.size - 1) {
                 if (assumptions[i] exact expression) {
                     save(expression, Annotation.Assumption(assumptions[i]), "Предп. ${i + 1}")
-                    if (alpha != null) deduct_axiom(expression)
+                    deduct_axiom(expression)
+
                     continue@loop
                 }
+            }
+
+            if (alpha != null && alpha exact expression) {
+                save(expression, Annotation.Assumption(alpha), "Предп.")
+                deduct_axiom_proof()
+
+                continue@loop
             }
 
             for (j in rights[expression.toString()] ?: emptyList<ArrayList<Int>>())
@@ -131,7 +194,9 @@ object Second : Solver {
                             ),
                             "M.P. ${fulls[(expressions[j] as Implication).lhs.toString()]}, $j"
                     )
-                    deduct_mp(expressions[j]!!)
+
+                    deduct_mp(expressions[j] as Implication)
+
                     continue@loop
                 }
 
@@ -141,89 +206,269 @@ object Second : Solver {
                 expression.lhs.rhs as Universal
                 expression.lhs.rhs.statement as Implication
 
-                val phi = expression.rhs
+                val f = expression.rhs
                 val x = expression.lhs.rhs.variable
 
                 try {
-                    if (phi.replace(x, Constant(0)) exact expression.lhs.lhs &&
-                            phi.replace(x, Increment(x)) exact expression.lhs.rhs.statement.rhs) {
+                    if (f.substitute(x, Constant(0)) exact expression.lhs.lhs &&
+                            f.substitute(x, Increment(x)) exact expression.lhs.rhs.statement.rhs) {
                         save(expression, Annotation.Axiom(induction_axiom_scheme), "Сх. акс.")
-                        if (alpha != null) deduct_axiom(expression)
+                        deduct_axiom(expression)
+
                         continue@loop
                     }
                 } catch (e: IllegalArgumentException) {} // Possible next variants
-            }
-
-            if (alpha != null && alpha exact expression) {
-                save(expression, Annotation.Assumption(alpha), "Предп.")
-                deduct_axiom_proof()
-                continue@loop
             }
 
             if (universal_axiom_scheme match expression) {
                 expression as Implication
                 expression.lhs as Universal
 
-                val phi = expression.lhs.statement
+                val f = expression.lhs.statement
                 val x = expression.lhs.variable
-                val term = mismatch(phi, expression.rhs, x)!! as Math
+                val t = mismatch(f, expression.rhs, x) as? Math
 
                 try {
-                    if (phi.replace(x, term) exact expression.rhs) {
-                        save(expression, Annotation.Axiom(universal_axiom_scheme), "Сх акс. 11")
-                        if (alpha != null) deduct_axiom(expression)
+                    if ((if (t == null) f else f.substitute(x, t)) exact expression.rhs) {
+                        save(expression, Annotation.Axiom(universal_axiom_scheme), "Сх. акс. 11")
+                        deduct_axiom(expression)
+
                         continue@loop
                     }
                 } catch (e: IllegalArgumentException) {
                     save(
                             expression,
                             Annotation.Mistake(),
-                            "Терм $term не свободен для подстановки в формулу $phi вместо $x"
+                            "Терм $t не свободен для подстановки в формулу $f вместо $x"
                     )
+
                     break@loop
                 }
             }
 
-            if (existence_axiom_scheme match expression) {
+            if (existential_axiom_scheme match expression) {
                 expression as Implication
                 expression.rhs as Existential
 
-                val phi = expression.rhs.statement
+                val f = expression.rhs.statement
                 val x = expression.rhs.variable
-                val term = mismatch(phi, expression.lhs, x)!! as Math
+                val t = mismatch(f, expression.lhs, x) as? Math
 
                 try {
-                    if (phi.replace(x, term) exact expression.lhs) {
-                        save(expression, Annotation.Axiom(existence_axiom_scheme), "Сх акс. 12")
-                        if (alpha != null) deduct_axiom(expression)
+                    if ((if (t == null) f else f.substitute(x, t)) exact expression.lhs) {
+                        save(expression, Annotation.Axiom(existential_axiom_scheme), "Сх. акс. 12")
+                        deduct_axiom(expression)
+
                         continue@loop
                     }
                 } catch (e: IllegalArgumentException) {
                     save(
                             expression,
                             Annotation.Mistake(),
-                            "Терм $term не свободен для подстановки в формулу $phi вместо $x"
+                            "Терм $t не свободен для подстановки в формулу $f вместо $x"
+                    )
+
+                    break@loop
+                }
+            }
+
+            if (expression is Implication && expression.rhs is Universal) {
+                val x = expression.rhs.variable
+                var free: Boolean
+
+                try {
+                    free = !(expression.lhs.substitute(x, Constant(0)) exact expression.lhs)
+                } catch (e: IllegalArgumentException) {
+                    free = false
+                }
+
+                if (fulls[(expression.lhs impl expression.rhs.statement).toString()] != null &&
+                        !free) {
+                    if (alpha != null) {
+                        if (alpha.substitute(x, Constant(0)) exact alpha) {
+                            save(expression, Annotation.Universal(), "Universal rule")
+                            deduct_universal(expression.lhs, expression.rhs.statement, x)
+
+                            continue@loop
+                        } else {
+                            save(
+                                    expression,
+                                    Annotation.Mistake(),
+                                    "Используется правило с квантором по переменной $x,\n" +
+                                            "входящей свободно в допущение $alpha"
+                            )
+
+                            break@loop
+                        }
+                    } else {
+                        save(expression, Annotation.Universal(), "Universal rule")
+                        continue@loop
+                    }
+                } else if (free) {
+                    save(
+                            expression,
+                            Annotation.Mistake(),
+                            "Переменная $x входит свободно в формулу ${expression.lhs}"
                     )
                     break@loop
                 }
             }
 
-            save(expression, Annotation.Mistake(), "Не доказано")
+            if (expression is Implication && expression.lhs is Existential) {
+                val x = expression.lhs.variable
+                var free: Boolean
+
+                try {
+                    free = !(expression.rhs.substitute(x, Constant(0)) exact expression.rhs)
+                } catch (e: IllegalArgumentException) {
+                    free = false
+                }
+
+                if (fulls[(expression.lhs.statement impl expression.rhs).toString()] != null &&
+                        !free) {
+                    if (alpha != null) {
+                        if (alpha.substitute(x, Constant(0)) exact alpha) {
+                            save(expression, Annotation.Existential(), "Existential rule")
+                            deduct_existential(expression.lhs.statement, expression.rhs, x)
+
+                            continue@loop
+                        } else {
+                            save(
+                                    expression,
+                                    Annotation.Mistake(),
+                                    "Используется правило с квантором по переменной $x,\n" +
+                                            "входящей свободно в допущение $alpha"
+                            )
+
+                            break@loop
+                        }
+                    } else {
+                        save(expression, Annotation.Existential(), "Existential rule")
+                        continue@loop
+                    }
+                } else if (free) {
+                    save(
+                            expression,
+                            Annotation.Mistake(),
+                            "Переменная $x входит свободно в формулу ${expression.rhs}"
+                    )
+
+                    break@loop
+                }
+            }
+
+            save(expression, Annotation.Mistake(), NOT_PROVED)
             break@loop
         }
 
         if (annotations[counter] is Annotation.Mistake) {
-            out.write("Вывод неверен начиная с формулы номер $counter: ")
-            out.write(messages[counter])
+            out.write("Вывод неверен начиная с формулы номер $counter")
+
+            if (messages[counter] != NOT_PROVED)
+                out.write(": ${messages[counter]}")
         } else {
             if (alpha != null) {
-                out.write("${assumptions.joinToString(",")}|-${Implication(alpha, unproven)}\n")
-                for (expression in deduction) out.write("$expression\n")
+                out.write(assumptions.map { it.stringify() }.joinToString(","))
+                out.write("|-${alpha impl unproven}\n")
+
+                for (expression in deduction)
+                    out.write("$expression\n")
             }
             else {
                 out.write("|-$unproven\n") // If alpha is null, then assumptions list is empty
-                for ((c, expression) in expressions) out.write("$expression\n")
+
+                for (expression in expressions.values)
+                    out.write("$expression\n")
             }
         }
     }
+
+    override fun check(ans: BufferedReader, out: BufferedReader) {
+        throw UnsupportedOperationException("Not implemented")
+    }
+
+    val AXIOM_EXPRESSIONS = listOf(
+            "A",
+            "A -> B -> A",
+            "B -> A"
+    ).map { Parser.single(it) }
+
+    val AXIOM_PROOF_EXPRESSIONS = listOf(
+            "A -> A -> A",
+            "(A -> A -> A) -> (A -> (A -> A) -> A) -> A -> A",
+            "(A -> (A -> A) -> A) -> A -> A",
+            "(A -> (A -> A) -> A)",
+            "A -> A"
+    ).map { Parser.single(it) }
+
+    val MP_EXPRESSIONS = listOf(
+            "(A -> C) -> (A -> B) -> (A -> D)",
+            "(A -> B) -> (A -> D)",
+            "A -> D"
+    ).map { Parser.single(it) }
+
+    val UNIVERSAL_RULE = listOf(
+            "A->B->C",
+            "A&B->A",
+            "A&B->B",
+            "A->B->C",
+            "(A->B->C)->A&B->A->B->C",
+            "A&B->A->B->C",
+            "(A&B->A)->(A&B->A->B->C)->A&B->B->C",
+            "(A&B->A->B->C)->A&B->B->C",
+            "A&B->B->C",
+            "(A&B->B)->(A&B->B->C)->(A&B->C)",
+            "(A&B->B->C)->(A&B->C)",
+            "A&B->C",
+            "A&B->@xC",
+            "A->B->A&B",
+            "A&B->@xC",
+            "(A&B->@xC)->A->A&B->@xC",
+            "A->A&B->@xC",
+            "(A&B->@xC)->B->A&B->@xC",
+            "((A&B->@xC)->B->A&B->@xC)->A->(A&B->@xC)->B->A&B->@xC",
+            "A->(A&B->@xC)->B->A&B->@xC",
+            "(A->A&B->@xC)->(A->((A&B->@xC)->B->A&B->@xC))->A->B->A&B->@xC",
+            "(A->((A&B->@xC)->B->A&B->@xC))->A->B->A&B->@xC",
+            "A->B->A&B->@xC",
+            "(B->A&B)->(B->A&B->@xC)->B->@xC",
+            "((B->A&B)->(B->A&B->@xC)->B->@xC)->A->(B->A&B)->(B->A&B->@xC)->B->@xC",
+            "A->(B->A&B)->(B->A&B->@xC)->B->@xC",
+            "(A->B->A&B)->(A->(B->A&B)->(B->A&B->@xC)->B->@xC)->A->(B->A&B->@xC)->B->@xC",
+            "(A->(B->A&B)->(B->A&B->@xC)->B->@xC)->A->(B->A&B->@xC)->B->@xC",
+            "A->(B->A&B->@xC)->B->@xC",
+            "(A->B->A&B->@xC)->(A->(B->A&B->@xC)->B->@xC)->A->B->@xC",
+            "(A->(B->A&B->@xC)->B->@xC)->A->B->@xC",
+            "A->B->@xC"
+    ).map { Parser.single(it) }
+
+    val EXISTENTIAL_RULE = listOf(
+            "B->A->B",
+            "A->B->C",
+            "(A->B->C)->B->A->B->C",
+            "B->A->B->C",
+            "(A->B)->(A->B->C)->A->C",
+            "((A->B)->(A->B->C)->A->C)->B->(A->B)->(A->B->C)->A->C",
+            "B->(A->B)->(A->B->C)->A->C",
+            "(B->A->B)->(B->(A->B)->(A->B->C)->A->C)->B->(A->B->C)->A->C",
+            "(B->(A->B)->(A->B->C)->A->C)->B->(A->B->C)->A->C",
+            "B->(A->B->C)->A->C",
+            "(B->A->B->C)->(B->(A->B->C)->A->C)->B->A->C",
+            "(B->(A->B->C)->A->C)->B->A->C",
+            "B->A->C",
+            "?xB->A->C",
+            "A->?xB->A",
+            "?xB->A->C",
+            "(?xB->A->C)->A->?xB->A->C",
+            "A->?xB->A->C",
+            "(?xB->A)->(?xB->A->C)->?xB->C",
+            "((?xB->A)->(?xB->A->C)->?xB->C)->A->(?xB->A)->(?xB->A->C)->?xB->C",
+            "A->(?xB->A)->(?xB->A->C)->?xB->C",
+            "(A->?xB->A)->(A->(?xB->A)->(?xB->A->C)->?xB->C)->A->(?xB->A->C)->?xB->C",
+            "(A->(?xB->A)->(?xB->A->C)->?xB->C)->A->(?xB->A->C)->?xB->C",
+            "A->(?xB->A->C)->?xB->C",
+            "(A->?xB->A->C)->(A->(?xB->A->C)->?xB->C)->A->?xB->C",
+            "(A->(?xB->A->C)->?xB->C)->A->?xB->C",
+            "A->?xB->C"
+    ).map { Parser.single(it) }
 }

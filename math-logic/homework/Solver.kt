@@ -11,4 +11,6 @@ import java.io.BufferedWriter
  */
 interface Solver {
     fun solve(`in`: BufferedReader, out: BufferedWriter)
+
+    fun check(ans: BufferedReader, out: BufferedReader)
 }

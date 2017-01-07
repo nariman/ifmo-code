@@ -151,4 +151,8 @@ object First : Solver {
             save("Не доказано", expression)
         }
     }
+
+    override fun check(ans: BufferedReader, out: BufferedReader) {
+        throw UnsupportedOperationException("Not implemented")
+    }
 }
