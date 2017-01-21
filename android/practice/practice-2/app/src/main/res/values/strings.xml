@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">Worldcam Demo</string>
+    <string name="invalid_value">Недопустимое значение</string>
+</resources>

@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">TMDB Demo</string>
+
+    <string name="movie_desc_by_lang_not_available">Unfortunately, but movie\'s description is not available on your language.</string>
+    <string name="no_more_movies_avaiable">No more movies available</string>
+    <string name="unexpected_error">There was an unexpected error, and we don\'t know why…</string>
+    <string name="no_internet">No internet connection</string>
+    <string name="error_while_data_loading">An error occurred while loading data</string>
+    <string name="try_again">Try again</string>
+</resources>

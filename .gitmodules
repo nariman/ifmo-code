@@ -4,3 +4,63 @@
 [submodule "paradigms/intro/java-intro-2015"]
 	path = paradigms/intro/java-intro-2015
 	url = https://github.com/kgeorgiy/java-intro-2015
+[submodule "android/remotes/info"]
+	path = android/remotes/info
+	url = https://github.com/IFMO-Android-2016/info
+[submodule "android/remotes/lessons/lesson1"]
+	path = android/remotes/lessons/lesson1
+	url = https://github.com/IFMO-Android-2016/lesson1
+[submodule "android/remotes/practice/practice1"]
+	path = android/remotes/practice/practice1
+	url = https://github.com/IFMO-Android-2016/practice1
+[submodule "android/remotes/homework/homework1"]
+	path = android/remotes/homework/homework1
+	url = https://github.com/IFMO-Android-2016/homework1
+[submodule "android/remotes/lessons/lesson2"]
+	path = android/remotes/lessons/lesson2
+	url = https://github.com/IFMO-Android-2016/lesson2
+[submodule "android/remotes/lessons/lesson3"]
+	path = android/remotes/lessons/lesson3
+	url = https://github.com/IFMO-Android-2016/lesson3
+[submodule "android/remotes/lessons/lesson4"]
+	path = android/remotes/lessons/lesson4
+	url = https://github.com/IFMO-Android-2016/lesson4
+[submodule "android/remotes/practice/practice2"]
+	path = android/remotes/practice/practice2
+	url = https://github.com/IFMO-Android-2016/practice2
+[submodule "android/remotes/lessons/lesson5"]
+	path = android/remotes/lessons/lesson5
+	url = https://github.com/IFMO-Android-2016/lesson5
+[submodule "android/remotes/homework/homework2"]
+	path = android/remotes/homework/homework2
+	url = https://github.com/IFMO-Android-2016/homework2
+[submodule "android/remotes/lessons/lesson6"]
+	path = android/remotes/lessons/lesson6
+	url = https://github.com/IFMO-Android-2016/lesson6
+[submodule "android/remotes/practice/practice3"]
+	path = android/remotes/practice/practice3
+	url = https://github.com/IFMO-Android-2016/practice3
+[submodule "android/remotes/lessons/lesson7"]
+	path = android/remotes/lessons/lesson7
+	url = https://github.com/IFMO-Android-2016/lesson7
+[submodule "android/remotes/homework/homework3"]
+	path = android/remotes/homework/homework3
+	url = https://github.com/IFMO-Android-2016/homework3
+[submodule "android/remotes/lessons/lesson8"]
+	path = android/remotes/lessons/lesson8
+	url = https://github.com/IFMO-Android-2016/lesson8
+[submodule "android/remotes/homework/homework4"]
+	path = android/remotes/homework/homework4
+	url = https://github.com/IFMO-Android-2016/homework4
+[submodule "android/remotes/lessons/lesson9"]
+	path = android/remotes/lessons/lesson9
+	url = https://github.com/IFMO-Android-2016/lesson9
+[submodule "android/remotes/lessons/lesson10"]
+	path = android/remotes/lessons/lesson10
+	url = https://github.com/IFMO-Android-2016/lesson10
+[submodule "android/remotes/lessons/lesson11"]
+	path = android/remotes/lessons/lesson11
+	url = https://github.com/IFMO-Android-2016/lesson11
+[submodule "math-logic/logic2016"]
+	path = math-logic/logic2016
+	url = https://github.com/shd/logic2016.git

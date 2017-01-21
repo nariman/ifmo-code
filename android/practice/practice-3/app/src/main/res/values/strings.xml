@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">Vk IFMO Demo</string>
+    <string name="logout">Выйти</string>
+    <string name="error">Ошибка</string>
+    <string name="ok_demo">OK Demo</string>
+    <string name="no_internet">Отсуствует соединение</string>
+    <string name="signin_vk">Войти через ВКонтакте</string>
+    <string name="login_successful">Логин выполнен</string>
+    <string name="login_failed">Ошибка логина</string>
+    <string name="already_logged_in">Логин был выполнен ранее</string>
+</resources>

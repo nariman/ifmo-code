@@ -1,0 +1,33 @@
+language: android
+
+jdk:
+  - oraclejdk8
+
+env:
+  matrix:
+    - ANDROID_TARGET=android-24
+    - ANDROID_TARGET=android-17
+
+android:
+  components:
+    - platform-tools
+    - tools
+
+    - build-tools-24.0.2
+
+    - android-24
+    # - android-23
+    # - android-22
+    # - android-21
+    # - android-20
+    # - android-19
+    # - android-18
+    - android-17
+
+    - extra-android-m2repository
+
+before_script:
+  - cd Calc
+
+script:
+  - ./gradlew build connectedCheck
