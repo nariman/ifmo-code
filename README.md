@@ -1,10 +1,8 @@
 # ITMO University
-### Computer Technologies Chair / Information Technologies and Programming Faculty / Internet Technologies and Programming Faculty
+### Computer Technologies Chair / Information Technologies and Programming Faculty / Internet Technologies and Programming MegaFaculty
 
-Completely all source code, written while at ITMO University, except some project's sources.  
+Completely all source code, written by me while at ITMO University, except some project's sources.  
 It's not an "open-source project", that means code style sometimes leaves a lot to be desired, but I did my best.
-
-[![Code Climate](https://codeclimate.com/github/woofilee/ifmo-code/badges/gpa.svg)](https://codeclimate.com/github/woofilee/ifmo-code)
 
 ### For ITMO students
 
@@ -14,13 +12,21 @@ Thanks.
 
 ### Repository structure
 
-Sources, that belongs to discipline of current semester, not merged to master branch.  
+Sources, that belongs to discipline of current term, not merged to the master branch.  
 See topic branches for latest changes.
 
 Disciplines:
 * **[algorithms](algorithms/)** - Algorithms and Data Structures
 * **[android](android/)** - Android
-* **[cpp](cpp/)** - C/C++ languages
-* **[discrete-math](discrete-math/)** - Discrete math
-* **[math-logic](math-logic/)** - Math logic
+* **[cpp](cpp/)** - C/C++ language
+* **[discrete-math](discrete-math/)** - Discrete Math
+* **[math-logic](math-logic/)** - Math Logic
 * **[paradigms](paradigms/)** - Programming Paradigms
+
+Sometimes you can find some submodules (remote repositories). It's worth paying attention to them.
+
+### License
+
+There is no license due to it's my private code, that means you have no permission to use, modify, or share the code in this repo.  
+But you're free to explore the code.  
+All third party libraries and code written by other authors, belongs to their authors.
