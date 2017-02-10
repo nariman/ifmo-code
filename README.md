@@ -25,6 +25,12 @@ Disciplines:
 
 Sometimes you can find some submodules (remote repositories). It's worth paying attention to them.
 
+### Related
+
+* **[ifmo-kt](https://github.com/egormkn/ifmo-kt)** by **[@egormkn](https://github.com/egormkn)**, with a homepage at **[ifmo.gear.su](http://ifmo.gear.su/)**
+* **[ifmo-code](https://github.com/DimaStoyanov/Ifmo-code)** by **[@DimaStoyanov](https://github.com/DimaStoyanov)**
+* ... here could be your advertising
+
 ### License
 
 There is no license due to it's my private code, that means you have no permission to use, modify, or share the code in this repo.  
