@@ -21,7 +21,7 @@ Disciplines:
 * **[cpp](cpp/)** - C/C++ language
 * **[discrete-math](discrete-math/)** - Discrete Math
 * **[math-logic](math-logic/)** - Math Logic
-* **[paradigms](paradigms/)** - Programming Paradigms
+* **[programming-paradigms](programming-paradigms/)** - Programming Paradigms (Java, JavaScript, Clojure)
 
 Sometimes you can find some submodules (remote repositories). It's worth paying attention to them.
 

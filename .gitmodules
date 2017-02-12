@@ -1,8 +1,8 @@
-[submodule "paradigms/paradigms-2016"]
-	path = paradigms/paradigms-2016
+[submodule "programming-paradigms/paradigms-2016"]
+	path = programming-paradigms/paradigms-2016
 	url = https://github.com/kgeorgiy/paradigms-2016
-[submodule "paradigms/intro/java-intro-2015"]
-	path = paradigms/intro/java-intro-2015
+[submodule "programming-paradigms/intro/java-intro-2015"]
+	path = programming-paradigms/intro/java-intro-2015
 	url = https://github.com/kgeorgiy/java-intro-2015
 [submodule "android/remotes/info"]
 	path = android/remotes/info
