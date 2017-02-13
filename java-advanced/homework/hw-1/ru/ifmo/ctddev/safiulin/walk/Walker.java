@@ -1,6 +1,6 @@
 /*
  * Nariman Safiulin (woofilee)
- * File: Walk.java
+ * File: Walker.java
  * Created on: Feb 12, 2017
  */
 
@@ -61,14 +61,16 @@ public class Walker {
         try {
             input = Files.newBufferedReader(is);
         } catch (IOException | SecurityException e) {
-            System.err.println("Can't open the input file. Please, check the file path correctness and availability.");
+            System.err.println("Can't open the input file. Please, check the file path " + 
+                               "correctness and availability.");
             return;
         }
 
         try {
             output = Files.newBufferedWriter(os);
         } catch (IOException | SecurityException e) {
-            System.err.println("Can't create the output file. Please, check the file path correctness and availability.");
+            System.err.println("Can't create the output file. Please, check the file path " + 
+                               "correctness and availability.");
             return;
         }
 
@@ -76,49 +78,55 @@ public class Walker {
         try {
             Iterator<String> lines = input.lines().iterator();
 
-            while (lines.hasNext()) {
-                String line = lines.next();
-                Iterator<Path> paths;
-
-                try {
-                    paths = Files.walk(Paths.get(line))
-                                 .filter(Files::isRegularFile)
-                                 .iterator();
-                } catch (IOException | SecurityException e) {
-                    System.err.println(String.format("Can't open a path for hashing: %s", line));
-
-                    output.write(String.format("%08x %s\n", ERROR_HASH, line));
-                    continue;
-                }
-
-                while (paths.hasNext()) {
-                    Path path = paths.next();
-                    int hash = DEFAULT_HASH;
+            try {
+                while (lines.hasNext()) {
+                    String line = lines.next();
+                    Iterator<Path> paths;
 
                     try {
-                        BufferedInputStream in = 
-                            new BufferedInputStream(Files.newInputStream(path));
+                        paths = Files.walk(Paths.get(line))
+                                    .filter(Files::isRegularFile)
+                                    .iterator();
+                    } catch (IOException | SecurityException e) {
+                        System.err.println(String.format("Can't open a path for hashing: %s", 
+                                                         line));
 
-                        byte[] bytes = new byte[BUFFER_SIZE];
-                        int length;
-
-                        while ((length = in.read(bytes)) >= 0) {
-                            for (int i = 0; i < length; i++) {
-                                hash *= FNV_PRIME;
-                                hash ^= bytes[i] & 0xFF;
-                            }
-                        }
-                    } catch (IOException e) {
-                        System.err.println(
-                            String.format("Can't read a file for hashing: %s", path.toString()));
-                        hash = ERROR_HASH;
+                        output.write(String.format("%08x %s\n", ERROR_HASH, line));
+                        continue;
                     }
 
-                    output.write(String.format("%08x %s\n", hash, path.toString()));
+                    while (paths.hasNext()) {
+                        Path path = paths.next();
+                        int hash = DEFAULT_HASH;
+
+                        try {
+                            BufferedInputStream in =
+                                new BufferedInputStream(Files.newInputStream(path));
+
+                            byte[] bytes = new byte[BUFFER_SIZE];
+                            int length;
+
+                            while ((length = in.read(bytes)) >= 0) {
+                                for (int i = 0; i < length; i++) {
+                                    hash *= FNV_PRIME;
+                                    hash ^= bytes[i] & 0xFF;
+                                }
+                            }
+                        } catch (IOException e) {
+                            System.err.println(String.format("Can't read a file for hashing: %s", 
+                                                             path.toString()));
+                            hash = ERROR_HASH;
+                        }
+
+                        output.write(String.format("%08x %s\n", hash, path.toString()));
+                    }
                 }
+            } catch (UncheckedIOException e) {
+                System.err.println("Error during reading the input file...");
+                return;
             }
         } catch (IOException e) {
-            System.err.println("Can't write to output file...");
+            System.err.println("Can't write to the output file...");
             return;
         }
 
@@ -136,11 +144,12 @@ public class Walker {
         if (args.length < 2) {
             Stream.of(
                 "Please, provide an required arguments:",
-                " - input file  - file path with the list of filenames/directories for hash calculating",
-                " - output file - file path, where result of hash calculating will be stored, for each file in the input file",
+                " - input filename  - file with the list of filenames/directories for hash " + 
+                                                                                "calculating",
+                " - output filename - file, where results of hash calculating will be stored",
                 "",
                 "Format:",
-                ">> java Walk <input file> <output file>",
+                ">> java Walk <input filename> <output filename>",
                 "",
                 "For example:",
                 ">> java Walk ./tests/input.txt ./tests/output.txt"
@@ -149,6 +158,10 @@ public class Walker {
             return;
         }
 
-        Walker.walk(Paths.get(args[0]), Paths.get(args[1]));
+        try {
+            Walker.walk(Paths.get(args[0]), Paths.get(args[1]));
+        } catch (InvalidPathException e) {
+            System.err.println("Can't recognise a paths in input and/or ouput file paths.");
+        }
     }
 }

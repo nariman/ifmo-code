@@ -76,6 +76,42 @@ public class WalkTest extends BaseTest {
         test(randomFiles(10, 1_000_000));
     }
 
+    @Test
+    public void test08_chineseSupport() throws IOException {
+        final String alphabet = ALPHABET;
+        ALPHABET = "\u8acb\u554f\u4f60\u7684\u7a0b\u5e8f\u652f\u6301\u4e2d\u570b";
+        test(randomFiles(10, 100));
+        ALPHABET = alphabet;
+    }
+
+    @Test
+    public void test09_noInput() throws IOException {
+        runRaw(randomFileName(), randomFileName());
+    }
+
+    @Test
+    public void test10_invalidInput() throws IOException {
+        runRaw("/", randomFileName());
+    }
+
+    @Test
+    public void test11_invalidOutput() throws IOException {
+        runRaw(createEmptyFile(name.getMethodName()), "/");
+    }
+
+    @Test
+    public void test12_singleArgument() throws IOException {
+        runRaw(createEmptyFile(name.getMethodName()));
+    }
+
+    @Test
+    public void test13_veryLargeFile() throws IOException {
+        final String alphabet = ALPHABET;
+        ALPHABET = "\u8acb\u554f\u4f60\u7684\u7a0b\u5e8f\u652f\u6301\u4e2d\u570b";
+        test(randomFiles(1, 100_000_00));
+        ALPHABET = alphabet;
+    }
+
     private String createEmptyFile(final String name) throws IOException {
         final Path input = DIR.resolve(name);
         Files.write(input, new byte[0]);

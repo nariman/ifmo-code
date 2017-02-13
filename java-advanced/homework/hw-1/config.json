@@ -22,8 +22,8 @@
             "hard": "info.kgeorgiy.java.advanced.walk.Tester RecursiveWalk"
         },
         "entries": {
-            "easy": "ru.ifmo.ctddev.safiulin.walk.Walker",
-            "hard": "ru.ifmo.ctddev.safiulin.walk.Walker"
+            "easy": "ru.ifmo.ctddev.safiulin.walk.Walker zzzz",
+            "hard": "ru.ifmo.ctddev.safiulin.walk.Walker zzzz"
         }
     }
 }
