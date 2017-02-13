@@ -39,7 +39,6 @@ def create_parser():
     task.add_argument("-b", "--build", action="store_true", default=False)
     task.add_argument("-t", "--test", "-r", "--run", action="store_true",
                       default=False)
-    task.add_argument("-c", "--clean", action="store_true", default=False)
     task.add_argument("task", type=int)
     task.add_argument("difficulties", nargs=argparse.REMAINDER)
 
