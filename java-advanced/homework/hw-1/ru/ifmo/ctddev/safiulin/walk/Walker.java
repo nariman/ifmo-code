@@ -8,95 +8,73 @@ package ru.ifmo.ctddev.safiulin.walk;
 
 import java.io.*;
 import java.util.*;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.nio.file.*;
 
 /**
  * Simple file system walker.
- * 
- * Calculates FNV hash for each file, listed in the input file, And
- * stores it in the output file.
- * All directories will be recursively walked.
  */
 public class Walker {
     /**
      * Default FNV hash
      */
-    int DEFAULT_HASH = 0x811c9dc5;
+    public static final int DEFAULT_HASH = 0x811c9dc5;
 
     /**
      * Hash for the invalid files
      */
-    int ERROR_HASH = 0x00000000;
+    public static final int ERROR_HASH = 0x00000000;
 
     /**
      * Prime number for the FNV hash
      */
-    int FNV_PRIME = 0x01000193;
+    public static final int FNV_PRIME = 0x01000193;
 
     /**
      * Buffer size for the hash proccess, in bytes
      */
-    int BUFFER_SIZE = 8192;
+    private static final int BUFFER_SIZE = 8192;
+
+    private Walker() {}
 
     /**
-     * Input file
+     * Calculates FNV hash for each file, listed in the input file, and
+     * stores it in the output file.
+     * All directories will be recursively walked.
+     * 
+     * @param is
+     *        input file path
+     * @param os
+     *        output file path
      */
-    BufferedReader input;
+    public static void walk(Path is, Path os) {
+        /**
+         * Input file
+         */
+        BufferedReader input;
 
-    /**
-     * Output file
-     */
-    BufferedWriter output;
+        /**
+         * Output file
+         */
+        BufferedWriter output;
 
-    public static void main(String[] args) throws Exception {
-        if (args.length < 2) {
-            Stream.of(
-                "Please, provide an required arguments:",
-                " - input file  - file path with the list of filenames/directories for hash calculating",
-                " - output file - file path, where result of hash calculating will be stored, for each file in the input file",
-                "",
-                "Format:",
-                ">> java Walk <input file> <output file>",
-                "",
-                "For example:",
-                ">> java Walk ./tests/input.txt ./tests/output.txt"
-            ).forEach(System.out::println);
-
-            return;
-        }
-
-        new Walker(Paths.get(args[0]), Paths.get(args[1]));
-    }
-
-    public Walker(Path input, Path output) {        
         try {
-            this.input = Files.newBufferedReader(input);
-        } catch (IOException e) {
-            System.err.println(
-                "Can't open the input file. Please, check the file path correctness.");
-            return;
-        } catch (SecurityException e) {
-            System.err.println("Can't open the input file. Please, check the file availability.");
+            input = Files.newBufferedReader(is);
+        } catch (IOException | SecurityException e) {
+            System.err.println("Can't open the input file. Please, check the file path correctness and availability.");
             return;
         }
 
         try {
-            this.output = Files.newBufferedWriter(output);
-        } catch (IOException e) {
-            System.err.println(
-                "Can't create the output file. Please, check the file path correctness.");
-            return;
-        } catch (SecurityException e) {
-            System.err.println(
-                "Can't create the output file. Please, check the path availability.");
+            output = Files.newBufferedWriter(os);
+        } catch (IOException | SecurityException e) {
+            System.err.println("Can't create the output file. Please, check the file path correctness and availability.");
             return;
         }
 
-        
+
         try {
-            Iterator<String> lines = this.input.lines().iterator();
+            Iterator<String> lines = input.lines().iterator();
 
             while (lines.hasNext()) {
                 String line = lines.next();
@@ -109,7 +87,7 @@ public class Walker {
                 } catch (IOException | SecurityException e) {
                     System.err.println(String.format("Can't open a path for hashing: %s", line));
 
-                    this.output.write(String.format("%08x %s\n", ERROR_HASH, line));
+                    output.write(String.format("%08x %s\n", ERROR_HASH, line));
                     continue;
                 }
 
@@ -136,7 +114,7 @@ public class Walker {
                         hash = ERROR_HASH;
                     }
 
-                    this.output.write(String.format("%08x %s\n", hash, path.toString()));
+                    output.write(String.format("%08x %s\n", hash, path.toString()));
                 }
             }
         } catch (IOException e) {
@@ -144,11 +122,33 @@ public class Walker {
             return;
         }
 
+
         try {
-            this.output.close();
-            this.input.close();
+            output.close();
+            input.close();
         } catch (IOException e) {
+            // Stupid Java closing logic
             e.printStackTrace();
         }
+    }
+
+    public static void main(String[] args) throws Exception {
+        if (args.length < 2) {
+            Stream.of(
+                "Please, provide an required arguments:",
+                " - input file  - file path with the list of filenames/directories for hash calculating",
+                " - output file - file path, where result of hash calculating will be stored, for each file in the input file",
+                "",
+                "Format:",
+                ">> java Walk <input file> <output file>",
+                "",
+                "For example:",
+                ">> java Walk ./tests/input.txt ./tests/output.txt"
+            ).forEach(System.out::println);
+
+            return;
+        }
+
+        Walker.walk(Paths.get(args[0]), Paths.get(args[1]));
     }
 }
