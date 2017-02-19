@@ -29,6 +29,8 @@ Sometimes you can find some submodules (remote repositories). It's worth paying 
 
 * **[ifmo-kt](https://github.com/egormkn/ifmo-kt)** by **[@egormkn](https://github.com/egormkn)**, with a homepage at **[ifmo.gear.su](http://ifmo.gear.su/)**
 * **[ifmo-code](https://github.com/DimaStoyanov/Ifmo-code)** by **[@DimaStoyanov](https://github.com/DimaStoyanov)**
+* Some repos by **[@Oktai15](https://github.com/Oktai15)**
+* Some repos by **[@Katsz](https://github.com/Katsz)**
 * ... here could be your advertising
 
 ### License
