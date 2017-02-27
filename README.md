@@ -33,6 +33,8 @@ Sometimes you can find some submodules (remote repositories). It's worth paying 
 * Some repos by **[@Katsz](https://github.com/Katsz)**
 * ... here could be your advertising
 
+There's another one repo - **[ifmo-code-is](https://github.com/woofilee/ifmo-code-is)** - created by **[me](https://github.com/woofilee)** with a code for *Information Systems Chair*.
+
 ### License
 
 There is no license due to it's my private code, that means you have no permission to use, modify, or share the code in this repo.  
