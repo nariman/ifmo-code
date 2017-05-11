@@ -1,0 +1,29 @@
+{
+    "bin": [
+        "junit-4.11",
+        "hamcrest-core-1.3",
+        "hw-1/WalkTest"
+    ],
+    "build": {
+        "task": [
+            "ru/ifmo/ctddev/safiulin/walk/*.java"
+        ],
+        "tests": [
+            "info/kgeorgiy/java/advanced/walk/*.java"
+        ]
+    },
+    "test": {
+        "difficulties": [
+            "easy",
+            "hard"
+        ],
+        "testers": {
+            "easy": "info.kgeorgiy.java.advanced.walk.Tester Walk",
+            "hard": "info.kgeorgiy.java.advanced.walk.Tester RecursiveWalk"
+        },
+        "entries": {
+            "easy": "ru.ifmo.ctddev.safiulin.walk.Walker zzzz",
+            "hard": "ru.ifmo.ctddev.safiulin.walk.Walker zzzz"
+        }
+    }
+}

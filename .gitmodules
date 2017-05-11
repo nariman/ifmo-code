@@ -64,3 +64,6 @@
 [submodule "math-logic/logic2016"]
 	path = math-logic/logic2016
 	url = https://github.com/shd/logic2016.git
+[submodule "java-advanced/java-advanced-2017"]
+	path = java-advanced/java-advanced-2017
+	url = https://github.com/kgeorgiy/java-advanced-2017

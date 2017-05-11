@@ -20,6 +20,7 @@ Disciplines:
 * **[android](android/)** - Android
 * **[cpp](cpp/)** - C/C++ language
 * **[discrete-math](discrete-math/)** - Discrete Math
+* **[java-advanced](java-advanced/)** - Java Technologies (Java Advanced)
 * **[math-logic](math-logic/)** - Math Logic
 * **[programming-paradigms](programming-paradigms/)** - Programming Paradigms (Java, JavaScript, Clojure)
 
