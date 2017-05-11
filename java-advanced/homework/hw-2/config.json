@@ -1,0 +1,29 @@
+{
+    "bin": [
+        "junit-4.11",
+        "hamcrest-core-1.3",
+        "hw-2/ArraySetTest"
+    ],
+    "build": {
+        "task": [
+            "ru/ifmo/ctddev/safiulin/arrayset/*.java"
+        ],
+        "tests": [
+            "info/kgeorgiy/java/advanced/arrayset/*.java"
+        ]
+    },
+    "test": {
+        "difficulties": [
+            "easy",
+            "hard"
+        ],
+        "testers": {
+            "easy": "info.kgeorgiy.java.advanced.arrayset.Tester SortedSet",
+            "hard": "info.kgeorgiy.java.advanced.arrayset.Tester NavigableSet"
+        },
+        "entries": {
+            "easy": "ru.ifmo.ctddev.safiulin.arrayset.ArraySet",
+            "hard": "ru.ifmo.ctddev.safiulin.arrayset.ArraySet"
+        }
+    }
+}
