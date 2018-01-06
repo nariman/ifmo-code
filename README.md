@@ -36,7 +36,7 @@ Sometimes you can find some submodules (remote repositories). It's worth paying 
 * Some repos by **[@Katsz](https://github.com/Katsz)**
 * ... here could be your advertising
 
-### FAQ
+### Mini FAQ
 
 #### I need a statement for problem X...
 I didn't attach statements due to most of them are typical, or you can guess the initial statement by source code.
@@ -47,6 +47,10 @@ Yep.
 * It's easier to maintain in this case
 * It's harder to copy-paste multiple files at once 😈
 * It's easy to merge w/ a Google Drive repository, where my other edu-related documents are located
+
+#### Where I can find your boilerplate code for labs?
+For Kotlin template - [here](https://gist.github.com/narimansafiulin/ff7e8cd7ededa9ad77c8ed28dbb3bb15).  
+For Java template (slightly outdated, compared to the Kotlin template) - [here](https://gist.github.com/narimansafiulin/113d9b9d60e6678eb8602774f20070e6).
 
 ### License
 
