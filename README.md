@@ -1,5 +1,5 @@
 # ITMO University
-### Computer Technologies Chair / Information Technologies and Programming Faculty / Internet Technologies and Programming MegaFaculty
+### Computer Technologies Chair and Information Systems Chair / Information Technologies and Programming Faculty / Translational Information Technologies MegaFaculty
 
 Completely all source code, written by me while at ITMO University, except some project's sources.  
 It's not an "open-source project", that means code style sometimes leaves a lot to be desired, but I did my best.
@@ -12,19 +12,21 @@ Thanks.
 
 ### Repository structure
 
-Sources, that belongs to discipline of current term, not merged to the master branch.  
+Sources, that belongs to the discipline of the current term, not merged to the master branch.  
 See topic branches for latest changes.
 
 Disciplines:
-* **[algorithms](algorithms/)** - Algorithms and Data Structures
-* **[android](android/)** - Android
-* **[cpp](cpp/)** - C/C++ language
-* **[discrete-math](discrete-math/)** - Discrete Math
-* **[java-advanced](java-advanced/)** - Java Technologies (Java Advanced)
-* **[math-logic](math-logic/)** - Math Logic
-* **[programming-paradigms](programming-paradigms/)** - Programming Paradigms (Java, JavaScript, Clojure)
+* *CT* **[algorithms](algorithms/ct)** - Algorithms and Data Structures - *1-3 term*
+* *IS* **[algorithms](algorithms/is)** - Algorithms and Data Structures - *5 term*
+* *CT* **[android](android/)** - Android - *3 term*
+* *CT* **[cpp](cpp/)** - C/C++ language - *2 term*
+* *CT* **[discrete-math](discrete-math/)** - Discrete math - *1-3 term*
+* *CT* **[java-advanced](java-advanced/)** - Java technologies (Java advanced) - *4 term*
+* *CT* **[math-logic](math-logic/)** - Math logic - *3 term*
+* *CT* **[programming-paradigms](programming-paradigms/)** - Programming paradigms (Java, JavaScript, Clojure) - *2 term*
+* *IS* **[web](web/)** - Web programming - *5 term*
 
-Sometimes you can find some submodules (remote repositories). It's worth paying attention to them.
+Sometimes you can find some submodules (remote repositories). It's worth paying attention to them, because they're contains initial sources, statements or other useful things.
 
 ### Related
 
@@ -34,7 +36,17 @@ Sometimes you can find some submodules (remote repositories). It's worth paying 
 * Some repos by **[@Katsz](https://github.com/Katsz)**
 * ... here could be your advertising
 
-There's another one repo - **[ifmo-code-is](https://github.com/narimansafiulin/ifmo-code-is)** - created by **[me](https://github.com/narimansafiulin)** with a code for *Information Systems Chair*.
+### FAQ
+
+#### I need a statement for problem X...
+I didn't attach statements due to most of them are typical, or you can guess the initial statement by source code.
+But feel free to create a new issue w/ a ref. to the problem. I'll provide you a link to the problem set PDF, or describe it myself.
+
+#### Monolithic repository?!?
+Yep.
+* It's easier to maintain in this case
+* It's harder to copy-paste multiple files at once 😈
+* It's easy to merge w/ a Google Drive repository, where my other edu-related documents are located
 
 ### License
 
