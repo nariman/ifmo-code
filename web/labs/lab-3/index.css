@@ -1,0 +1,141 @@
+.navbar {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    transition: all ease-in-out .2s;
+    padding-top: 1rem;
+}
+
+.navbar-brand img {
+    max-height: 3rem;
+    filter: grayscale();
+}
+
+.carousel {
+    margin-bottom: 4rem;
+}
+
+.carousel-caption {
+    bottom: 3rem;
+    z-index: 10;
+}
+
+.carousel-item {
+    height: 36rem;
+    background-color: #000;
+}
+
+.carousel-item > img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    min-width: 100%;
+    opacity: .5;
+}
+
+section.product-lists {
+    text-align: center;
+}
+
+section.product-lists,
+section.product-lists h2,
+section.product-lists .btn {
+    font-weight: 300;
+}
+
+section.product-lists .row > div {
+    margin-bottom: 2rem;
+}
+
+section.product-lists .product-img {
+    width: 200px;
+    height: 200px;
+    overflow: hidden;
+    margin: 0 auto 1rem;
+}
+
+section.product-lists .product-img img {
+    max-height: 100%;
+}
+
+section .container {
+    margin-top: 3rem;
+    margin-bottom: 3rem;
+}
+
+section .section-header {
+    height: 20rem;
+    position: relative;
+    overflow: hidden;
+    background: #000;
+}
+
+section .section-header img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    opacity: .5;
+}
+
+section .section-header h2 {
+    position: absolute;
+    top: 8rem;
+    left: 0;
+    right: 0;
+    text-align: center;
+    color: #fff;
+    z-index: 100;
+}
+
+section.about .row {
+    margin-top: 1rem;
+}
+
+@media only screen and (max-width: 768px) {
+    section.contacts {
+        text-align: center;
+    }
+}
+
+footer {
+    background: #212121;
+}
+
+footer img.logo {
+    max-width: 150px;
+    filter: grayscale();
+}
+
+footer li {
+    margin-top: 1rem;
+}
+
+footer a {
+    text-decoration: underline;
+    color: #dedede;
+}
+
+footer a:hover,
+footer a:focus,
+footer a:active {
+    text-decoration: none;
+    color: #dedede;
+}
+
+footer .footer-light-text {
+    color: #dedede;
+}
+
+@media only screen and (max-width: 992px) {
+    footer {
+        text-align: center;
+    }
+
+    footer div.row > div + div {
+        margin-top: 1rem;
+    }
+}
