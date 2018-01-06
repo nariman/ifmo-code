@@ -1,0 +1,49 @@
+body {
+    background-color: #0f0f0f;
+}
+
+button {
+    background-color: transparent;
+    border: 2px solid #4CAF50;
+    border-radius: 2px;
+    color: white;
+    cursor: pointer;
+    display: block;
+    font-size: 16px;
+    margin: 16px auto;
+    outline: none;
+    padding: 16px 32px;
+    text-align: center;
+    text-decoration: none;
+    transition-duration: 0.4s;
+}
+
+button:hover,
+button:focus,
+button:active {
+    background-color: #4CAF50;
+}
+
+button:disabled {
+    background-color: #E7E7E7;
+    border: 2px solid #E7E7E7;
+    cursor: default;
+}
+
+input {
+    background-color: transparent;
+    border: 0;
+    color: white;
+    display: block;
+    font-size: 16px;
+    margin: 16px auto;
+    outline: none;
+    padding: 16px 32px;
+    text-align: center;
+    width: 90%;
+}
+
+canvas {
+    display: block;
+    margin: 16px auto;
+}
