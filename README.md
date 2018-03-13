@@ -24,6 +24,7 @@ Disciplines:
 * *CT* **[java-advanced](java-advanced/)** - Java technologies (Java advanced) - *4 term*
 * *CT* **[math-logic](math-logic/)** - Math logic - *3 term*
 * *CT* **[programming-paradigms](programming-paradigms/)** - Programming paradigms (Java, JavaScript, Clojure) - *2 term*
+* *IS* **[programming-technologies](programming-technologies/)** - Programming technologies - *6 term*
 * *IS* **[web](web/)** - Web programming - *5 term*
 
 Sometimes you can find some submodules (remote repositories). It's worth paying attention to them, because they're contains initial sources, statements or other useful things.
