@@ -17,7 +17,7 @@ See topic branches for latest changes.
 
 Disciplines:
 * *CT* **[algorithms](algorithms/ct)** - Algorithms and Data Structures - *1-3 term*
-* *IS* **[algorithms](algorithms/is)** - Algorithms and Data Structures - *5 term*
+* *IS* **[algorithms](algorithms/is)** - Algorithms and Data Structures - *5-6 term*
 * *CT* **[android](android/)** - Android - *3 term*
 * *CT* **[cpp](cpp/)** - C/C++ language - *2 term*
 * *CT* **[discrete-math](discrete-math/)** - Discrete math - *1-3 term*
