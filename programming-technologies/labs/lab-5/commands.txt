@@ -1,0 +1,9 @@
+Task #1,2
+
+javac -cp ".\lib\derbyclient.jar;.\src" .\src\com\javatunes\JDBCTest.java
+java -cp ".\lib\derbyclient.jar;.\src" com.javatunes.JDBCTest
+
+Task #3,4,5
+
+javac -cp ".\lib\derbyclient.jar;.\src" .\src\com\javatunes\ItemDAOMain.java
+java -cp ".\lib\derbyclient.jar;.\src" com.javatunes.ItemDAOMain
