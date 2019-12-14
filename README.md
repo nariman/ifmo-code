@@ -50,8 +50,8 @@ Yep.
 * It's easy to merge w/ a Google Drive repository, where my other edu-related documents are located
 
 #### Where I can find your boilerplate code for labs?
-For Kotlin template - [here](https://gist.github.com/narimansafiulin/ff7e8cd7ededa9ad77c8ed28dbb3bb15).  
-For Java template (slightly outdated, compared to the Kotlin template) - [here](https://gist.github.com/narimansafiulin/113d9b9d60e6678eb8602774f20070e6).
+For Kotlin template - [here](https://gist.github.com/nariman/ff7e8cd7ededa9ad77c8ed28dbb3bb15).  
+For Java template (slightly outdated, compared to the Kotlin template) - [here](https://gist.github.com/nariman/113d9b9d60e6678eb8602774f20070e6).
 
 ### License
 
